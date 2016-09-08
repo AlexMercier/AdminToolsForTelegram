@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="actionDeleteGroup">Eliminar grupo</string>
+    <string name="action_ban_user">Banear usuario</string>
+    <string name="action_banlist">Lista de Ban</string>
+    <string name="action_change_user">Cerrar sesion</string>
+    <string name="action_chats_info">Info de chats</string>
+    <string name="action_chk_show_channels">Mostrar canales</string>
+    <string name="action_chk_show_only_created">Mostrar solo los grupos que he creado</string>
+    <string name="action_clear_log">Limpiar todo el log de eventos</string>
+    <string name="action_copy">Copiar</string>
+    <string name="action_copy_link">Copiar link al portapapeles</string>
+    <string name="action_group_was_converted">El grupo ha sido convertido a supergrupo</string>
+    <string name="action_log">Log de eventos</string>
+    <string name="action_manage_channel">Administrar canal</string>
+    <string name="action_manage_chat_users">Administrar usuarios</string>
+    <string name="action_manage_group">Administrar chat</string>
+    <string name="action_open_chat_info">Abrir la info de chat</string>
+    <string name="action_open_group_link">Abrir grupo en Telegram</string>
+    <string name="action_open_userninfo">Abrir la informacion del usuario</string>
+    <string name="action_remove_deleted_users">Eliminar usuarios expulsado en este chat</string>
+    <string name="action_remove_from_ban">Remover de la lista de ban</string>
+    <string name="action_remove_user_from_chat">Eliminar usuario de este chat</string>
+    <string name="action_rename">Renombrar</string>
+    <string name="action_reset_warns">Resetear contador de anti spam</string>
+    <string name="action_return_to_chat">Regresar al chat</string>
+    <string name="action_set_as_admin">Añadir como admin</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="action_show_log_notification">Mostrar notificaciones del log</string>
+    <string name="action_unban_all">Desbanear a todos</string>
+    <string name="adminsCount">Admins:</string>
+    <string name="auth_cloud_pass_hint">Introduce tu constraseña en la nube</string>
+    <string name="auth_confirmcode_hint">introduce el codigo de activacion enviado por sms</string>
+    <string name="auth_phone_hint">Introduce tu numero de telefono</string>
+    <string name="ban_reason">Motivo del ban</string>
+    <string name="ban_soft_hint">"Nota: la app oficial de Telegram no tiene herramienta interna para ban temporal, por lo que esta app usa una lista de ban propia.
+\nUn usuario con ban temporal, solo podra ser eliminado de la lista si tu telefono esta conectado. Si desinstalas o reinstalas esta app, la lista de ban se perdera. Puedes exportar la lista en ajustes."</string>
+    <string name="btnContinue">Continuar</string>
+    <string name="btnSave">Guardar</string>
+    <string name="btn_submit">Enviar</string>
+    <string name="btn_yes">Si</string>
+    <string name="button_delete">Borrar</string>
+    <string name="button_rate_us">Si te gusta esta app, haz click para puntuarla en google play</string>
+    <string name="cancel">Cancelar</string>
+    <string name="caption_autostart">Auto inicio</string>
+    <string name="caption_enter_value">Introduce un nuevo valor:</string>
+    <string name="caption_users_whitelist">Lista blanca de usuarios</string>
+    <string name="changeChatAbout">Cambiar descripcion</string>
+    <string name="chatOwner">Propietario:</string>
+    <string name="chatType">Tipo:</string>
+    <string name="chatTypeChannel">Canal</string>
+    <string name="chatTypeGroup">Grupo</string>
+    <string name="chatTypeSuperGroup">Supergrupo</string>
+    <string name="chat_title">Titulo del chat</string>
+    <string name="check_BanForWordBlackList">Banear usuario</string>
+    <string name="check_allow_mention_links">Activar mencion en los links</string>
+    <string name="check_allow_stickers_links">Activar links para stickers</string>
+    <string name="check_anyone_can_change_chat">Todos pueden cambiar el titulo, la foto o invitar amigos</string>
+    <string name="check_anyone_can_invite">Todos pueden invitar amigos</string>
+    <string name="check_autostart">Auto arranque en el inicio</string>
+    <string name="check_delMsgBlackWords">Eliminar mensajes que contengan palabras de la lista negra</string>
+    <string name="check_enabled">Activar</string>
+    <string name="check_ignore_antispam_for_shared">Ignorar las reglas de antispam para contactos mutuos</string>
+    <string name="check_remove_joined_message">"Eliminar el mensaje de 'usuario se ha unido'"</string>
+    <string name="check_remove_leaved_message">"Eliminar el mensaje de 'usuario se ha ido'"</string>
+    <string name="check_return_after_bantime_expired">Volver al chat cuando el tiempo de ban termine</string>
+    <string name="chkSendBanReasonToChat">Enviar razon al chat</string>
+    <string name="chkTitleBanForSticks">Ban para stickers</string>
+    <string name="chkWarnBeforeBanWord">Avisar antes del ban</string>
+    <string name="chk_remove_messages_links">Eliminar mensajes con links</string>
+    <string name="chk_remove_messages_stickers">Eliminar mensajes con stickers</string>
+    <string name="chtTitleAlertOnBlackWordBan">Notificar al chat del ban</string>
+    <string name="chtTitleBanForLinks">Ban por links</string>
+    <string name="close">Cerrar</string>
+    <string name="create_chat_title">Titulo del chat</string>
+    <string name="create_group">Crear grupo</string>
+    <string name="create_supergroup">Crear supergrupo</string>
+    <string name="deleted_accounts_hint">"Noticia: Telegram no permite borrar usuarios que han eliminado su cuenta, pero su cuenta sera eliminada tras 1 semana.\nAsi que no te preocupes por ello"</string>
+    <string name="dialog_group_all_are_admins">"Este grupo ha sido marcado como todos admines.\nQuieres que solo los admines lo administren?"</string>
+    <string name="dialog_new_chat_title">Crear grupo</string>
+    <string name="dialog_text_logout">Seguro que quieres cerrar sesion?</string>
+    <string name="dialog_title_auth">Auth</string>
+    <string name="dialog_title_edit_link">Link publico</string>
+    <string name="dialog_title_logout">Cerrar sesion</string>
+    <string name="edit_chat_about_hint">Introduce la descripcion del grupo</string>
+    <string name="error_empty_chat_title">El titulo no puede quedar vacio</string>
+    <string name="error_link_already_occupied">Error: El link esta ocupado</string>
+    <string name="error_too_many_public_links">Tienes creados demasiados canales publicos</string>
+    <string name="founded_deleted_users">"Se han encontrado %s cuentas eliminadas. Removerlas del grupo?\nEsto llevara algun tiempo"</string>
+    <string name="generate_invite_link">Generar link de invitacion</string>
+    <string name="generate_new_invite_link">Generar otro link de invitacion</string>
+    <string name="group_created">Grupo creado</string>
+    <string name="hint_blackwords">Introduce alguna palabra en otra linea</string>
+    <string name="hint_chat_description">Descripcion del chat</string>
+    <string name="hint_each_whitelink_at_new_line">Introduce el link en una nueva linea</string>
+    <string name="hint_enter_chat_title">Introduce el titulo del chat</string>
+    <string name="hint_enter_welcome_text">Introduce el texto de bienvenida para los usuarios que se unan</string>
+    <string name="hint_invite_link_not_created">Click para crear link de invitacion</string>
+    <string name="hint_no_chat_about">Toca para añadir descripcion del chat</string>
+    <string name="hint_short_link_not_created">El link corto no ha sido creado</string>
+    <string name="hint_upgrade_to_supergroup">"Puedes convertir este grupo en supergrupo"</string>
+    <string name="hint_warntext_links">Texto de noticia para link</string>
+    <string name="hint_warntext_stickers">Texto de noticia para stickers</string>
+    <string name="input_edit_chat_about">Introduce descripcion del chat</string>
+    <string name="input_new_chat_title">Introduce nueva descripcion del chat</string>
+    <string name="kickedCount">Expulsado:</string>
+    <string name="labelAutoBanRules">Reglas de Antispam</string>
+    <string name="labelOther">Otro</string>
+    <string name="labelWelcomeTextForJoinedUsers">Texto de bienvenida para nuevos usuarios</string>
+    <string name="label_allow_count">Contador activado para cada usuario</string>
+    <string name="label_ban_for_time">Baneado por:</string>
+    <string name="label_ban_period">Duracion del ban</string>
+    <string name="label_ban_time_prefix">para</string>
+    <string name="label_banwords_warntext">Mensaje de aviso:</string>
+    <string name="label_empty">La lista esta vacia</string>
+    <string name="label_loading">Cargando...</string>
+    <string name="label_loading_chats_count">Cargando chats...</string>
+    <string name="label_note_ban_simple_groups">Nota: En no supergrupos lan lista de ban está ausente , por lo que esta aplicación sólo se iniciará cuando el usuario trate de volver al chat.</string>
+    <string name="label_notice_ignore_antispam_for_shared">Ignorar las reglas para los contactos compartidos está activada en Ajustes</string>
+    <string name="label_total_groups">Total:</string>
+    <string name="last_seen_at">ultima vez a</string>
+    <string name="logAction_autoUnban">Remover usuario de la lista de ban cuando este termine</string>
+    <string name="logAction_autokick">El autokick expulsara al usuario si intenta regresar al chat</string>
+    <string name="logAction_banForBlackWord">Ban por palabra</string>
+    <string name="logAction_banForLink">Ban por spam</string>
+    <string name="logAction_banForSticker">Ban por flood de stickers</string>
+    <string name="logAction_banUser">Has baneado al usuario</string>
+    <string name="logAction_banwordsFloodWarn">Avisar al usuario por usar palabras de la lista negra</string>
+    <string name="logAction_delMsgWithBlackWord">Mensaje eliminado con la palabra prohibida</string>
+    <string name="logAction_linksFloodWarn">Advertir al usuario sobre el ban</string>
+    <string name="logAction_removeLink">Mensaje eliminado con el url</string>
+    <string name="logAction_removeSticker">Mensaje eliminado con sticker</string>
+    <string name="logAction_return_to_chat">Retornar al usuario cuando el tiempo de ban finalice</string>
+    <string name="logAction_stickersFloodWarn">Avisar al usuario sobre stickers-flood</string>
+    <string name="logAction_unbanByAdminInvite">Desbanear con invitacion del admin</string>
+    <string name="mesage_user_banned_banword">Usuario %1$s ha sido baneado por palabra prohibida</string>
+    <string name="message_confirm_revoke_link">"Seguro que quieres generar un nuevo link?\nEl anterior link sera desactivado."</string>
+    <string name="msg_confirm_unban_all">Seguro que quieres desbanear a todos los usuarios desbaneados?</string>
+    <string name="msg_unban_all_supergroup">Nota: Esta operacion puede ser detenida por Telegram si tienes muchos usuarios baneados!</string>
+    <string name="noteAntispamLinks">Nota: Las reglas se ignoraran para los admins.</string>
+    <string name="notification_show_hint">Toca para ver el log de eventos</string>
+    <string name="online_last_seen">ultima vez recientemente</string>
+    <string name="participiantsCount">Participantes:</string>
+    <string name="revoke_user_admin">Quitar privilegios de admin</string>
+    <string name="role_action_switch_continue">Cambiar y continuar</string>
+    <string name="role_editor">Admin</string>
+    <string name="role_editor_description_supegroup">El admin puede invitar usuarios baneados, cambiar la foto del grupo, borrar mensajes de todos...</string>
+    <string name="role_moderator">Moderador</string>
+    <string name="role_moderator_description_supergroup">El moderador solo puede borrar mensajes</string>
+    <string name="selectBanForever">Ban permanente</string>
+    <string name="selectBanTemporary">Ban temporal</string>
+    <string name="textChatRole">Rol:</string>
+    <string name="textRoleAdmin">Administrador</string>
+    <string name="textRoleModerator">Moderador</string>
+    <string name="text_about_app">Tools for Telegram messenger te ayudara a administrar tus grupos.</string>
+    <string name="text_all_are_admins_group">Todos los miembros son admins</string>
+    <string name="text_appstate_enabled">Aplicacion activada</string>
+    <string name="text_appstate_stopped">Aplicacion detenida</string>
+    <string name="text_ban_permanently">Ban permanente</string>
+    <string name="text_ban_temporary">Ban temporal. Expira en:</string>
+    <string name="text_ban_time">Fecha del ban:</string>
+    <string name="text_confirm_deletion_group">"Seguro que quieres eliminar este grupo?\nEsta accion no se puede deshacer!"</string>
+    <string name="text_delete_group">Si, borrar este grupo</string>
+    <string name="text_publish_banreason">Usuario %1$s ha sido baneado por la razon: %2$s</string>
+    <string name="text_unban_time">El ban expira en:</string>
+    <string name="titleEditChatDescription">Descripcion del chat</string>
+    <string name="titleLogLifetime">Limpiar el log despues</string>
+    <string name="titleManagingGroups">Administrando grupos</string>
+    <string name="titleRemoveLinksWhiteList">Lista blanca en los link de anti spam:</string>
+    <string name="title_activity_banlist">Ban list</string>
+    <string name="title_ban_age">Tiempo de ban:</string>
+    <string name="title_ban_list">Lista de ban</string>
+    <string name="title_change_value">Cambiar valor</string>
+    <string name="title_delete_group">Borrar grupo</string>
+    <string name="title_group_info">Administrar grupo</string>
+    <string name="title_list_of_banned_words">La lista de palabras prohibidad en el chat. Cada palabra en una nueva linea</string>
+    <string name="title_users">Miembros del chat</string>
+    <string name="toast_access_denied_admin">"Acceso denegado.\nSolo el creador puede editar esta opcion"</string>
+    <string name="toast_banlist_empty">La lista de ban esta vacia</string>
+    <string name="toast_chat_link_added">Link cambiado</string>
+    <string name="toast_copied_to_clipboard">Texto copiado al portapapeles</string>
+    <string name="toast_deletion_not_avail">Borrar solo disponible para supergrupos</string>
+    <string name="toast_group_deleted">Grupo borrado</string>
+    <string name="toast_user_role_changed">Rol del usuario cambiada</string>
+    <string name="toast_user_unblacklisted">Usuario removido de la lista negra</string>
+    <string name="toast_user_was_restored_to_chat">El usuario ha vuelto al chat</string>
+    <string name="user_type_deleted">Cuenta eliminada</string>
+    <string name="warntext_banword_first">Primer aviso. El uso de palabras prohibidas no esta permitido</string>
+    <string name="warntext_banword_last">Ultimo aviso. El uso de palabras prohibidas no esta permitido</string>
+    <string name="warntext_links_default_firts">Primer aviso. Deja el spam</string>
+    <string name="warntext_links_default_last">Ultimo aviso. Deja el spam</string>
+    <string name="warntext_stickers_default_first">Primer aviso. Flood con stickers</string>
+    <string name="warntext_stickers_default_last">Ultimo aviso. Flood con stickers</string>
+    <string name="whitelist_links_description">(cada link en una linea nueva)</string>
+
+    <string name="crash_dialog_sendok">El reporte ha sido enviado, gracias</string>
+    <string name="crash_dialog_text">"Disculpe, la app se ha cerrado!\nPor favor, envia el error para arreglarlo"</string>
+    <string name="lang_code">es</string>
+
+    <string name="about_translator">Ivan Lazcano</string>
+    
+    <string-array name="ban_times">
+        <item>Min.</item>
+        <item>Hour.</item>
+        <item>Day.</item>
+        <item>Month.</item>
+    </string-array>
+
+    <string-array name="auto_ban_times">
+        <item>Forever</item>
+        <item>Min.</item>
+        <item>Hour.</item>
+        <item>Day.</item>
+    </string-array>
+
+    <string-array name="log_lifetime">
+        <item>Month</item>
+        <item>Week</item>
+        <item>3 days</item>
+        <item>1 day</item>
+    </string-array>
+
+
+</resources>

@@ -93,6 +93,8 @@
                 android:layout_marginTop="8dp" />
 
 
+
+
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -130,6 +132,19 @@
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_horizontal"
                 android:padding="8dp" />
+
+
+            <TextView android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/thnaksTo"
+                android:text="@string/app_thanks_to"/>
+            <TextView
+                android:textStyle="italic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/thnaksToList"
+                android:text="@string/thanks_to_list"/>
 
 
         </LinearLayout>
