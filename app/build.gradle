@@ -1,0 +1,118 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+    def arch = "x86" //x86 v7a
+
+    sourceSets.main {
+        jniLibs.srcDir 'src/main/libs'
+        jni.srcDirs = [] //disable automatic ndk-build call
+    }
+
+    lintOptions {
+        // use this line to check all rules except those listed
+        disable 'InvalidPackage'
+        disable 'MissingTranslation'
+    }
+
+    defaultConfig {
+        applicationId "com.madpixels.tgadmintools"
+        minSdkVersion 11
+        targetSdkVersion 23
+        versionCode 40
+        if(arch=="v7a"){
+            versionCode versionCode + 1
+        }
+        versionName "1.0.0"
+
+        def buildDate = "15.07.2016"
+        resValue "string", "buildDate", buildDate
+    }
+
+
+
+    signingConfigs {
+        debug {
+            storeFile file("S:\\android_studio\\!keys\\gemob_silent\\gemobkey_debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+
+        def appName
+        if (project.hasProperty("applicationName")) {
+            appName = applicationName
+        } else {
+            appName = parent.name
+        }
+
+
+        release {
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        def fileName = "${appName}_v${versionName}_b${versionCode}_${arch}.apk"
+                        output.outputFile = new File(outputFile.parent, fileName)
+                    }
+                }
+            }
+        }
+    }
+
+    buildTypes {
+
+        release {
+            debuggable false
+            jniDebuggable false
+            minifyEnabled false
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+
+        }
+    }
+
+    productFlavors {
+        production {
+            /**
+             * production flavor use my ad library classes in AdHelper.java, so you can leave 'dev' flavor
+             **/
+            sourceSets {
+                main {
+                    java {
+                        // exclude '**/Updater.java'
+                    }
+                }
+            }
+            ndk {
+                if (arch == "x86") {
+                    abiFilter "x86"
+                } else {
+                    abiFilter "armeabi-v7a"
+                }
+            }
+        }
+
+        dev {
+            ndk {
+                if (arch == "x86") {
+                    abiFilter "x86"
+                } else {
+                    abiFilter "armeabi-v7a"
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    productionCompile fileTree(include: ['*.jar'], dir: 'libs\\appodeal')
+    productionCompile 'com.google.android.gms:play-services-ads:7.3.0'
+    compile project(':AppHelperLib')
+    compile 'io.github.rockerhieu:emojicon:1.4.1'
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'ch.acra:acra:4.9.0'
+    compile 'com.yandex.android:mobmetricalib:2.41@aar'
+}

@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <include layout="@layout/toolbar" />
+
+    <View
+        android:id="@+id/dummyFocus"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <requestFocus />
+    </View>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/adView"
+        android:layout_below="@id/toolbar"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:id="@+id/prgLoading"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" />
+
+        <ScrollView
+            android:id="@+id/scrollViewMainContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <ImageButton
+                        android:id="@+id/imgBtnChatAva"
+                        android:layout_width="50px"
+                        android:layout_height="50px"
+                        android:background="@null"
+                        android:src="@drawable/no_avatar"
+                        android:scaleType="fitCenter" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:orientation="vertical">
+
+                        <io.github.rockerhieu.emojicon.EmojiconTextView
+                            android:id="@+id/tvTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Chat title" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/textView9"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="4dp"
+                                android:text="@string/chatOwner" />
+
+                            <io.github.rockerhieu.emojicon.EmojiconTextView
+                                android:id="@+id/tvMainAdmin"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Main admin"
+                                android:textColor="@color/text_clickable" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="4dp"
+                                android:text="@string/chatType" />
+
+                            <TextView
+                                android:id="@+id/tvChatType"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="..." />
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="16dp"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:id="@+id/tvChatUsername"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="\@username"
+                        android:textColor="@color/text_clickable" />
+
+                    <TextView
+                        android:id="@+id/tvInviteLink"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="abcdefg...."
+                        android:textColor="@color/text_clickable" />
+
+                    <CheckBox
+                        android:id="@+id/chkAnyoneInviteFriendsSuper"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="@string/check_anyone_can_invite" />
+
+                    <ProgressBar
+                        android:id="@+id/prgChangeState"
+                        style="?android:attr/progressBarStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:visibility="gone" />
+
+                    <CheckBox
+                        android:id="@+id/chkAnyoneManageGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="@string/check_anyone_can_change_chat" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/viewChatDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:background="@color/md_white_1000"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hint_chat_description"
+                        android:textColor="@color/md_blue_600"
+                        android:textStyle="bold" />
+
+
+                    <io.github.rockerhieu.emojicon.EmojiconTextView
+                        android:id="@+id/tvChatDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="@string/hint_chat_description" />
+
+                </LinearLayout>
+
+
+                <Button
+                    android:id="@+id/btnConvertToSuper"
+                    style="@style/MyButton"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="Upgrade to supergroup" />
+
+                <LinearLayout
+                    android:id="@+id/counters"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:id="@+id/tvAdminsCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="4dp"
+                        android:paddingTop="4dp"
+                        android:text="Admins: 999"
+                        android:textColor="@color/md_teal_500" />
+
+                    <TextView
+                        android:id="@+id/tvUsersCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="4dp"
+                        android:paddingTop="4dp"
+                        android:text="Users: 999"
+                        android:textColor="@color/md_teal_500" />
+
+                    <TextView
+                        android:id="@+id/tvKickedCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="4dp"
+                        android:paddingTop="4dp"
+                        android:text="Kicked: 999"
+                        android:textColor="@color/md_teal_500" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:background="@color/md_white_1000"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:id="@+id/textView20"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/labelWelcomeTextForJoinedUsers"
+                        android:textColor="@color/md_blue_600"
+                        android:textStyle="bold" />
+
+                    <CheckBox
+                        android:id="@+id/chkWelcomeText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="@string/check_enabled" />
+
+                    <EditText
+                        android:id="@+id/edtWelcomeText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_enter_welcome_text"
+                        android:lines="1"
+                        android:maxLines="4" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:background="@color/md_white_1000"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/labelOther"
+                        android:textColor="@color/md_blue_600"
+                        android:textStyle="bold" />
+
+                    <CheckBox
+                        android:id="@+id/chkRemoveJoinedMsg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="@string/check_remove_joined_message" />
+
+                    <CheckBox
+                        android:id="@+id/chkRemoveLeaveMsg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="@string/check_remove_leaved_message" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/layerAutoban"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:background="@color/md_white_1000"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/labelAutoBanRules"
+                        android:textColor="@color/md_blue_600" />
+
+                    <TextView
+                        android:id="@+id/textView14"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/noteAntispamLinks" />
+
+                    <TextView
+                        android:id="@+id/tvNoticePhoneBookEnabled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/noteAntispamLinks" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp">
+
+
+
+
+                        <LinearLayout
+                            android:id="@+id/layer_links_antispam"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" android:layout_marginBottom="16dp"></LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/layer_stickers_antispam"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" android:layout_marginBottom="16dp"></LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/layer_words_antispam"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/md_blue_grey_50"
+                            android:orientation="vertical"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp"
+                            android:visibility="gone">
+
+                            <CheckBox
+                                android:id="@+id/chkImageAntiFlood"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:checked="false"
+                                android:text="Ban for Images Flood" />
+
+
+                            <LinearLayout
+                                android:id="@+id/layerBanImages"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:id="@+id/textView10"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Flood within:" />
+
+                                    <EditText
+                                        android:id="@+id/editText"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="50" />
+
+                                    <TextView
+                                        android:id="@+id/textView23"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="minutes" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/label_allow_count"
+                                    android:textAppearance="?android:attr/textAppearanceSmall"
+                                    android:visibility="visible" />
+
+                                <TextView
+                                    android:id="@+id/tvBanImagesWarningCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:layout_toRightOf="@+id/textView12"
+                                    android:text="10"
+                                    android:textAppearance="?android:attr/textAppearanceSmall"
+                                    android:textStyle="bold" />
+
+                                <SeekBar
+                                    android:id="@+id/seekBarBanImagesCount"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_toLeftOf="@+id/tvBanSticksWarningCount"
+                                    android:layout_toStartOf="@+id/tvBanSticksWarningCount"
+                                    android:indeterminate="false"
+                                    android:max="100"
+                                    android:progress="1" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="16dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:visibility="visible">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0"
+                                        android:text="@string/title_ban_age"
+                                        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                                    <EditText
+                                        android:id="@+id/edtImagesBanAgeVal"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1.2"
+                                        android:ems="10"
+                                        android:gravity="center_horizontal"
+                                        android:inputType="number"
+                                        android:text="5" />
+
+                                    <Spinner
+                                        android:id="@+id/spinnerImagesSticksAge"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0" />
+                                </LinearLayout>
+
+
+                                <CheckBox
+                                    android:id="@+id/chkReturnOnBanImagesExpired"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="false"
+                                    android:text="@string/check_return_after_bantime_expired" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"></LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menu_action_chats_info"
+        android:title="@string/action_chats_info"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/menu_action_create_group"
+        android:title="@string/create_group"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/menu_action_create_supergroup"
+        android:title="@string/create_supergroup"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/menu_action_settings"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/menu_action_log"
+        android:title="@string/action_log"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/menu_action_show_created_groups"
+        android:checkable="true"
+        android:title="@string/action_chk_show_only_created"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/menu_action_show_channels"
+        android:checkable="true"
+        android:title="@string/action_chk_show_channels"
+        app:showAsAction="never" />
+
+</menu>

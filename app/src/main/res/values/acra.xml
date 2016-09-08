@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name = "crash_dialog_title">@string/app_name</string>
+    <string name = "crash_dialog_sendok">Report has been sent. Thanks</string>
+    <string name = "crash_dialog_text">Sorry. Application was crashed!\nPlease send error report to help fix error</string>
+
+
+
+
+</resources>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.madpixels.tgadmintools"
+    android:installLocation="auto">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.network" android:required="false" />
+
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity  android:theme="@style/Toolbar"
+            android:name="com.madpixels.tgadmintools.activity.MainActivity"
+            android:configChanges="orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+
+        <activity
+            android:name="com.madpixels.tgadmintools.activity.ActivityGroupsList"
+            android:theme="@style/Toolbar" />
+        <activity
+            android:name="com.madpixels.tgadmintools.activity.ActivityBanList"
+            android:theme="@style/Toolbar" />
+
+        <activity android:name="com.madpixels.tgadmintools.activity.ActivityChatUsers"
+            android:theme="@style/Toolbar" />
+        <activity android:name="com.madpixels.tgadmintools.activity.ActivityGroupInfo"
+            android:theme="@style/Toolbar" />
+        <activity android:name="com.madpixels.tgadmintools.activity.ActivitySettings"
+            android:theme="@style/Toolbar" />
+        <activity android:name="com.madpixels.tgadmintools.activity.ActivityLogView"
+            android:theme="@style/Toolbar" />
+
+
+        <receiver android:name="com.madpixels.tgadmintools.services.ReceiverStartupSystem">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="com.madpixels.tgadmintools.services.ServiceUnbanTask" />
+        <service android:name="com.madpixels.tgadmintools.services.ServiceAutoKicker"/>
+        <service android:name="com.madpixels.tgadmintools.services.ServiceAntispam" />
+        <service android:name=".services.ServiceOnStartCheckAuth"/>
+
+
+        <activity
+            android:name="org.acra.CrashReportDialog"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance"
+            android:theme="@android:style/Theme.Dialog" />
+
+        <!-- yandex analytics -->
+        <service android:name="com.yandex.metrica.MetricaService" android:enabled="true"
+            android:exported="true" android:process=":Metrica">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="com.yandex.metrica.IMetricaService" />
+                <data android:scheme="metrica" />
+            </intent-filter>
+            <meta-data android:name="metrica:api:level" android:value="44" />
+        </service>
+        <receiver android:name="com.yandex.metrica.MetricaEventHandler"
+            android:enabled="true" android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+        <!-- /.yandex -->
+
+        <!-- ads -->
+
+
+        <!-- /ads -->
+
+    </application>
+
+</manifest>

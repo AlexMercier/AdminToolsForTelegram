@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Введите новую ссылку.\ntelegram.me/"
+        android:id="@+id/textView7" />
+
+    <EditText
+        android:singleLine="true" android:lines="1" android:maxLines="1"
+        android:hint="input short link here"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edtInputUsername" />
+
+    <TextView android:textColor="@color/md_red_500"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/tvValueHint" />
+</LinearLayout>

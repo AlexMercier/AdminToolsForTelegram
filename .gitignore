@@ -1,0 +1,16 @@
+
+app/src/production/*
+files/*
+apks/*
+.gradle/*
+.hg/*
+build/*
+app/build/*
+backup_log.txt
+
+backup_main_files_hg.bat
+app/libs/appodeal/*
+app/*.apk
+.hgignore
+
+projectFilesBackup/*

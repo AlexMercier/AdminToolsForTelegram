@@ -1,0 +1,5 @@
+include ':app'
+
+include ':AppHelperLib'
+project(':AppHelperLib').projectDir = new File('AppHelperLib')
+

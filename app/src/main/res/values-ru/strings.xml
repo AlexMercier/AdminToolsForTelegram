@@ -1,0 +1,224 @@
+<resources>
+
+
+    <string name="ban_soft_hint">Примечание: В телеграме нет возможности дать временный бан, поэтому приложение само убирает пользователя из черного списка по истечении времени.
+        \nЕсли вы удалите или остановите приложение то пользователь не будет разбанен вовремя.</string>
+    <string name="chatOwner">Создатель:</string>
+    <string name="changeChatAbout">Изменить описание</string>
+    <string name="kickedCount">Забанено:</string>
+    <string name="adminsCount">Админов:</string>
+    <string name="participiantsCount">Пользователей:</string>
+    <string name="hint_short_link_not_created">Короткая ссылка не задана</string>
+    <string name="cancel">Отмена</string>
+    <string name="btnSave">Применить</string>
+
+    <string name="error_too_many_public_links">Вы уже создали слишком много публичных каналов</string>
+    <string name="error_link_already_occupied">Ошибка, эта ссылка уже занята кем-то другим</string>
+    <string name="dialog_title_edit_link">Публичная ссылка</string>
+    <string name="hint_upgrade_to_supergroup">Вы можете перевести свою группу в супергруппу.
+        \nПосле обновления в группу сможет вступить больше чем 200 пользователей, новые пользователи будут видеть всю историю сообщений, при удалении сообщений они удаляются у всех, пользователи смогут редактировать свои сообщения, по умолчанию уведомления будут выключены у всех. Текущая публичная ссылка будет удалена.</string>
+
+    <string name="input_new_chat_title">Введите новое название чата</string>
+    <string name="input_edit_chat_about">Введите описание чата</string>
+    <string name="titleEditChatDescription">Описание чата</string>
+    <string name="action_ban_user">Забанить</string>
+    <string name="action_set_as_admin">Назначить админом</string>
+    <string name="action_remove_user_from_chat">Убрать из чата</string>
+    <string name="action_remove_deleted_users">Очистить чат от удалённых пользователей</string>
+    <string name="action_manage_group">Управление группой</string>
+    <string name="action_manage_chat_users">Управление пользователями</string>
+    <string name="action_banlist">Бан-лист</string>
+    <string name="btnContinue">Продолжить</string>
+    <string name="create_group">Создать группу</string>
+    <string name="create_supergroup">Создать супергруппу</string>
+    <string name="labelAutoBanRules">Анти-спам</string>
+    <string name="noteAntispamLinks">Примечание: Правила не применяются для админов</string>
+    <string name="toast_chat_link_added">Ссылка изменена</string>
+    <string name="hint_invite_link_not_created">Ссылка на чат не создана</string>
+    <string name="hint_no_chat_about">Описание чата не задано.\nНажмите чтобы ввести</string>
+    <string name="generate_invite_link">Создать публичную ссылку</string>
+    <string name="generate_new_invite_link">Изменить публичную ссылку</string>
+    <string name="action_copy_link">Скопировать ссылку</string>
+    <string name="toast_copied_to_clipboard">Текст скопирован в буфер обмена</string>
+    <string name="message_confirm_revoke_link">После смены публичной ссылки старая перестанет работать.\nПродолжить?</string>
+    <string name="chat_title">Название чата</string>
+    <string name="action_rename">Переименовать</string>
+    <string name="error_empty_chat_title">Название не может быть пустым</string>
+    <string name="user_type_deleted">Аккаунт удалён</string>
+    <string name="online_last_seen">в сети: недавно</string>
+    <string name="last_seen_at">был в сети</string>
+    <string name="founded_deleted_users">Найдено %s удалённых аккаунтов. Удалить их из чата?</string>
+    <string name="close">Закрыть</string>
+    <string name="revoke_user_admin">Снять права админа</string>
+    <string name="ban_reason">Причина бана</string>
+    <string name="action_group_was_converted">Группа переведена в супергруппу</string>
+    <string name="hint_enter_chat_title">Введите название чата</string>
+    <string name="titleRemoveLinksWhiteList">Белый список ссылок</string>
+    <string name="action_settings">Настройки</string>
+    <string name="whitelist_links_description">(каждая с новой строки)</string>
+    <string name="check_allow_stickers_links">Разрешить ссылки на стикеры</string>
+    <string name="chtTitleBanForLinks">Бан за ссылки</string>
+    <string name="chkTitleBanForSticks">Бан за стикеры</string>
+    <string name="logAction_autokick">Бан пользователя при попытке вернуться в чат</string>
+    <string name="logAction_return_to_chat">Пользователь возвращён в чат после временного бана</string>
+    <string name="logAction_autoUnban">Пользователь удалён из бана после истечения срока бана</string>
+    <string name="logAction_banForLink">Бан за спам</string>
+    <string name="logAction_banForSticker">Бан за флуд стикерами</string>
+    <string name="logAction_removeLink">Удалено сообщение со ссылкой</string>
+    <string name="logAction_removeSticker">Удалено сообщение со стикером</string>
+    <string name="logAction_banForBlackWord">Баз за запрещённое слово</string>
+
+    <string name="hint_warntext_links">Текст предупреждения за ссылки</string>
+    <string name="hint_warntext_stickers">Текст предупреждения за стикеры</string>
+    <string name="label_allow_count">Разрешенное кол-во для каждого юзера</string>
+    <string name="warntext_links_default_last">Последнее предупреждение. Прекрати спамить</string>
+    <string name="warntext_stickers_default_first">Первое предупреждение. Флуд стикерами</string>
+    <string name="warntext_banword_last">Последнее предупреждение. Использование запрещённого слова</string>
+    <string name="edit_chat_about_hint">Введите описание</string>
+    <string name="action_reset_warns">Сбросить счётчик предупреждений антиспама</string>
+    <string name="title_ban_age">Срок бана:</string>
+    <string name="check_return_after_bantime_expired">Вернуть в чат после истечения срока бана</string>
+    <string name="title_group_info">Управление группой</string>
+    <string name="logAction_stickersFloodWarn">Предупреждение пользователя о стикер-флуде</string>
+    <string name="logAction_linksFloodWarn">Предупреждение пользователя о бане за спам</string>
+    <string name="text_publish_banreason">Пользователь %1$s был забанен по причине: %2$s</string>
+    <string name="deleted_accounts_hint">В Телеграме нельзя удалить из списка удалённые аккаунты. Просто ждите, они сами пропадут примерно через неделю</string>
+    <string name="action_log">Журнал событий</string>
+    <string name="action_change_user">Сменить учетную запись</string>
+    <string name="title_activity_banlist">Забаненные</string>
+    <string name="toast_banlist_empty">Бан-лист пуст</string>
+    <string name="msg_confirm_unban_all">Разбанить всех юзеров?</string>
+    <string name="msg_unban_all_supergroup">Это действие может быть отменено Телеграмом если список очень большой</string>
+    <string name="actionDeleteGroup">Удалить группу</string>
+    <string name="action_remove_from_ban">Удалить из бана</string>
+    <string name="action_return_to_chat">Вернуть в чат</string>
+    <string name="logAction_unbanByAdminInvite">Разбан по приглашению админа</string>
+    <string name="action_show_log_notification">Показывать уведомления событий</string>
+    <string name="action_clear_log">Очистить журнал</string>
+    <string name="btn_yes">Да</string>
+    <string name="chk_remove_messages_links">Удалять сообщения со ссылками</string>
+    <string name="chk_remove_messages_stickers">Удалять сообщения со стикерами</string>
+    <string name="titleLogLifetime">Срок хранения журнала</string>
+    <string name="check_anyone_can_invite">Любой может приглашать участников</string>
+    <string name="check_anyone_can_change_chat">Любой может менять название, аватрку и приглашать участников в чат</string>
+    <string name="action_chk_show_only_created">Показать созданные группы</string>
+    <string name="action_chk_show_channels">Показать каналы</string>
+    <string name="check_autostart">Автозапуск</string>
+    <string name="check_allow_mention_links">Разрешить ссылки-упоминания</string>
+    <string name="text_confirm_deletion_group">Вы уверены что хотите удалить эту группу?\nЭто действие нельзя будет отменить!</string>
+    <string name="text_delete_group">Да. Удалить группу.</string>
+    <string name="button_delete">Удалить</string>
+    <string name="toast_group_deleted">Группа удалена.</string>
+    <string name="title_delete_group">Удалить группу</string>
+    <string name="action_manage_channel">Управление каналом</string>
+    <string name="chatType">Тип:</string>
+    <string name="chatTypeGroup">Группа</string>
+    <string name="chatTypeChannel">Канал</string>
+    <string name="chatTypeSuperGroup">Супергруппа</string>
+    <string name="text_appstate_enabled">Приложение запущено</string>
+    <string name="text_appstate_stopped">Приложение остановлено</string>
+    <string name="notification_show_hint">Нажмите для просмотра журнала</string>
+    <string name="label_total_groups">Всего  в списке:</string>
+    <string name="create_chat_title">Название чата</string>
+    <string name="dialog_new_chat_title">Создание группы</string>
+    <string name="group_created">Группа создана</string>
+    <string name="label_empty">Список пуст</string>
+    <string name="text_ban_time">Время бана:</string>
+    <string name="text_ban_permanently">Бан навсегда</string>
+    <string name="text_ban_temporary">Временный бан. Дата разбана:</string>
+    <string name="action_unban_all">Разбанить всех</string>
+    <string name="textRoleAdmin">Администратор</string>
+    <string name="textRoleModerator">Модератор</string>
+    <string name="textChatRole"></string>
+    <string name="check_enabled">Включено</string>
+    <string name="hint_enter_welcome_text">Задайте текст для приветствия новых участников</string>
+    <string name="hint_chat_description">Описание чата</string>
+    <string name="labelWelcomeTextForJoinedUsers">Текст приветствия для новых юзеров</string>
+    <string name="titleManagingGroups">Управление группами</string>
+    <string name="title_list_of_banned_words">Список запрещенных слов в чате. Каждое слово с новой строки</string>
+    <string name="check_BanForWordBlackList">Банить юзера</string>
+    <string name="hint_each_whitelink_at_new_line">Каждая ссылка с новой строки</string>
+    <string name="hint_blackwords">Введите каждое слово с новой строки</string>
+    <string name="check_delMsgBlackWords">Удалять сообщения с запрещенными словами</string>
+    <string name="logAction_delMsgWithBlackWord">Удалено сообщение с запрещенным словом</string>
+    <string name="dialog_title_logout">Выход</string>
+    <string name="dialog_text_logout">Сменить учётную запись?</string>
+    <string name="dialog_title_auth">Авторизация</string>
+    <string name="auth_phone_hint">Ваш номер телефона</string>
+    <string name="auth_confirmcode_hint">Введите код из смс</string>
+    <string name="auth_cloud_pass_hint">Введите ваш пароль для входа</string>
+    <string name="btn_submit">Вход</string>
+    <string name="label_loading">Загрузка...</string>
+    <string name="check_remove_joined_message">Удалять сообщение \'пользователь присоединился\'</string>
+    <string name="check_remove_leaved_message">Удалять сообщение \'пользователь покинул группу\'</string>
+    <string name="labelOther">Прочее</string>
+    <string name="title_users">Пользователи</string>
+    <string name="logAction_banUser">Вы забанили пользователя</string>
+    <string name="caption_enter_value">Введите новое значение:</string>
+    <string name="title_change_value">Изменить значение</string>
+    <string name="caption_autostart">Автозапуск</string>
+    <string name="caption_users_whitelist">Белый список юзеров</string>
+    <string name="check_ignore_antispam_for_shared">Игнорировать правила антиспама для пользователей из контакт-листа</string>
+    <string name="label_notice_ignore_antispam_for_shared">В настройках включено не применять правила к друзьям из контакт-листа</string>
+    <string name="toast_deletion_not_avail">Удаление сообщений возможно только в супергруппах</string>
+    <string name="toast_access_denied_admin">Недоступно. Только создатель чата может менять этот параметр</string>
+    <string name="toast_user_unblacklisted">Пользователь удалён из чёрного списка</string>
+    <string name="toast_user_was_restored_to_chat">Пользователь возвращён</string>
+    <string name="chtTitleAlertOnBlackWordBan">Сообщать в чат о бане</string>
+    <string name="mesage_user_banned_banword">Пользователь %1$s был забанен за употребление запрещённых слов</string>
+    <string name="label_banwords_warntext">Текст предупреждения:</string>
+    <string name="chkWarnBeforeBanWord">Предупреждать перед баном</string>
+    <string name="action_open_chat_info">Открыть инфу о чате</string>
+    <string name="action_open_userninfo">Инфа о юзере</string>
+    <string name="logAction_banwordsFloodWarn">Предупреждение пользователю о запрещённом слове</string>
+    <string name="warntext_links_default_firts">Первое предупреждение. Прекрати спамить</string>
+    <string name="warntext_stickers_default_last">Последнее предупреждение. Флуд стикерами</string>
+    <string name="warntext_banword_first">Первое предупреждение. Использование запрещённого слова</string>
+    <string name="action_copy">Копировать</string>
+    <string name="text_about_app">Приложение для мессенджера Telegram для помощи в администрировании групп.</string>
+    <string name="button_rate_us" >Пожалуйста оцените приложение в GooglePlay</string>
+    <string name="role_moderator">Модератор</string>
+    <string name="role_editor">Админ</string>
+    <string name="role_editor_description_supegroup">Админ может приглашать и банить юзеров, менять аву и описание супергруппы</string>
+    <string name="role_moderator_description_supergroup">Модератор может только удалять сообщения</string>
+    <string name="toast_user_role_changed">Привилегии пользователя изменены</string>
+    <string name="dialog_group_all_are_admins">В группе установлены права - \'Все Админы\'.\nИзменить управление группой только на администраторов?</string>
+    <string name="role_action_switch_continue">Изменить и продолжить</string>
+    <string name="text_all_are_admins_group">Все участники - администры</string>
+    <string name="label_ban_for_time">Забанить на:</string>
+    <string name="label_note_ban_simple_groups">Примечание: В обычных чатах (не супер группах) отсутствует список бана, поэтому приложение будет кикать пользователяя когда он возвращается в чат.</string>
+    <string name="chkSendBanReasonToChat">Отправить в чат причину бана</string>
+    <string name="selectBanForever">Забанить навсегда</string>
+    <string name="selectBanTemporary">Забанить на время</string>
+    <string name="label_ban_period">Срок бана</string>
+    <string name="label_ban_time_prefix">на</string>
+    <string name="text_unban_time">Время разбана:</string>
+    <string name="title_ban_list">Бан лист</string>
+    <string name="label_loading_chats_count">Загрузка списка чатов...</string>
+    <string name="action_chats_info">Информация о чатах</string>
+    <string name="action_open_group_link">Открыть группу в Телеграм</string>
+
+
+    <string-array name="ban_times">
+        <item>Мин.</item>
+        <item>Час.</item>
+        <item>Дней.</item>
+        <item>Мес.</item>
+    </string-array>
+
+
+    <string-array name="auto_ban_times">
+        <item>Навсегда</item>
+        <item>Минут</item>
+        <item>Часов</item>
+        <item>Дней</item>
+    </string-array>
+
+    <string-array name="log_lifetime">
+        <item>Месяц</item>
+        <item>Неделя</item>
+        <item>3 дня</item>
+        <item>1 день</item>
+    </string-array>
+
+</resources>
