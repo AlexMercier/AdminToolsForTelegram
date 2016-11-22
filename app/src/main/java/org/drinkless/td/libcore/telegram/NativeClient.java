@@ -27,9 +27,9 @@ import android.util.Log;
  */
 final class NativeClient {
     static {
-        // TODO: move System.loadLibrary("tdjni") in proper place.
         try {
             System.loadLibrary("tdjni");
+            Log.w("DLTD", "TDJNI loaded");
         } catch (UnsatisfiedLinkError e) {
             Log.w("DLTD", "Can't find tdjni", e);
         }

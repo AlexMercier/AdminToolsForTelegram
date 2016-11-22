@@ -15,10 +15,45 @@ public class TdApi {
             return s.toString();
         }
 
-        protected abstract void toStringBuilder(int shift, StringBuilder s);
+        StringBuilder appendLine(StringBuilder s, int shift) {
+            s.append('\n');
+            for (int i = 0; i < shift; i++) {
+                s.append(' ');
+            }
+            return s;
+        }
+
+        abstract void toStringBuilder(int shift, StringBuilder s);
     }
 
     public abstract static class TLFunction extends TLObject {
+    }
+
+    public static class AccountTtl extends TLObject {
+        public int days;
+
+        public AccountTtl() {
+        }
+
+        public AccountTtl(int days) {
+            this.days = days;
+        }
+
+        public static final int CONSTRUCTOR = 813220011;
+
+        @Override
+        public int getConstructor() {
+            return 813220011;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AccountTtl").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("days = ").append(days);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
     }
 
     public static class Animation extends TLObject {
@@ -49,17 +84,17 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Animation").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Animation").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("width").append(" = ").append(width).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("height").append(" = ").append(height).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fileName").append(" = ").append(fileName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("mimeType").append(" = ").append(mimeType).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("thumb").append(" = "); thumb.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("animation").append(" = "); animation.toStringBuilder(shift, s);
+            appendLine(s, shift).append("width = ").append(width);
+            appendLine(s, shift).append("height = ").append(height);
+            appendLine(s, shift).append("fileName = ").append(fileName);
+            appendLine(s, shift).append("mimeType = ").append(mimeType);
+            appendLine(s, shift).append("thumb = "); thumb.toStringBuilder(shift, s);
+            appendLine(s, shift).append("animation = "); animation.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -81,12 +116,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Animations").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Animations").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("animations").append(" = ").append("Animation[]").append(" {").append(Arrays.toString(animations)).append("}\n");
+            appendLine(s, shift).append("animations = ").append(Arrays.toString(animations));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -120,18 +155,129 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Audio").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Audio").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("duration").append(" = ").append(duration).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("performer").append(" = ").append(performer).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fileName").append(" = ").append(fileName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("mimeType").append(" = ").append(mimeType).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("albumCoverThumb").append(" = "); albumCoverThumb.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("audio").append(" = "); audio.toStringBuilder(shift, s);
+            appendLine(s, shift).append("duration = ").append(duration);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("performer = ").append(performer);
+            appendLine(s, shift).append("fileName = ").append(fileName);
+            appendLine(s, shift).append("mimeType = ").append(mimeType);
+            appendLine(s, shift).append("albumCoverThumb = "); albumCoverThumb.toStringBuilder(shift, s);
+            appendLine(s, shift).append("audio = "); audio.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public abstract static class AuthCodeType extends TLObject {
+    }
+
+    public static class AuthCodeTypeMessage extends AuthCodeType {
+        public int length;
+
+        public AuthCodeTypeMessage() {
+        }
+
+        public AuthCodeTypeMessage(int length) {
+            this.length = length;
+        }
+
+        public static final int CONSTRUCTOR = 1692441707;
+
+        @Override
+        public int getConstructor() {
+            return 1692441707;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AuthCodeTypeMessage").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("length = ").append(length);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class AuthCodeTypeSms extends AuthCodeType {
+        public int length;
+
+        public AuthCodeTypeSms() {
+        }
+
+        public AuthCodeTypeSms(int length) {
+            this.length = length;
+        }
+
+        public static final int CONSTRUCTOR = -7919996;
+
+        @Override
+        public int getConstructor() {
+            return -7919996;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AuthCodeTypeSms").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("length = ").append(length);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class AuthCodeTypeCall extends AuthCodeType {
+        public int length;
+
+        public AuthCodeTypeCall() {
+        }
+
+        public AuthCodeTypeCall(int length) {
+            this.length = length;
+        }
+
+        public static final int CONSTRUCTOR = -1432894294;
+
+        @Override
+        public int getConstructor() {
+            return -1432894294;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AuthCodeTypeCall").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("length = ").append(length);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class AuthCodeTypeFlashCall extends AuthCodeType {
+        public String pattern;
+
+        public AuthCodeTypeFlashCall() {
+        }
+
+        public AuthCodeTypeFlashCall(String pattern) {
+            this.pattern = pattern;
+        }
+
+        public static final int CONSTRUCTOR = -1080364751;
+
+        @Override
+        public int getConstructor() {
+            return -1080364751;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AuthCodeTypeFlashCall").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("pattern = ").append(pattern);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -151,53 +297,47 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("AuthStateWaitPhoneNumber").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AuthStateWaitPhoneNumber").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class AuthStateWaitCode extends AuthState {
+        public boolean isRegistered;
+        public AuthCodeType codeType;
+        public AuthCodeType nextCodeType;
+        public int timeout;
 
         public AuthStateWaitCode() {
         }
 
-        public static final int CONSTRUCTOR = -1154394952;
+        public AuthStateWaitCode(boolean isRegistered, AuthCodeType codeType, AuthCodeType nextCodeType, int timeout) {
+            this.isRegistered = isRegistered;
+            this.codeType = codeType;
+            this.nextCodeType = nextCodeType;
+            this.timeout = timeout;
+        }
+
+        public static final int CONSTRUCTOR = 2103299766;
 
         @Override
         public int getConstructor() {
-            return -1154394952;
+            return 2103299766;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("AuthStateWaitCode").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AuthStateWaitCode").append(" {");
             shift += 2;
+            appendLine(s, shift).append("isRegistered = ").append(isRegistered);
+            appendLine(s, shift).append("codeType = "); codeType.toStringBuilder(shift, s);
+            appendLine(s, shift).append("nextCodeType = "); nextCodeType.toStringBuilder(shift, s);
+            appendLine(s, shift).append("timeout = ").append(timeout);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class AuthStateWaitName extends AuthState {
-
-        public AuthStateWaitName() {
-        }
-
-        public static final int CONSTRUCTOR = -245435948;
-
-        @Override
-        public int getConstructor() {
-            return -245435948;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("AuthStateWaitName").append(" {\n");
-            shift += 2;
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -223,14 +363,14 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("AuthStateWaitPassword").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AuthStateWaitPassword").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("hint").append(" = ").append(hint).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("hasRecovery").append(" = ").append(hasRecovery).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("emailUnconfirmedPattern").append(" = ").append(emailUnconfirmedPattern).append('\n');
+            appendLine(s, shift).append("hint = ").append(hint);
+            appendLine(s, shift).append("hasRecovery = ").append(hasRecovery);
+            appendLine(s, shift).append("emailUnconfirmedPattern = ").append(emailUnconfirmedPattern);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -247,11 +387,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("AuthStateOk").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AuthStateOk").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -268,11 +408,104 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("AuthStateLoggingOut").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AuthStateLoggingOut").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class Authorization extends TLObject {
+        public long id;
+        public boolean isCurrent;
+        public int appId;
+        public String appName;
+        public String appVersion;
+        public boolean isOfficialApp;
+        public String deviceModel;
+        public String platform;
+        public String systemVersion;
+        public int dateCreated;
+        public int dateActive;
+        public String ip;
+        public String country;
+        public String region;
+
+        public Authorization() {
+        }
+
+        public Authorization(long id, boolean isCurrent, int appId, String appName, String appVersion, boolean isOfficialApp, String deviceModel, String platform, String systemVersion, int dateCreated, int dateActive, String ip, String country, String region) {
+            this.id = id;
+            this.isCurrent = isCurrent;
+            this.appId = appId;
+            this.appName = appName;
+            this.appVersion = appVersion;
+            this.isOfficialApp = isOfficialApp;
+            this.deviceModel = deviceModel;
+            this.platform = platform;
+            this.systemVersion = systemVersion;
+            this.dateCreated = dateCreated;
+            this.dateActive = dateActive;
+            this.ip = ip;
+            this.country = country;
+            this.region = region;
+        }
+
+        public static final int CONSTRUCTOR = -844705341;
+
+        @Override
+        public int getConstructor() {
+            return -844705341;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Authorization").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("isCurrent = ").append(isCurrent);
+            appendLine(s, shift).append("appId = ").append(appId);
+            appendLine(s, shift).append("appName = ").append(appName);
+            appendLine(s, shift).append("appVersion = ").append(appVersion);
+            appendLine(s, shift).append("isOfficialApp = ").append(isOfficialApp);
+            appendLine(s, shift).append("deviceModel = ").append(deviceModel);
+            appendLine(s, shift).append("platform = ").append(platform);
+            appendLine(s, shift).append("systemVersion = ").append(systemVersion);
+            appendLine(s, shift).append("dateCreated = ").append(dateCreated);
+            appendLine(s, shift).append("dateActive = ").append(dateActive);
+            appendLine(s, shift).append("ip = ").append(ip);
+            appendLine(s, shift).append("country = ").append(country);
+            appendLine(s, shift).append("region = ").append(region);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class Authorizations extends TLObject {
+        public Authorization[] authorizations;
+
+        public Authorizations() {
+        }
+
+        public Authorizations(Authorization[] authorizations) {
+            this.authorizations = authorizations;
+        }
+
+        public static final int CONSTRUCTOR = -1499890846;
+
+        @Override
+        public int getConstructor() {
+            return -1499890846;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Authorizations").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("authorizations = ").append(Arrays.toString(authorizations));
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -296,70 +529,133 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("BotCommand").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("BotCommand").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("command").append(" = ").append(command).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("description").append(" = ").append(description).append('\n');
+            appendLine(s, shift).append("command = ").append(command);
+            appendLine(s, shift).append("description = ").append(description);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public abstract static class BotInfo extends TLObject {
-    }
-
-    public static class BotInfoEmpty extends BotInfo {
-
-        public BotInfoEmpty() {
-        }
-
-        public static final int CONSTRUCTOR = -1154598962;
-
-        @Override
-        public int getConstructor() {
-            return -1154598962;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("BotInfoEmpty").append(" {\n");
-            shift += 2;
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class BotInfoGeneral extends BotInfo {
-        public String shareText;
+    public static class BotInfo extends TLObject {
         public String description;
         public BotCommand[] commands;
 
-        public BotInfoGeneral() {
+        public BotInfo() {
         }
 
-        public BotInfoGeneral(String shareText, String description, BotCommand[] commands) {
-            this.shareText = shareText;
+        public BotInfo(String description, BotCommand[] commands) {
             this.description = description;
             this.commands = commands;
         }
 
-        public static final int CONSTRUCTOR = 1269773691;
+        public static final int CONSTRUCTOR = 1296528907;
 
         @Override
         public int getConstructor() {
-            return 1269773691;
+            return 1296528907;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("BotInfoGeneral").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("BotInfo").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("shareText").append(" = ").append(shareText).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("description").append(" = ").append(description).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("commands").append(" = ").append("BotCommand[]").append(" {").append(Arrays.toString(commands)).append("}\n");
+            appendLine(s, shift).append("description = ").append(description);
+            appendLine(s, shift).append("commands = ").append(Arrays.toString(commands));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class CallbackQueryAnswer extends TLObject {
+        public String text;
+        public boolean showAlert;
+        public String url;
+
+        public CallbackQueryAnswer() {
+        }
+
+        public CallbackQueryAnswer(String text, boolean showAlert, String url) {
+            this.text = text;
+            this.showAlert = showAlert;
+            this.url = url;
+        }
+
+        public static final int CONSTRUCTOR = 360867933;
+
+        @Override
+        public int getConstructor() {
+            return 360867933;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CallbackQueryAnswer").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("text = ").append(text);
+            appendLine(s, shift).append("showAlert = ").append(showAlert);
+            appendLine(s, shift).append("url = ").append(url);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public abstract static class CallbackQueryPayload extends TLObject {
+    }
+
+    public static class CallbackQueryData extends CallbackQueryPayload {
+        public byte[] data;
+
+        public CallbackQueryData() {
+        }
+
+        public CallbackQueryData(byte[] data) {
+            this.data = data;
+        }
+
+        public static final int CONSTRUCTOR = 1624256266;
+
+        @Override
+        public int getConstructor() {
+            return 1624256266;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CallbackQueryData").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("data = ").append("bytes { "); { for (byte k : data) { int b = (int)k & 255; s.append(HEX_CHARACTERS[b >> 4]).append(HEX_CHARACTERS[b & 15]).append(' '); } } s.append('}');
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class CallbackQueryGame extends CallbackQueryPayload {
+        public String gameShortName;
+
+        public CallbackQueryGame() {
+        }
+
+        public CallbackQueryGame(String gameShortName) {
+            this.gameShortName = gameShortName;
+        }
+
+        public static final int CONSTRUCTOR = -1634706916;
+
+        @Override
+        public int getConstructor() {
+            return -1634706916;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CallbackQueryGame").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("gameShortName = ").append(gameShortName);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -367,10 +663,9 @@ public class TdApi {
         public int id;
         public String username;
         public int date;
-        public ChatParticipantRole role;
+        public ChatMemberStatus status;
         public boolean anyoneCanInvite;
         public boolean signMessages;
-        public boolean isBroadcast;
         public boolean isSupergroup;
         public boolean isVerified;
         public String restrictionReason;
@@ -378,180 +673,184 @@ public class TdApi {
         public Channel() {
         }
 
-        public Channel(int id, String username, int date, ChatParticipantRole role, boolean anyoneCanInvite, boolean signMessages, boolean isBroadcast, boolean isSupergroup, boolean isVerified, String restrictionReason) {
+        public Channel(int id, String username, int date, ChatMemberStatus status, boolean anyoneCanInvite, boolean signMessages, boolean isSupergroup, boolean isVerified, String restrictionReason) {
             this.id = id;
             this.username = username;
             this.date = date;
-            this.role = role;
+            this.status = status;
             this.anyoneCanInvite = anyoneCanInvite;
             this.signMessages = signMessages;
-            this.isBroadcast = isBroadcast;
             this.isSupergroup = isSupergroup;
             this.isVerified = isVerified;
             this.restrictionReason = restrictionReason;
         }
 
-        public static final int CONSTRUCTOR = -167731781;
+        public static final int CONSTRUCTOR = -1532245212;
 
         @Override
         public int getConstructor() {
-            return -167731781;
+            return -1532245212;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Channel").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Channel").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("username").append(" = ").append(username).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("date").append(" = ").append(date).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("role").append(" = "); role.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("anyoneCanInvite").append(" = ").append(anyoneCanInvite).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("signMessages").append(" = ").append(signMessages).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isBroadcast").append(" = ").append(isBroadcast).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isSupergroup").append(" = ").append(isSupergroup).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isVerified").append(" = ").append(isVerified).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("restrictionReason").append(" = ").append(restrictionReason).append('\n');
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("username = ").append(username);
+            appendLine(s, shift).append("date = ").append(date);
+            appendLine(s, shift).append("status = "); status.toStringBuilder(shift, s);
+            appendLine(s, shift).append("anyoneCanInvite = ").append(anyoneCanInvite);
+            appendLine(s, shift).append("signMessages = ").append(signMessages);
+            appendLine(s, shift).append("isSupergroup = ").append(isSupergroup);
+            appendLine(s, shift).append("isVerified = ").append(isVerified);
+            appendLine(s, shift).append("restrictionReason = ").append(restrictionReason);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class ChannelFull extends TLObject {
         public Channel channel;
         public String about;
-        public int participantsCount;
-        public int adminsCount;
+        public int memberCount;
+        public int administratorCount;
         public int kickedCount;
-        public boolean canGetParticipants;
+        public boolean canGetMembers;
+        public boolean canSetUsername;
         public String inviteLink;
+        public int pinnedMessageId;
         public int migratedFromGroupId;
         public int migratedFromMaxMessageId;
 
         public ChannelFull() {
         }
 
-        public ChannelFull(Channel channel, String about, int participantsCount, int adminsCount, int kickedCount, boolean canGetParticipants, String inviteLink, int migratedFromGroupId, int migratedFromMaxMessageId) {
+        public ChannelFull(Channel channel, String about, int memberCount, int administratorCount, int kickedCount, boolean canGetMembers, boolean canSetUsername, String inviteLink, int pinnedMessageId, int migratedFromGroupId, int migratedFromMaxMessageId) {
             this.channel = channel;
             this.about = about;
-            this.participantsCount = participantsCount;
-            this.adminsCount = adminsCount;
+            this.memberCount = memberCount;
+            this.administratorCount = administratorCount;
             this.kickedCount = kickedCount;
-            this.canGetParticipants = canGetParticipants;
+            this.canGetMembers = canGetMembers;
+            this.canSetUsername = canSetUsername;
             this.inviteLink = inviteLink;
+            this.pinnedMessageId = pinnedMessageId;
             this.migratedFromGroupId = migratedFromGroupId;
             this.migratedFromMaxMessageId = migratedFromMaxMessageId;
         }
 
-        public static final int CONSTRUCTOR = -236597239;
+        public static final int CONSTRUCTOR = -1962673954;
 
         @Override
         public int getConstructor() {
-            return -236597239;
+            return -1962673954;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChannelFull").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChannelFull").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channel").append(" = "); channel.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("about").append(" = ").append(about).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("participantsCount").append(" = ").append(participantsCount).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("adminsCount").append(" = ").append(adminsCount).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("kickedCount").append(" = ").append(kickedCount).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("canGetParticipants").append(" = ").append(canGetParticipants).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inviteLink").append(" = ").append(inviteLink).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("migratedFromGroupId").append(" = ").append(migratedFromGroupId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("migratedFromMaxMessageId").append(" = ").append(migratedFromMaxMessageId).append('\n');
+            appendLine(s, shift).append("channel = "); channel.toStringBuilder(shift, s);
+            appendLine(s, shift).append("about = ").append(about);
+            appendLine(s, shift).append("memberCount = ").append(memberCount);
+            appendLine(s, shift).append("administratorCount = ").append(administratorCount);
+            appendLine(s, shift).append("kickedCount = ").append(kickedCount);
+            appendLine(s, shift).append("canGetMembers = ").append(canGetMembers);
+            appendLine(s, shift).append("canSetUsername = ").append(canSetUsername);
+            appendLine(s, shift).append("inviteLink = ").append(inviteLink);
+            appendLine(s, shift).append("pinnedMessageId = ").append(pinnedMessageId);
+            appendLine(s, shift).append("migratedFromGroupId = ").append(migratedFromGroupId);
+            appendLine(s, shift).append("migratedFromMaxMessageId = ").append(migratedFromMaxMessageId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public abstract static class ChannelParticipantsFilter extends TLObject {
+    public abstract static class ChannelMembersFilter extends TLObject {
     }
 
-    public static class ChannelParticipantsRecent extends ChannelParticipantsFilter {
+    public static class ChannelMembersRecent extends ChannelMembersFilter {
 
-        public ChannelParticipantsRecent() {
+        public ChannelMembersRecent() {
         }
 
-        public static final int CONSTRUCTOR = -566281095;
+        public static final int CONSTRUCTOR = -1275194555;
 
         @Override
         public int getConstructor() {
-            return -566281095;
+            return -1275194555;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChannelParticipantsRecent").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChannelMembersRecent").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class ChannelParticipantsAdmins extends ChannelParticipantsFilter {
+    public static class ChannelMembersAdministrators extends ChannelMembersFilter {
 
-        public ChannelParticipantsAdmins() {
+        public ChannelMembersAdministrators() {
         }
 
-        public static final int CONSTRUCTOR = -1268741783;
+        public static final int CONSTRUCTOR = 791495882;
 
         @Override
         public int getConstructor() {
-            return -1268741783;
+            return 791495882;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChannelParticipantsAdmins").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChannelMembersAdministrators").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class ChannelParticipantsKicked extends ChannelParticipantsFilter {
+    public static class ChannelMembersKicked extends ChannelMembersFilter {
 
-        public ChannelParticipantsKicked() {
+        public ChannelMembersKicked() {
         }
 
-        public static final int CONSTRUCTOR = 1010285434;
+        public static final int CONSTRUCTOR = -1100658;
 
         @Override
         public int getConstructor() {
-            return 1010285434;
+            return -1100658;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChannelParticipantsKicked").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChannelMembersKicked").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class ChannelParticipantsBots extends ChannelParticipantsFilter {
+    public static class ChannelMembersBots extends ChannelMembersFilter {
 
-        public ChannelParticipantsBots() {
+        public ChannelMembersBots() {
         }
 
-        public static final int CONSTRUCTOR = -1328445861;
+        public static final int CONSTRUCTOR = 1290076627;
 
         @Override
         public int getConstructor() {
-            return -1328445861;
+            return 1290076627;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChannelParticipantsBots").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChannelMembersBots").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -566,12 +865,13 @@ public class TdApi {
         public int lastReadOutboxMessageId;
         public NotificationSettings notificationSettings;
         public int replyMarkupMessageId;
+        public DraftMessage draftMessage;
         public ChatInfo type;
 
         public Chat() {
         }
 
-        public Chat(long id, String title, ChatPhoto photo, Message topMessage, long order, int unreadCount, int lastReadInboxMessageId, int lastReadOutboxMessageId, NotificationSettings notificationSettings, int replyMarkupMessageId, ChatInfo type) {
+        public Chat(long id, String title, ChatPhoto photo, Message topMessage, long order, int unreadCount, int lastReadInboxMessageId, int lastReadOutboxMessageId, NotificationSettings notificationSettings, int replyMarkupMessageId, DraftMessage draftMessage, ChatInfo type) {
             this.id = id;
             this.title = title;
             this.photo = photo;
@@ -582,33 +882,35 @@ public class TdApi {
             this.lastReadOutboxMessageId = lastReadOutboxMessageId;
             this.notificationSettings = notificationSettings;
             this.replyMarkupMessageId = replyMarkupMessageId;
+            this.draftMessage = draftMessage;
             this.type = type;
         }
 
-        public static final int CONSTRUCTOR = 639725222;
+        public static final int CONSTRUCTOR = -712119535;
 
         @Override
         public int getConstructor() {
-            return 639725222;
+            return -712119535;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Chat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Chat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photo").append(" = "); photo.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("topMessage").append(" = "); topMessage.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("order").append(" = ").append(order).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("unreadCount").append(" = ").append(unreadCount).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastReadInboxMessageId").append(" = ").append(lastReadInboxMessageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastReadOutboxMessageId").append(" = ").append(lastReadOutboxMessageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("notificationSettings").append(" = "); notificationSettings.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("replyMarkupMessageId").append(" = ").append(replyMarkupMessageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("type").append(" = "); type.toStringBuilder(shift, s);
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("photo = "); photo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("topMessage = "); topMessage.toStringBuilder(shift, s);
+            appendLine(s, shift).append("order = ").append(order);
+            appendLine(s, shift).append("unreadCount = ").append(unreadCount);
+            appendLine(s, shift).append("lastReadInboxMessageId = ").append(lastReadInboxMessageId);
+            appendLine(s, shift).append("lastReadOutboxMessageId = ").append(lastReadOutboxMessageId);
+            appendLine(s, shift).append("notificationSettings = "); notificationSettings.toStringBuilder(shift, s);
+            appendLine(s, shift).append("replyMarkupMessageId = ").append(replyMarkupMessageId);
+            appendLine(s, shift).append("draftMessage = "); draftMessage.toStringBuilder(shift, s);
+            appendLine(s, shift).append("type = "); type.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -633,12 +935,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("PrivateChatInfo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("PrivateChatInfo").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("user").append(" = "); user.toStringBuilder(shift, s);
+            appendLine(s, shift).append("user = "); user.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -660,12 +962,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GroupChatInfo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GroupChatInfo").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("group").append(" = "); group.toStringBuilder(shift, s);
+            appendLine(s, shift).append("group = "); group.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -687,12 +989,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChannelChatInfo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChannelChatInfo").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channel").append(" = "); channel.toStringBuilder(shift, s);
+            appendLine(s, shift).append("channel = "); channel.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -706,20 +1008,20 @@ public class TdApi {
             this.secretChat = secretChat;
         }
 
-        public static final int CONSTRUCTOR = 1178675350;
+        public static final int CONSTRUCTOR = 361623800;
 
         @Override
         public int getConstructor() {
-            return 1178675350;
+            return 361623800;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SecretChatInfo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SecretChatInfo").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("secretChat").append(" = "); secretChat.toStringBuilder(shift, s);
+            appendLine(s, shift).append("secretChat = "); secretChat.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -741,255 +1043,261 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChatInviteLink").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChatInviteLink").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inviteLink").append(" = ").append(inviteLink).append('\n');
+            appendLine(s, shift).append("inviteLink = ").append(inviteLink);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class ChatInviteLinkInfo extends TLObject {
         public long chatId;
         public String title;
+        public ChatPhoto photo;
+        public int memberCount;
+        public User[] members;
         public boolean isGroup;
         public boolean isChannel;
-        public boolean isBroadcastChannel;
         public boolean isPublicChannel;
         public boolean isSupergroupChannel;
 
         public ChatInviteLinkInfo() {
         }
 
-        public ChatInviteLinkInfo(long chatId, String title, boolean isGroup, boolean isChannel, boolean isBroadcastChannel, boolean isPublicChannel, boolean isSupergroupChannel) {
+        public ChatInviteLinkInfo(long chatId, String title, ChatPhoto photo, int memberCount, User[] members, boolean isGroup, boolean isChannel, boolean isPublicChannel, boolean isSupergroupChannel) {
             this.chatId = chatId;
             this.title = title;
+            this.photo = photo;
+            this.memberCount = memberCount;
+            this.members = members;
             this.isGroup = isGroup;
             this.isChannel = isChannel;
-            this.isBroadcastChannel = isBroadcastChannel;
             this.isPublicChannel = isPublicChannel;
             this.isSupergroupChannel = isSupergroupChannel;
         }
 
-        public static final int CONSTRUCTOR = 948466112;
+        public static final int CONSTRUCTOR = 1161132260;
 
         @Override
         public int getConstructor() {
-            return 948466112;
+            return 1161132260;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChatInviteLinkInfo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChatInviteLinkInfo").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isGroup").append(" = ").append(isGroup).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isChannel").append(" = ").append(isChannel).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isBroadcastChannel").append(" = ").append(isBroadcastChannel).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isPublicChannel").append(" = ").append(isPublicChannel).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isSupergroupChannel").append(" = ").append(isSupergroupChannel).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("photo = "); photo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("memberCount = ").append(memberCount);
+            appendLine(s, shift).append("members = ").append(Arrays.toString(members));
+            appendLine(s, shift).append("isGroup = ").append(isGroup);
+            appendLine(s, shift).append("isChannel = ").append(isChannel);
+            appendLine(s, shift).append("isPublicChannel = ").append(isPublicChannel);
+            appendLine(s, shift).append("isSupergroupChannel = ").append(isSupergroupChannel);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class ChatParticipant extends TLObject {
-        public User user;
-        public int inviterId;
+    public static class ChatMember extends TLObject {
+        public int userId;
+        public int inviterUserId;
         public int joinDate;
-        public ChatParticipantRole role;
+        public ChatMemberStatus status;
         public BotInfo botInfo;
 
-        public ChatParticipant() {
+        public ChatMember() {
         }
 
-        public ChatParticipant(User user, int inviterId, int joinDate, ChatParticipantRole role, BotInfo botInfo) {
-            this.user = user;
-            this.inviterId = inviterId;
+        public ChatMember(int userId, int inviterUserId, int joinDate, ChatMemberStatus status, BotInfo botInfo) {
+            this.userId = userId;
+            this.inviterUserId = inviterUserId;
             this.joinDate = joinDate;
-            this.role = role;
+            this.status = status;
             this.botInfo = botInfo;
         }
 
-        public static final int CONSTRUCTOR = 4451682;
+        public static final int CONSTRUCTOR = -1759820220;
 
         @Override
         public int getConstructor() {
-            return 4451682;
+            return -1759820220;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChatParticipant").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChatMember").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("user").append(" = "); user.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inviterId").append(" = ").append(inviterId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("joinDate").append(" = ").append(joinDate).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("role").append(" = "); role.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("botInfo").append(" = "); botInfo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("userId = ").append(userId);
+            appendLine(s, shift).append("inviterUserId = ").append(inviterUserId);
+            appendLine(s, shift).append("joinDate = ").append(joinDate);
+            appendLine(s, shift).append("status = "); status.toStringBuilder(shift, s);
+            appendLine(s, shift).append("botInfo = "); botInfo.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public abstract static class ChatParticipantRole extends TLObject {
+    public abstract static class ChatMemberStatus extends TLObject {
     }
 
-    public static class ChatParticipantRoleAdmin extends ChatParticipantRole {
+    public static class ChatMemberStatusCreator extends ChatMemberStatus {
 
-        public ChatParticipantRoleAdmin() {
+        public ChatMemberStatusCreator() {
         }
 
-        public static final int CONSTRUCTOR = -1668488066;
+        public static final int CONSTRUCTOR = 920396693;
 
         @Override
         public int getConstructor() {
-            return -1668488066;
+            return 920396693;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChatParticipantRoleAdmin").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChatMemberStatusCreator").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class ChatParticipantRoleEditor extends ChatParticipantRole {
+    public static class ChatMemberStatusEditor extends ChatMemberStatus {
 
-        public ChatParticipantRoleEditor() {
+        public ChatMemberStatusEditor() {
         }
 
-        public static final int CONSTRUCTOR = -1981910583;
+        public static final int CONSTRUCTOR = -2061812836;
 
         @Override
         public int getConstructor() {
-            return -1981910583;
+            return -2061812836;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChatParticipantRoleEditor").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChatMemberStatusEditor").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class ChatParticipantRoleModerator extends ChatParticipantRole {
+    public static class ChatMemberStatusModerator extends ChatMemberStatus {
 
-        public ChatParticipantRoleModerator() {
+        public ChatMemberStatusModerator() {
         }
 
-        public static final int CONSTRUCTOR = 1964166193;
+        public static final int CONSTRUCTOR = 1687825199;
 
         @Override
         public int getConstructor() {
-            return 1964166193;
+            return 1687825199;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChatParticipantRoleModerator").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChatMemberStatusModerator").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class ChatParticipantRoleGeneral extends ChatParticipantRole {
+    public static class ChatMemberStatusMember extends ChatMemberStatus {
 
-        public ChatParticipantRoleGeneral() {
+        public ChatMemberStatusMember() {
         }
 
-        public static final int CONSTRUCTOR = -486762553;
+        public static final int CONSTRUCTOR = 844723285;
 
         @Override
         public int getConstructor() {
-            return -486762553;
+            return 844723285;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChatParticipantRoleGeneral").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChatMemberStatusMember").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class ChatParticipantRoleLeft extends ChatParticipantRole {
+    public static class ChatMemberStatusLeft extends ChatMemberStatus {
 
-        public ChatParticipantRoleLeft() {
+        public ChatMemberStatusLeft() {
         }
 
-        public static final int CONSTRUCTOR = 825688243;
+        public static final int CONSTRUCTOR = -5815259;
 
         @Override
         public int getConstructor() {
-            return 825688243;
+            return -5815259;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChatParticipantRoleLeft").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChatMemberStatusLeft").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class ChatParticipantRoleKicked extends ChatParticipantRole {
+    public static class ChatMemberStatusKicked extends ChatMemberStatus {
 
-        public ChatParticipantRoleKicked() {
+        public ChatMemberStatusKicked() {
         }
 
-        public static final int CONSTRUCTOR = 1361255364;
+        public static final int CONSTRUCTOR = -982188162;
 
         @Override
         public int getConstructor() {
-            return 1361255364;
+            return -982188162;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChatParticipantRoleKicked").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChatMemberStatusKicked").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class ChatParticipants extends TLObject {
+    public static class ChatMembers extends TLObject {
         public int totalCount;
-        public ChatParticipant[] participants;
+        public ChatMember[] members;
 
-        public ChatParticipants() {
+        public ChatMembers() {
         }
 
-        public ChatParticipants(int totalCount, ChatParticipant[] participants) {
+        public ChatMembers(int totalCount, ChatMember[] members) {
             this.totalCount = totalCount;
-            this.participants = participants;
+            this.members = members;
         }
 
-        public static final int CONSTRUCTOR = 985093454;
+        public static final int CONSTRUCTOR = -1191923299;
 
         @Override
         public int getConstructor() {
-            return 985093454;
+            return -1191923299;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChatParticipants").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChatMembers").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("totalCount").append(" = ").append(totalCount).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("participants").append(" = ").append("ChatParticipant[]").append(" {").append(Arrays.toString(participants)).append("}\n");
+            appendLine(s, shift).append("totalCount = ").append(totalCount);
+            appendLine(s, shift).append("members = ").append(Arrays.toString(members));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -1013,13 +1321,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChatPhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChatPhoto").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("small").append(" = "); small.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("big").append(" = "); big.toStringBuilder(shift, s);
+            appendLine(s, shift).append("small = "); small.toStringBuilder(shift, s);
+            appendLine(s, shift).append("big = "); big.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -1041,39 +1349,48 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Chats").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Chats").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chats").append(" = ").append("Chat[]").append(" {").append(Arrays.toString(chats)).append("}\n");
+            appendLine(s, shift).append("chats = ").append(Arrays.toString(chats));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class Contacts extends TLObject {
-        public User[] users;
+    public static class Contact extends TLObject {
+        public String phoneNumber;
+        public String firstName;
+        public String lastName;
+        public int userId;
 
-        public Contacts() {
+        public Contact() {
         }
 
-        public Contacts(User[] users) {
-            this.users = users;
+        public Contact(String phoneNumber, String firstName, String lastName, int userId) {
+            this.phoneNumber = phoneNumber;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.userId = userId;
         }
 
-        public static final int CONSTRUCTOR = 1238821485;
+        public static final int CONSTRUCTOR = -2089833262;
 
         @Override
         public int getConstructor() {
-            return 1238821485;
+            return -2089833262;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Contacts").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Contact").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("users").append(" = ").append("User[]").append(" {").append(Arrays.toString(users)).append("}\n");
+            appendLine(s, shift).append("phoneNumber = ").append(phoneNumber);
+            appendLine(s, shift).append("firstName = ").append(firstName);
+            appendLine(s, shift).append("lastName = ").append(lastName);
+            appendLine(s, shift).append("userId = ").append(userId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -1101,45 +1418,75 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Document").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Document").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fileName").append(" = ").append(fileName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("mimeType").append(" = ").append(mimeType).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("thumb").append(" = "); thumb.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("document").append(" = "); document.toStringBuilder(shift, s);
+            appendLine(s, shift).append("fileName = ").append(fileName);
+            appendLine(s, shift).append("mimeType = ").append(mimeType);
+            appendLine(s, shift).append("thumb = "); thumb.toStringBuilder(shift, s);
+            appendLine(s, shift).append("document = "); document.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class DraftMessage extends TLObject {
+        public int replyToMessageId;
+        public InputMessageContent inputMessageText;
+
+        public DraftMessage() {
+        }
+
+        public DraftMessage(int replyToMessageId, InputMessageContent inputMessageText) {
+            this.replyToMessageId = replyToMessageId;
+            this.inputMessageText = inputMessageText;
+        }
+
+        public static final int CONSTRUCTOR = 1818402019;
+
+        @Override
+        public int getConstructor() {
+            return 1818402019;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DraftMessage").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("replyToMessageId = ").append(replyToMessageId);
+            appendLine(s, shift).append("inputMessageText = "); inputMessageText.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class Error extends TLObject {
         public int code;
-        public String text;
+        public String message;
 
         public Error() {
         }
 
-        public Error(int code, String text) {
+        public Error(int code, String message) {
             this.code = code;
-            this.text = text;
+            this.message = message;
         }
 
-        public static final int CONSTRUCTOR = -994444869;
+        public static final int CONSTRUCTOR = 2115198528;
 
         @Override
         public int getConstructor() {
-            return -994444869;
+            return 2115198528;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Error").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Error").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("code").append(" = ").append(code).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("text").append(" = ").append(text).append('\n');
+            appendLine(s, shift).append("code = ").append(code);
+            appendLine(s, shift).append("message = ").append(message);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -1167,22 +1514,130 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("File").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("File").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("persistentId").append(" = ").append(persistentId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("size").append(" = ").append(size).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("path").append(" = ").append(path).append('\n');
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("persistentId = ").append(persistentId);
+            appendLine(s, shift).append("size = ").append(size);
+            appendLine(s, shift).append("path = ").append(path);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class Game extends TLObject {
+        public long id;
+        public String shortName;
+        public String title;
+        public String text;
+        public MessageEntity[] textEntities;
+        public String description;
+        public Photo photo;
+        public Animation animation;
+
+        public Game() {
+        }
+
+        public Game(long id, String shortName, String title, String text, MessageEntity[] textEntities, String description, Photo photo, Animation animation) {
+            this.id = id;
+            this.shortName = shortName;
+            this.title = title;
+            this.text = text;
+            this.textEntities = textEntities;
+            this.description = description;
+            this.photo = photo;
+            this.animation = animation;
+        }
+
+        public static final int CONSTRUCTOR = -1777252919;
+
+        @Override
+        public int getConstructor() {
+            return -1777252919;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Game").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("shortName = ").append(shortName);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("text = ").append(text);
+            appendLine(s, shift).append("textEntities = ").append(Arrays.toString(textEntities));
+            appendLine(s, shift).append("description = ").append(description);
+            appendLine(s, shift).append("photo = "); photo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("animation = "); animation.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class GameHighScore extends TLObject {
+        public int position;
+        public int userId;
+        public int score;
+
+        public GameHighScore() {
+        }
+
+        public GameHighScore(int position, int userId, int score) {
+            this.position = position;
+            this.userId = userId;
+            this.score = score;
+        }
+
+        public static final int CONSTRUCTOR = 518716217;
+
+        @Override
+        public int getConstructor() {
+            return 518716217;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GameHighScore").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("position = ").append(position);
+            appendLine(s, shift).append("userId = ").append(userId);
+            appendLine(s, shift).append("score = ").append(score);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class GameHighScores extends TLObject {
+        public GameHighScore[] scores;
+
+        public GameHighScores() {
+        }
+
+        public GameHighScores(GameHighScore[] scores) {
+            this.scores = scores;
+        }
+
+        public static final int CONSTRUCTOR = -725770727;
+
+        @Override
+        public int getConstructor() {
+            return -725770727;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GameHighScores").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("scores = ").append(Arrays.toString(scores));
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class Group extends TLObject {
         public int id;
-        public int participantsCount;
-        public ChatParticipantRole role;
+        public int memberCount;
+        public ChatMemberStatus status;
         public boolean anyoneCanEdit;
         public boolean isActive;
         public int migratedToChannelId;
@@ -1190,70 +1645,208 @@ public class TdApi {
         public Group() {
         }
 
-        public Group(int id, int participantsCount, ChatParticipantRole role, boolean anyoneCanEdit, boolean isActive, int migratedToChannelId) {
+        public Group(int id, int memberCount, ChatMemberStatus status, boolean anyoneCanEdit, boolean isActive, int migratedToChannelId) {
             this.id = id;
-            this.participantsCount = participantsCount;
-            this.role = role;
+            this.memberCount = memberCount;
+            this.status = status;
             this.anyoneCanEdit = anyoneCanEdit;
             this.isActive = isActive;
             this.migratedToChannelId = migratedToChannelId;
         }
 
-        public static final int CONSTRUCTOR = -2105342645;
+        public static final int CONSTRUCTOR = 1988317413;
 
         @Override
         public int getConstructor() {
-            return -2105342645;
+            return 1988317413;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Group").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Group").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("participantsCount").append(" = ").append(participantsCount).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("role").append(" = "); role.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("anyoneCanEdit").append(" = ").append(anyoneCanEdit).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isActive").append(" = ").append(isActive).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("migratedToChannelId").append(" = ").append(migratedToChannelId).append('\n');
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("memberCount = ").append(memberCount);
+            appendLine(s, shift).append("status = "); status.toStringBuilder(shift, s);
+            appendLine(s, shift).append("anyoneCanEdit = ").append(anyoneCanEdit);
+            appendLine(s, shift).append("isActive = ").append(isActive);
+            appendLine(s, shift).append("migratedToChannelId = ").append(migratedToChannelId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class GroupFull extends TLObject {
         public Group group;
-        public int adminId;
-        public ChatParticipant[] participants;
+        public int creatorUserId;
+        public ChatMember[] members;
         public String inviteLink;
 
         public GroupFull() {
         }
 
-        public GroupFull(Group group, int adminId, ChatParticipant[] participants, String inviteLink) {
+        public GroupFull(Group group, int creatorUserId, ChatMember[] members, String inviteLink) {
             this.group = group;
-            this.adminId = adminId;
-            this.participants = participants;
+            this.creatorUserId = creatorUserId;
+            this.members = members;
             this.inviteLink = inviteLink;
         }
 
-        public static final int CONSTRUCTOR = 987785959;
+        public static final int CONSTRUCTOR = -1934840272;
 
         @Override
         public int getConstructor() {
-            return 987785959;
+            return -1934840272;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GroupFull").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GroupFull").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("group").append(" = "); group.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("adminId").append(" = ").append(adminId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("participants").append(" = ").append("ChatParticipant[]").append(" {").append(Arrays.toString(participants)).append("}\n");
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inviteLink").append(" = ").append(inviteLink).append('\n');
+            appendLine(s, shift).append("group = "); group.toStringBuilder(shift, s);
+            appendLine(s, shift).append("creatorUserId = ").append(creatorUserId);
+            appendLine(s, shift).append("members = ").append(Arrays.toString(members));
+            appendLine(s, shift).append("inviteLink = ").append(inviteLink);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InlineKeyboardButton extends TLObject {
+        public String text;
+        public InlineKeyboardButtonType type;
+
+        public InlineKeyboardButton() {
+        }
+
+        public InlineKeyboardButton(String text, InlineKeyboardButtonType type) {
+            this.text = text;
+            this.type = type;
+        }
+
+        public static final int CONSTRUCTOR = -372105704;
+
+        @Override
+        public int getConstructor() {
+            return -372105704;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineKeyboardButton").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("text = ").append(text);
+            appendLine(s, shift).append("type = "); type.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public abstract static class InlineKeyboardButtonType extends TLObject {
+    }
+
+    public static class InlineKeyboardButtonTypeUrl extends InlineKeyboardButtonType {
+        public String url;
+
+        public InlineKeyboardButtonTypeUrl() {
+        }
+
+        public InlineKeyboardButtonTypeUrl(String url) {
+            this.url = url;
+        }
+
+        public static final int CONSTRUCTOR = 1130741420;
+
+        @Override
+        public int getConstructor() {
+            return 1130741420;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineKeyboardButtonTypeUrl").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("url = ").append(url);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InlineKeyboardButtonTypeCallback extends InlineKeyboardButtonType {
+        public byte[] data;
+
+        public InlineKeyboardButtonTypeCallback() {
+        }
+
+        public InlineKeyboardButtonTypeCallback(byte[] data) {
+            this.data = data;
+        }
+
+        public static final int CONSTRUCTOR = -1127515139;
+
+        @Override
+        public int getConstructor() {
+            return -1127515139;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineKeyboardButtonTypeCallback").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("data = ").append("bytes { "); { for (byte k : data) { int b = (int)k & 255; s.append(HEX_CHARACTERS[b >> 4]).append(HEX_CHARACTERS[b & 15]).append(' '); } } s.append('}');
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InlineKeyboardButtonTypeCallbackGame extends InlineKeyboardButtonType {
+
+        public InlineKeyboardButtonTypeCallbackGame() {
+        }
+
+        public static final int CONSTRUCTOR = -383429528;
+
+        @Override
+        public int getConstructor() {
+            return -383429528;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineKeyboardButtonTypeCallbackGame").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InlineKeyboardButtonTypeSwitchInline extends InlineKeyboardButtonType {
+        public String query;
+        public boolean inCurrentChat;
+
+        public InlineKeyboardButtonTypeSwitchInline() {
+        }
+
+        public InlineKeyboardButtonTypeSwitchInline(String query, boolean inCurrentChat) {
+            this.query = query;
+            this.inCurrentChat = inCurrentChat;
+        }
+
+        public static final int CONSTRUCTOR = -2035563307;
+
+        @Override
+        public int getConstructor() {
+            return -2035563307;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineKeyboardButtonTypeSwitchInline").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("query = ").append(query);
+            appendLine(s, shift).append("inCurrentChat = ").append(inCurrentChat);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -1269,12 +1862,11 @@ public class TdApi {
         public String thumbUrl;
         public int thumbWidth;
         public int thumbHeight;
-        public InputMessageContent message;
 
         public InlineQueryResultArticle() {
         }
 
-        public InlineQueryResultArticle(String id, String url, boolean hideUrl, String title, String description, String thumbUrl, int thumbWidth, int thumbHeight, InputMessageContent message) {
+        public InlineQueryResultArticle(String id, String url, boolean hideUrl, String title, String description, String thumbUrl, int thumbWidth, int thumbHeight) {
             this.id = id;
             this.url = url;
             this.hideUrl = hideUrl;
@@ -1283,289 +1875,413 @@ public class TdApi {
             this.thumbUrl = thumbUrl;
             this.thumbWidth = thumbWidth;
             this.thumbHeight = thumbHeight;
-            this.message = message;
         }
 
-        public static final int CONSTRUCTOR = 111003847;
+        public static final int CONSTRUCTOR = 571709788;
 
         @Override
         public int getConstructor() {
-            return 111003847;
+            return 571709788;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InlineQueryResultArticle").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResultArticle").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("url").append(" = ").append(url).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("hideUrl").append(" = ").append(hideUrl).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("description").append(" = ").append(description).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("thumbUrl").append(" = ").append(thumbUrl).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("thumbWidth").append(" = ").append(thumbWidth).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("thumbHeight").append(" = ").append(thumbHeight).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("message").append(" = "); message.toStringBuilder(shift, s);
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("url = ").append(url);
+            appendLine(s, shift).append("hideUrl = ").append(hideUrl);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("description = ").append(description);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("thumbWidth = ").append(thumbWidth);
+            appendLine(s, shift).append("thumbHeight = ").append(thumbHeight);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InlineQueryResultContact extends InlineQueryResult {
+        public String id;
+        public Contact contact;
+        public String thumbUrl;
+        public int thumbWidth;
+        public int thumbHeight;
+
+        public InlineQueryResultContact() {
+        }
+
+        public InlineQueryResultContact(String id, Contact contact, String thumbUrl, int thumbWidth, int thumbHeight) {
+            this.id = id;
+            this.contact = contact;
+            this.thumbUrl = thumbUrl;
+            this.thumbWidth = thumbWidth;
+            this.thumbHeight = thumbHeight;
+        }
+
+        public static final int CONSTRUCTOR = 1362196731;
+
+        @Override
+        public int getConstructor() {
+            return 1362196731;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResultContact").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("contact = "); contact.toStringBuilder(shift, s);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("thumbWidth = ").append(thumbWidth);
+            appendLine(s, shift).append("thumbHeight = ").append(thumbHeight);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InlineQueryResultLocation extends InlineQueryResult {
+        public String id;
+        public Location location;
+        public String title;
+        public String thumbUrl;
+        public int thumbWidth;
+        public int thumbHeight;
+
+        public InlineQueryResultLocation() {
+        }
+
+        public InlineQueryResultLocation(String id, Location location, String title, String thumbUrl, int thumbWidth, int thumbHeight) {
+            this.id = id;
+            this.location = location;
+            this.title = title;
+            this.thumbUrl = thumbUrl;
+            this.thumbWidth = thumbWidth;
+            this.thumbHeight = thumbHeight;
+        }
+
+        public static final int CONSTRUCTOR = 1290211266;
+
+        @Override
+        public int getConstructor() {
+            return 1290211266;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResultLocation").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("location = "); location.toStringBuilder(shift, s);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("thumbWidth = ").append(thumbWidth);
+            appendLine(s, shift).append("thumbHeight = ").append(thumbHeight);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InlineQueryResultVenue extends InlineQueryResult {
+        public String id;
+        public Venue venue;
+        public String thumbUrl;
+        public int thumbWidth;
+        public int thumbHeight;
+
+        public InlineQueryResultVenue() {
+        }
+
+        public InlineQueryResultVenue(String id, Venue venue, String thumbUrl, int thumbWidth, int thumbHeight) {
+            this.id = id;
+            this.venue = venue;
+            this.thumbUrl = thumbUrl;
+            this.thumbWidth = thumbWidth;
+            this.thumbHeight = thumbHeight;
+        }
+
+        public static final int CONSTRUCTOR = -1226696829;
+
+        @Override
+        public int getConstructor() {
+            return -1226696829;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResultVenue").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("venue = "); venue.toStringBuilder(shift, s);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("thumbWidth = ").append(thumbWidth);
+            appendLine(s, shift).append("thumbHeight = ").append(thumbHeight);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InlineQueryResultGame extends InlineQueryResult {
+        public String id;
+        public Game game;
+
+        public InlineQueryResultGame() {
+        }
+
+        public InlineQueryResultGame(String id, Game game) {
+            this.id = id;
+            this.game = game;
+        }
+
+        public static final int CONSTRUCTOR = 1706916987;
+
+        @Override
+        public int getConstructor() {
+            return 1706916987;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResultGame").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("game = "); game.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InlineQueryResultAnimation extends InlineQueryResult {
+        public String id;
+        public Animation animation;
+        public String title;
+
+        public InlineQueryResultAnimation() {
+        }
+
+        public InlineQueryResultAnimation(String id, Animation animation, String title) {
+            this.id = id;
+            this.animation = animation;
+            this.title = title;
+        }
+
+        public static final int CONSTRUCTOR = 2009984267;
+
+        @Override
+        public int getConstructor() {
+            return 2009984267;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResultAnimation").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("animation = "); animation.toStringBuilder(shift, s);
+            appendLine(s, shift).append("title = ").append(title);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InlineQueryResultAudio extends InlineQueryResult {
+        public String id;
+        public Audio audio;
+
+        public InlineQueryResultAudio() {
+        }
+
+        public InlineQueryResultAudio(String id, Audio audio) {
+            this.id = id;
+            this.audio = audio;
+        }
+
+        public static final int CONSTRUCTOR = 842650360;
+
+        @Override
+        public int getConstructor() {
+            return 842650360;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResultAudio").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("audio = "); audio.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InlineQueryResultDocument extends InlineQueryResult {
+        public String id;
+        public Document document;
+        public String title;
+        public String description;
+
+        public InlineQueryResultDocument() {
+        }
+
+        public InlineQueryResultDocument(String id, Document document, String title, String description) {
+            this.id = id;
+            this.document = document;
+            this.title = title;
+            this.description = description;
+        }
+
+        public static final int CONSTRUCTOR = -1491268539;
+
+        @Override
+        public int getConstructor() {
+            return -1491268539;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResultDocument").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("document = "); document.toStringBuilder(shift, s);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("description = ").append(description);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class InlineQueryResultPhoto extends InlineQueryResult {
         public String id;
+        public Photo photo;
         public String title;
         public String description;
-        public String thumbUrl;
-        public String photoUrl;
-        public int photoWidth;
-        public int photoHeight;
-        public InputMessageContent message;
 
         public InlineQueryResultPhoto() {
         }
 
-        public InlineQueryResultPhoto(String id, String title, String description, String thumbUrl, String photoUrl, int photoWidth, int photoHeight, InputMessageContent message) {
+        public InlineQueryResultPhoto(String id, Photo photo, String title, String description) {
             this.id = id;
+            this.photo = photo;
             this.title = title;
             this.description = description;
-            this.thumbUrl = thumbUrl;
-            this.photoUrl = photoUrl;
-            this.photoWidth = photoWidth;
-            this.photoHeight = photoHeight;
-            this.message = message;
         }
 
-        public static final int CONSTRUCTOR = 2146421621;
+        public static final int CONSTRUCTOR = 1848319440;
 
         @Override
         public int getConstructor() {
-            return 2146421621;
+            return 1848319440;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InlineQueryResultPhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResultPhoto").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("description").append(" = ").append(description).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("thumbUrl").append(" = ").append(thumbUrl).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photoUrl").append(" = ").append(photoUrl).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photoWidth").append(" = ").append(photoWidth).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photoHeight").append(" = ").append(photoHeight).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("message").append(" = "); message.toStringBuilder(shift, s);
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("photo = "); photo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("description = ").append(description);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class InlineQueryResultAnimatedGif extends InlineQueryResult {
+    public static class InlineQueryResultSticker extends InlineQueryResult {
         public String id;
-        public String title;
-        public String thumbUrl;
-        public String gifUrl;
-        public int gifWidth;
-        public int gifHeight;
-        public InputMessageContent message;
+        public Sticker sticker;
 
-        public InlineQueryResultAnimatedGif() {
+        public InlineQueryResultSticker() {
         }
 
-        public InlineQueryResultAnimatedGif(String id, String title, String thumbUrl, String gifUrl, int gifWidth, int gifHeight, InputMessageContent message) {
+        public InlineQueryResultSticker(String id, Sticker sticker) {
             this.id = id;
-            this.title = title;
-            this.thumbUrl = thumbUrl;
-            this.gifUrl = gifUrl;
-            this.gifWidth = gifWidth;
-            this.gifHeight = gifHeight;
-            this.message = message;
+            this.sticker = sticker;
         }
 
-        public static final int CONSTRUCTOR = -1944033660;
+        public static final int CONSTRUCTOR = -1848224245;
 
         @Override
         public int getConstructor() {
-            return -1944033660;
+            return -1848224245;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InlineQueryResultAnimatedGif").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResultSticker").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("thumbUrl").append(" = ").append(thumbUrl).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("gifUrl").append(" = ").append(gifUrl).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("gifWidth").append(" = ").append(gifWidth).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("gifHeight").append(" = ").append(gifHeight).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("message").append(" = "); message.toStringBuilder(shift, s);
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("sticker = "); sticker.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class InlineQueryResultAnimatedMpeg4 extends InlineQueryResult {
-        public String id;
-        public String title;
-        public String thumbUrl;
-        public String mpeg4Url;
-        public int mpeg4Width;
-        public int mpeg4Height;
-        public InputMessageContent message;
-
-        public InlineQueryResultAnimatedMpeg4() {
-        }
-
-        public InlineQueryResultAnimatedMpeg4(String id, String title, String thumbUrl, String mpeg4Url, int mpeg4Width, int mpeg4Height, InputMessageContent message) {
-            this.id = id;
-            this.title = title;
-            this.thumbUrl = thumbUrl;
-            this.mpeg4Url = mpeg4Url;
-            this.mpeg4Width = mpeg4Width;
-            this.mpeg4Height = mpeg4Height;
-            this.message = message;
-        }
-
-        public static final int CONSTRUCTOR = -76471915;
-
-        @Override
-        public int getConstructor() {
-            return -76471915;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InlineQueryResultAnimatedMpeg4").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("thumbUrl").append(" = ").append(thumbUrl).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("mpeg4Url").append(" = ").append(mpeg4Url).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("mpeg4Width").append(" = ").append(mpeg4Width).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("mpeg4Height").append(" = ").append(mpeg4Height).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("message").append(" = "); message.toStringBuilder(shift, s);
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class InlineQueryResultVideo extends InlineQueryResult {
         public String id;
+        public Video video;
         public String title;
         public String description;
-        public String thumbUrl;
-        public String videoUrl;
-        public String mimeType;
-        public int videoWidth;
-        public int videoHeight;
-        public int videoDuration;
-        public InputMessageContent message;
 
         public InlineQueryResultVideo() {
         }
 
-        public InlineQueryResultVideo(String id, String title, String description, String thumbUrl, String videoUrl, String mimeType, int videoWidth, int videoHeight, int videoDuration, InputMessageContent message) {
+        public InlineQueryResultVideo(String id, Video video, String title, String description) {
             this.id = id;
+            this.video = video;
             this.title = title;
             this.description = description;
-            this.thumbUrl = thumbUrl;
-            this.videoUrl = videoUrl;
-            this.mimeType = mimeType;
-            this.videoWidth = videoWidth;
-            this.videoHeight = videoHeight;
-            this.videoDuration = videoDuration;
-            this.message = message;
         }
 
-        public static final int CONSTRUCTOR = -741636295;
+        public static final int CONSTRUCTOR = -1373158683;
 
         @Override
         public int getConstructor() {
-            return -741636295;
+            return -1373158683;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InlineQueryResultVideo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResultVideo").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("description").append(" = ").append(description).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("thumbUrl").append(" = ").append(thumbUrl).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("videoUrl").append(" = ").append(videoUrl).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("mimeType").append(" = ").append(mimeType).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("videoWidth").append(" = ").append(videoWidth).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("videoHeight").append(" = ").append(videoHeight).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("videoDuration").append(" = ").append(videoDuration).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("message").append(" = "); message.toStringBuilder(shift, s);
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("video = "); video.toStringBuilder(shift, s);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("description = ").append(description);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class InlineQueryResultCachedPhoto extends InlineQueryResult {
+    public static class InlineQueryResultVoice extends InlineQueryResult {
         public String id;
-        public Photo photo;
-        public InputMessageContent message;
+        public Voice voice;
+        public String title;
 
-        public InlineQueryResultCachedPhoto() {
+        public InlineQueryResultVoice() {
         }
 
-        public InlineQueryResultCachedPhoto(String id, Photo photo, InputMessageContent message) {
+        public InlineQueryResultVoice(String id, Voice voice, String title) {
             this.id = id;
-            this.photo = photo;
-            this.message = message;
+            this.voice = voice;
+            this.title = title;
         }
 
-        public static final int CONSTRUCTOR = -617732293;
+        public static final int CONSTRUCTOR = -1799819518;
 
         @Override
         public int getConstructor() {
-            return -617732293;
+            return -1799819518;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InlineQueryResultCachedPhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResultVoice").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photo").append(" = "); photo.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("message").append(" = "); message.toStringBuilder(shift, s);
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("voice = "); voice.toStringBuilder(shift, s);
+            appendLine(s, shift).append("title = ").append(title);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class InlineQueryResultCachedAnimation extends InlineQueryResult {
-        public String id;
-        public Animation animation;
-        public InputMessageContent message;
-
-        public InlineQueryResultCachedAnimation() {
-        }
-
-        public InlineQueryResultCachedAnimation(String id, Animation animation, InputMessageContent message) {
-            this.id = id;
-            this.animation = animation;
-            this.message = message;
-        }
-
-        public static final int CONSTRUCTOR = 742840235;
-
-        @Override
-        public int getConstructor() {
-            return 742840235;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InlineQueryResultCachedAnimation").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("animation").append(" = "); animation.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("message").append(" = "); message.toStringBuilder(shift, s);
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -1573,65 +2289,38 @@ public class TdApi {
         public long inlineQueryId;
         public String nextOffset;
         public InlineQueryResult[] results;
+        public String switchPmText;
+        public String switchPmParameter;
 
         public InlineQueryResults() {
         }
 
-        public InlineQueryResults(long inlineQueryId, String nextOffset, InlineQueryResult[] results) {
+        public InlineQueryResults(long inlineQueryId, String nextOffset, InlineQueryResult[] results, String switchPmText, String switchPmParameter) {
             this.inlineQueryId = inlineQueryId;
             this.nextOffset = nextOffset;
             this.results = results;
+            this.switchPmText = switchPmText;
+            this.switchPmParameter = switchPmParameter;
         }
 
-        public static final int CONSTRUCTOR = 1601490522;
+        public static final int CONSTRUCTOR = -399798881;
 
         @Override
         public int getConstructor() {
-            return 1601490522;
+            return -399798881;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InlineQueryResults").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InlineQueryResults").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inlineQueryId").append(" = ").append(inlineQueryId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("nextOffset").append(" = ").append(nextOffset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("results").append(" = ").append("InlineQueryResult[]").append(" {").append(Arrays.toString(results)).append("}\n");
+            appendLine(s, shift).append("inlineQueryId = ").append(inlineQueryId);
+            appendLine(s, shift).append("nextOffset = ").append(nextOffset);
+            appendLine(s, shift).append("results = ").append(Arrays.toString(results));
+            appendLine(s, shift).append("switchPmText = ").append(switchPmText);
+            appendLine(s, shift).append("switchPmParameter = ").append(switchPmParameter);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class InputContact extends TLObject {
-        public String phoneNumber;
-        public String firstName;
-        public String lastName;
-
-        public InputContact() {
-        }
-
-        public InputContact(String phoneNumber, String firstName, String lastName) {
-            this.phoneNumber = phoneNumber;
-            this.firstName = firstName;
-            this.lastName = lastName;
-        }
-
-        public static final int CONSTRUCTOR = 1707235253;
-
-        @Override
-        public int getConstructor() {
-            return 1707235253;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputContact").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("phoneNumber").append(" = ").append(phoneNumber).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("firstName").append(" = ").append(firstName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastName").append(" = ").append(lastName).append('\n');
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -1656,12 +2345,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputFileId").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputFileId").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
+            appendLine(s, shift).append("id = ").append(id);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -1683,12 +2372,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputFilePersistentId").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputFilePersistentId").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("persistentId").append(" = ").append(persistentId).append('\n');
+            appendLine(s, shift).append("persistentId = ").append(persistentId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -1710,12 +2399,630 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputFileLocal").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputFileLocal").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("path").append(" = ").append(path).append('\n');
+            appendLine(s, shift).append("path = ").append(path);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public abstract static class InputInlineQueryResult extends TLObject {
+    }
+
+    public static class InputInlineQueryResultAnimatedGif extends InputInlineQueryResult {
+        public String id;
+        public String title;
+        public String thumbUrl;
+        public String gifUrl;
+        public int gifWidth;
+        public int gifHeight;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public InputInlineQueryResultAnimatedGif() {
+        }
+
+        public InputInlineQueryResultAnimatedGif(String id, String title, String thumbUrl, String gifUrl, int gifWidth, int gifHeight, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.id = id;
+            this.title = title;
+            this.thumbUrl = thumbUrl;
+            this.gifUrl = gifUrl;
+            this.gifWidth = gifWidth;
+            this.gifHeight = gifHeight;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = 1525729396;
+
+        @Override
+        public int getConstructor() {
+            return 1525729396;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultAnimatedGif").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("gifUrl = ").append(gifUrl);
+            appendLine(s, shift).append("gifWidth = ").append(gifWidth);
+            appendLine(s, shift).append("gifHeight = ").append(gifHeight);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputInlineQueryResultAnimatedMpeg4 extends InputInlineQueryResult {
+        public String id;
+        public String title;
+        public String thumbUrl;
+        public String mpeg4Url;
+        public int mpeg4Width;
+        public int mpeg4Height;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public InputInlineQueryResultAnimatedMpeg4() {
+        }
+
+        public InputInlineQueryResultAnimatedMpeg4(String id, String title, String thumbUrl, String mpeg4Url, int mpeg4Width, int mpeg4Height, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.id = id;
+            this.title = title;
+            this.thumbUrl = thumbUrl;
+            this.mpeg4Url = mpeg4Url;
+            this.mpeg4Width = mpeg4Width;
+            this.mpeg4Height = mpeg4Height;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = 1614693872;
+
+        @Override
+        public int getConstructor() {
+            return 1614693872;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultAnimatedMpeg4").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("mpeg4Url = ").append(mpeg4Url);
+            appendLine(s, shift).append("mpeg4Width = ").append(mpeg4Width);
+            appendLine(s, shift).append("mpeg4Height = ").append(mpeg4Height);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputInlineQueryResultArticle extends InputInlineQueryResult {
+        public String id;
+        public String url;
+        public boolean hideUrl;
+        public String title;
+        public String description;
+        public String thumbUrl;
+        public int thumbWidth;
+        public int thumbHeight;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public InputInlineQueryResultArticle() {
+        }
+
+        public InputInlineQueryResultArticle(String id, String url, boolean hideUrl, String title, String description, String thumbUrl, int thumbWidth, int thumbHeight, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.id = id;
+            this.url = url;
+            this.hideUrl = hideUrl;
+            this.title = title;
+            this.description = description;
+            this.thumbUrl = thumbUrl;
+            this.thumbWidth = thumbWidth;
+            this.thumbHeight = thumbHeight;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = 1146479239;
+
+        @Override
+        public int getConstructor() {
+            return 1146479239;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultArticle").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("url = ").append(url);
+            appendLine(s, shift).append("hideUrl = ").append(hideUrl);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("description = ").append(description);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("thumbWidth = ").append(thumbWidth);
+            appendLine(s, shift).append("thumbHeight = ").append(thumbHeight);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputInlineQueryResultAudio extends InputInlineQueryResult {
+        public String id;
+        public String title;
+        public String performer;
+        public String audioUrl;
+        public int audioDuration;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public InputInlineQueryResultAudio() {
+        }
+
+        public InputInlineQueryResultAudio(String id, String title, String performer, String audioUrl, int audioDuration, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.id = id;
+            this.title = title;
+            this.performer = performer;
+            this.audioUrl = audioUrl;
+            this.audioDuration = audioDuration;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = 1891166308;
+
+        @Override
+        public int getConstructor() {
+            return 1891166308;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultAudio").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("performer = ").append(performer);
+            appendLine(s, shift).append("audioUrl = ").append(audioUrl);
+            appendLine(s, shift).append("audioDuration = ").append(audioDuration);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputInlineQueryResultContact extends InputInlineQueryResult {
+        public String id;
+        public Contact contact;
+        public String thumbUrl;
+        public int thumbWidth;
+        public int thumbHeight;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public InputInlineQueryResultContact() {
+        }
+
+        public InputInlineQueryResultContact(String id, Contact contact, String thumbUrl, int thumbWidth, int thumbHeight, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.id = id;
+            this.contact = contact;
+            this.thumbUrl = thumbUrl;
+            this.thumbWidth = thumbWidth;
+            this.thumbHeight = thumbHeight;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = -1322216516;
+
+        @Override
+        public int getConstructor() {
+            return -1322216516;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultContact").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("contact = "); contact.toStringBuilder(shift, s);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("thumbWidth = ").append(thumbWidth);
+            appendLine(s, shift).append("thumbHeight = ").append(thumbHeight);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputInlineQueryResultDocument extends InputInlineQueryResult {
+        public String id;
+        public String title;
+        public String description;
+        public String documentUrl;
+        public String mimeType;
+        public String thumbUrl;
+        public int thumbWidth;
+        public int thumbHeight;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public InputInlineQueryResultDocument() {
+        }
+
+        public InputInlineQueryResultDocument(String id, String title, String description, String documentUrl, String mimeType, String thumbUrl, int thumbWidth, int thumbHeight, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.id = id;
+            this.title = title;
+            this.description = description;
+            this.documentUrl = documentUrl;
+            this.mimeType = mimeType;
+            this.thumbUrl = thumbUrl;
+            this.thumbWidth = thumbWidth;
+            this.thumbHeight = thumbHeight;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = 310750688;
+
+        @Override
+        public int getConstructor() {
+            return 310750688;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultDocument").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("description = ").append(description);
+            appendLine(s, shift).append("documentUrl = ").append(documentUrl);
+            appendLine(s, shift).append("mimeType = ").append(mimeType);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("thumbWidth = ").append(thumbWidth);
+            appendLine(s, shift).append("thumbHeight = ").append(thumbHeight);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputInlineQueryResultGame extends InputInlineQueryResult {
+        public String id;
+        public String gameShortName;
+        public ReplyMarkup replyMarkup;
+
+        public InputInlineQueryResultGame() {
+        }
+
+        public InputInlineQueryResultGame(String id, String gameShortName, ReplyMarkup replyMarkup) {
+            this.id = id;
+            this.gameShortName = gameShortName;
+            this.replyMarkup = replyMarkup;
+        }
+
+        public static final int CONSTRUCTOR = 966074327;
+
+        @Override
+        public int getConstructor() {
+            return 966074327;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultGame").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("gameShortName = ").append(gameShortName);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputInlineQueryResultLocation extends InputInlineQueryResult {
+        public String id;
+        public Location location;
+        public String title;
+        public String thumbUrl;
+        public int thumbWidth;
+        public int thumbHeight;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public InputInlineQueryResultLocation() {
+        }
+
+        public InputInlineQueryResultLocation(String id, Location location, String title, String thumbUrl, int thumbWidth, int thumbHeight, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.id = id;
+            this.location = location;
+            this.title = title;
+            this.thumbUrl = thumbUrl;
+            this.thumbWidth = thumbWidth;
+            this.thumbHeight = thumbHeight;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = 1842110793;
+
+        @Override
+        public int getConstructor() {
+            return 1842110793;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultLocation").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("location = "); location.toStringBuilder(shift, s);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("thumbWidth = ").append(thumbWidth);
+            appendLine(s, shift).append("thumbHeight = ").append(thumbHeight);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputInlineQueryResultPhoto extends InputInlineQueryResult {
+        public String id;
+        public String title;
+        public String description;
+        public String thumbUrl;
+        public String photoUrl;
+        public int photoWidth;
+        public int photoHeight;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public InputInlineQueryResultPhoto() {
+        }
+
+        public InputInlineQueryResultPhoto(String id, String title, String description, String thumbUrl, String photoUrl, int photoWidth, int photoHeight, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.id = id;
+            this.title = title;
+            this.description = description;
+            this.thumbUrl = thumbUrl;
+            this.photoUrl = photoUrl;
+            this.photoWidth = photoWidth;
+            this.photoHeight = photoHeight;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = 737237435;
+
+        @Override
+        public int getConstructor() {
+            return 737237435;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultPhoto").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("description = ").append(description);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("photoUrl = ").append(photoUrl);
+            appendLine(s, shift).append("photoWidth = ").append(photoWidth);
+            appendLine(s, shift).append("photoHeight = ").append(photoHeight);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputInlineQueryResultSticker extends InputInlineQueryResult {
+        public String id;
+        public String thumbUrl;
+        public String stickerUrl;
+        public int stickerWidth;
+        public int stickerHeight;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public InputInlineQueryResultSticker() {
+        }
+
+        public InputInlineQueryResultSticker(String id, String thumbUrl, String stickerUrl, int stickerWidth, int stickerHeight, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.id = id;
+            this.thumbUrl = thumbUrl;
+            this.stickerUrl = stickerUrl;
+            this.stickerWidth = stickerWidth;
+            this.stickerHeight = stickerHeight;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = 850856384;
+
+        @Override
+        public int getConstructor() {
+            return 850856384;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultSticker").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("stickerUrl = ").append(stickerUrl);
+            appendLine(s, shift).append("stickerWidth = ").append(stickerWidth);
+            appendLine(s, shift).append("stickerHeight = ").append(stickerHeight);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputInlineQueryResultVenue extends InputInlineQueryResult {
+        public String id;
+        public Venue venue;
+        public String thumbUrl;
+        public int thumbWidth;
+        public int thumbHeight;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public InputInlineQueryResultVenue() {
+        }
+
+        public InputInlineQueryResultVenue(String id, Venue venue, String thumbUrl, int thumbWidth, int thumbHeight, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.id = id;
+            this.venue = venue;
+            this.thumbUrl = thumbUrl;
+            this.thumbWidth = thumbWidth;
+            this.thumbHeight = thumbHeight;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = -567519575;
+
+        @Override
+        public int getConstructor() {
+            return -567519575;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultVenue").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("venue = "); venue.toStringBuilder(shift, s);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("thumbWidth = ").append(thumbWidth);
+            appendLine(s, shift).append("thumbHeight = ").append(thumbHeight);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputInlineQueryResultVideo extends InputInlineQueryResult {
+        public String id;
+        public String title;
+        public String description;
+        public String thumbUrl;
+        public String videoUrl;
+        public String mimeType;
+        public int videoWidth;
+        public int videoHeight;
+        public int videoDuration;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public InputInlineQueryResultVideo() {
+        }
+
+        public InputInlineQueryResultVideo(String id, String title, String description, String thumbUrl, String videoUrl, String mimeType, int videoWidth, int videoHeight, int videoDuration, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.id = id;
+            this.title = title;
+            this.description = description;
+            this.thumbUrl = thumbUrl;
+            this.videoUrl = videoUrl;
+            this.mimeType = mimeType;
+            this.videoWidth = videoWidth;
+            this.videoHeight = videoHeight;
+            this.videoDuration = videoDuration;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = -2120242070;
+
+        @Override
+        public int getConstructor() {
+            return -2120242070;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultVideo").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("description = ").append(description);
+            appendLine(s, shift).append("thumbUrl = ").append(thumbUrl);
+            appendLine(s, shift).append("videoUrl = ").append(videoUrl);
+            appendLine(s, shift).append("mimeType = ").append(mimeType);
+            appendLine(s, shift).append("videoWidth = ").append(videoWidth);
+            appendLine(s, shift).append("videoHeight = ").append(videoHeight);
+            appendLine(s, shift).append("videoDuration = ").append(videoDuration);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputInlineQueryResultVoice extends InputInlineQueryResult {
+        public String id;
+        public String title;
+        public String voiceUrl;
+        public int voiceDuration;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public InputInlineQueryResultVoice() {
+        }
+
+        public InputInlineQueryResultVoice(String id, String title, String voiceUrl, int voiceDuration, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.id = id;
+            this.title = title;
+            this.voiceUrl = voiceUrl;
+            this.voiceDuration = voiceDuration;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = 950126512;
+
+        @Override
+        public int getConstructor() {
+            return 950126512;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputInlineQueryResultVoice").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("voiceUrl = ").append(voiceUrl);
+            appendLine(s, shift).append("voiceDuration = ").append(voiceDuration);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -1725,38 +3032,45 @@ public class TdApi {
     public static class InputMessageText extends InputMessageContent {
         public String text;
         public boolean disableWebPagePreview;
+        public boolean clearDraft;
         public MessageEntity[] entities;
+        public TextParseMode parseMode;
 
         public InputMessageText() {
         }
 
-        public InputMessageText(String text, boolean disableWebPagePreview, MessageEntity[] entities) {
+        public InputMessageText(String text, boolean disableWebPagePreview, boolean clearDraft, MessageEntity[] entities, TextParseMode parseMode) {
             this.text = text;
             this.disableWebPagePreview = disableWebPagePreview;
+            this.clearDraft = clearDraft;
             this.entities = entities;
+            this.parseMode = parseMode;
         }
 
-        public static final int CONSTRUCTOR = -764893502;
+        public static final int CONSTRUCTOR = 1095854080;
 
         @Override
         public int getConstructor() {
-            return -764893502;
+            return 1095854080;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessageText").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageText").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("text").append(" = ").append(text).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("disableWebPagePreview").append(" = ").append(disableWebPagePreview).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("entities").append(" = ").append("MessageEntity[]").append(" {").append(Arrays.toString(entities)).append("}\n");
+            appendLine(s, shift).append("text = ").append(text);
+            appendLine(s, shift).append("disableWebPagePreview = ").append(disableWebPagePreview);
+            appendLine(s, shift).append("clearDraft = ").append(clearDraft);
+            appendLine(s, shift).append("entities = ").append(Arrays.toString(entities));
+            appendLine(s, shift).append("parseMode = "); parseMode.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class InputMessageAnimation extends InputMessageContent {
         public InputFile animation;
+        public InputThumb thumb;
         public int width;
         public int height;
         public String caption;
@@ -1764,96 +3078,107 @@ public class TdApi {
         public InputMessageAnimation() {
         }
 
-        public InputMessageAnimation(InputFile animation, int width, int height, String caption) {
+        public InputMessageAnimation(InputFile animation, InputThumb thumb, int width, int height, String caption) {
             this.animation = animation;
+            this.thumb = thumb;
             this.width = width;
             this.height = height;
             this.caption = caption;
         }
 
-        public static final int CONSTRUCTOR = 629438140;
+        public static final int CONSTRUCTOR = -238183558;
 
         @Override
         public int getConstructor() {
-            return 629438140;
+            return -238183558;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessageAnimation").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageAnimation").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("animation").append(" = "); animation.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("width").append(" = ").append(width).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("height").append(" = ").append(height).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("caption").append(" = ").append(caption).append('\n');
+            appendLine(s, shift).append("animation = "); animation.toStringBuilder(shift, s);
+            appendLine(s, shift).append("thumb = "); thumb.toStringBuilder(shift, s);
+            appendLine(s, shift).append("width = ").append(width);
+            appendLine(s, shift).append("height = ").append(height);
+            appendLine(s, shift).append("caption = ").append(caption);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class InputMessageAudio extends InputMessageContent {
         public InputFile audio;
+        public InputThumb albumCoverThumb;
         public int duration;
         public String title;
         public String performer;
+        public String caption;
 
         public InputMessageAudio() {
         }
 
-        public InputMessageAudio(InputFile audio, int duration, String title, String performer) {
+        public InputMessageAudio(InputFile audio, InputThumb albumCoverThumb, int duration, String title, String performer, String caption) {
             this.audio = audio;
+            this.albumCoverThumb = albumCoverThumb;
             this.duration = duration;
             this.title = title;
             this.performer = performer;
+            this.caption = caption;
         }
 
-        public static final int CONSTRUCTOR = -674962739;
+        public static final int CONSTRUCTOR = -1122193064;
 
         @Override
         public int getConstructor() {
-            return -674962739;
+            return -1122193064;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessageAudio").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageAudio").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("audio").append(" = "); audio.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("duration").append(" = ").append(duration).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("performer").append(" = ").append(performer).append('\n');
+            appendLine(s, shift).append("audio = "); audio.toStringBuilder(shift, s);
+            appendLine(s, shift).append("albumCoverThumb = "); albumCoverThumb.toStringBuilder(shift, s);
+            appendLine(s, shift).append("duration = ").append(duration);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("performer = ").append(performer);
+            appendLine(s, shift).append("caption = ").append(caption);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class InputMessageDocument extends InputMessageContent {
         public InputFile document;
+        public InputThumb thumb;
         public String caption;
 
         public InputMessageDocument() {
         }
 
-        public InputMessageDocument(InputFile document, String caption) {
+        public InputMessageDocument(InputFile document, InputThumb thumb, String caption) {
             this.document = document;
+            this.thumb = thumb;
             this.caption = caption;
         }
 
-        public static final int CONSTRUCTOR = 1289989663;
+        public static final int CONSTRUCTOR = 395779985;
 
         @Override
         public int getConstructor() {
-            return 1289989663;
+            return 395779985;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessageDocument").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageDocument").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("document").append(" = "); document.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("caption").append(" = ").append(caption).append('\n');
+            appendLine(s, shift).append("document = "); document.toStringBuilder(shift, s);
+            appendLine(s, shift).append("thumb = "); thumb.toStringBuilder(shift, s);
+            appendLine(s, shift).append("caption = ").append(caption);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -1877,79 +3202,85 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessagePhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessagePhoto").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photo").append(" = "); photo.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("caption").append(" = ").append(caption).append('\n');
+            appendLine(s, shift).append("photo = "); photo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("caption = ").append(caption);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class InputMessageSticker extends InputMessageContent {
         public InputFile sticker;
+        public InputThumb thumb;
 
         public InputMessageSticker() {
         }
 
-        public InputMessageSticker(InputFile sticker) {
+        public InputMessageSticker(InputFile sticker, InputThumb thumb) {
             this.sticker = sticker;
+            this.thumb = thumb;
         }
 
-        public static final int CONSTRUCTOR = 1579676898;
+        public static final int CONSTRUCTOR = -892964456;
 
         @Override
         public int getConstructor() {
-            return 1579676898;
+            return -892964456;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessageSticker").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageSticker").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("sticker").append(" = "); sticker.toStringBuilder(shift, s);
+            appendLine(s, shift).append("sticker = "); sticker.toStringBuilder(shift, s);
+            appendLine(s, shift).append("thumb = "); thumb.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class InputMessageVideo extends InputMessageContent {
         public InputFile video;
-        public String caption;
+        public InputThumb thumb;
         public int duration;
         public int width;
         public int height;
+        public String caption;
 
         public InputMessageVideo() {
         }
 
-        public InputMessageVideo(InputFile video, String caption, int duration, int width, int height) {
+        public InputMessageVideo(InputFile video, InputThumb thumb, int duration, int width, int height, String caption) {
             this.video = video;
-            this.caption = caption;
+            this.thumb = thumb;
             this.duration = duration;
             this.width = width;
             this.height = height;
+            this.caption = caption;
         }
 
-        public static final int CONSTRUCTOR = -1404882448;
+        public static final int CONSTRUCTOR = -1954994738;
 
         @Override
         public int getConstructor() {
-            return -1404882448;
+            return -1954994738;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessageVideo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageVideo").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("video").append(" = "); video.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("caption").append(" = ").append(caption).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("duration").append(" = ").append(duration).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("width").append(" = ").append(width).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("height").append(" = ").append(height).append('\n');
+            appendLine(s, shift).append("video = "); video.toStringBuilder(shift, s);
+            appendLine(s, shift).append("thumb = "); thumb.toStringBuilder(shift, s);
+            appendLine(s, shift).append("duration = ").append(duration);
+            appendLine(s, shift).append("width = ").append(width);
+            appendLine(s, shift).append("height = ").append(height);
+            appendLine(s, shift).append("caption = ").append(caption);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -1957,140 +3288,146 @@ public class TdApi {
         public InputFile voice;
         public int duration;
         public byte[] waveform;
+        public String caption;
 
         public InputMessageVoice() {
         }
 
-        public InputMessageVoice(InputFile voice, int duration, byte[] waveform) {
+        public InputMessageVoice(InputFile voice, int duration, byte[] waveform, String caption) {
             this.voice = voice;
             this.duration = duration;
             this.waveform = waveform;
+            this.caption = caption;
         }
 
-        public static final int CONSTRUCTOR = -942554872;
+        public static final int CONSTRUCTOR = -2011553452;
 
         @Override
         public int getConstructor() {
-            return -942554872;
+            return -2011553452;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessageVoice").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageVoice").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("voice").append(" = "); voice.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("duration").append(" = ").append(duration).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("waveform").append(" = ").append("bytes { "); { for (byte k : waveform) { int b = (int)k & 255; s.append(HEX_CHARACTERS[b >> 4]).append(HEX_CHARACTERS[b & 15]).append(' '); } } s.append("}\n");
+            appendLine(s, shift).append("voice = "); voice.toStringBuilder(shift, s);
+            appendLine(s, shift).append("duration = ").append(duration);
+            appendLine(s, shift).append("waveform = ").append("bytes { "); { for (byte k : waveform) { int b = (int)k & 255; s.append(HEX_CHARACTERS[b >> 4]).append(HEX_CHARACTERS[b & 15]).append(' '); } } s.append('}');
+            appendLine(s, shift).append("caption = ").append(caption);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class InputMessageLocation extends InputMessageContent {
-        public double longitude;
-        public double latitude;
+        public Location location;
 
         public InputMessageLocation() {
         }
 
-        public InputMessageLocation(double longitude, double latitude) {
-            this.longitude = longitude;
-            this.latitude = latitude;
+        public InputMessageLocation(Location location) {
+            this.location = location;
         }
 
-        public static final int CONSTRUCTOR = 1494132433;
+        public static final int CONSTRUCTOR = 2121763042;
 
         @Override
         public int getConstructor() {
-            return 1494132433;
+            return 2121763042;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessageLocation").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageLocation").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("longitude").append(" = ").append(longitude).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("latitude").append(" = ").append(latitude).append('\n');
+            appendLine(s, shift).append("location = "); location.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class InputMessageVenue extends InputMessageContent {
-        public double longitude;
-        public double latitude;
-        public String title;
-        public String address;
-        public String provider;
-        public String venueId;
+        public Venue venue;
 
         public InputMessageVenue() {
         }
 
-        public InputMessageVenue(double longitude, double latitude, String title, String address, String provider, String venueId) {
-            this.longitude = longitude;
-            this.latitude = latitude;
-            this.title = title;
-            this.address = address;
-            this.provider = provider;
-            this.venueId = venueId;
+        public InputMessageVenue(Venue venue) {
+            this.venue = venue;
         }
 
-        public static final int CONSTRUCTOR = -971070542;
+        public static final int CONSTRUCTOR = 1447926269;
 
         @Override
         public int getConstructor() {
-            return -971070542;
+            return 1447926269;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessageVenue").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageVenue").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("longitude").append(" = ").append(longitude).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("latitude").append(" = ").append(latitude).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("address").append(" = ").append(address).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("provider").append(" = ").append(provider).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("venueId").append(" = ").append(venueId).append('\n');
+            appendLine(s, shift).append("venue = "); venue.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class InputMessageContact extends InputMessageContent {
-        public String phoneNumber;
-        public String firstName;
-        public String lastName;
-        public int userId;
+        public Contact contact;
 
         public InputMessageContact() {
         }
 
-        public InputMessageContact(String phoneNumber, String firstName, String lastName, int userId) {
-            this.phoneNumber = phoneNumber;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.userId = userId;
+        public InputMessageContact(Contact contact) {
+            this.contact = contact;
         }
 
-        public static final int CONSTRUCTOR = -1261805057;
+        public static final int CONSTRUCTOR = -982446849;
 
         @Override
         public int getConstructor() {
-            return -1261805057;
+            return -982446849;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessageContact").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageContact").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("phoneNumber").append(" = ").append(phoneNumber).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("firstName").append(" = ").append(firstName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastName").append(" = ").append(lastName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
+            appendLine(s, shift).append("contact = "); contact.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputMessageGame extends InputMessageContent {
+        public int botUserId;
+        public String gameShortName;
+
+        public InputMessageGame() {
+        }
+
+        public InputMessageGame(int botUserId, String gameShortName) {
+            this.botUserId = botUserId;
+            this.gameShortName = gameShortName;
+        }
+
+        public static final int CONSTRUCTOR = 1989596156;
+
+        @Override
+        public int getConstructor() {
+            return 1989596156;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageGame").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("botUserId = ").append(botUserId);
+            appendLine(s, shift).append("gameShortName = ").append(gameShortName);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2114,13 +3451,142 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessageForwarded").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageForwarded").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fromChatId").append(" = ").append(fromChatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageId").append(" = ").append(messageId).append('\n');
+            appendLine(s, shift).append("fromChatId = ").append(fromChatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class InputThumb extends TLObject {
+        public String path;
+        public int width;
+        public int height;
+
+        public InputThumb() {
+        }
+
+        public InputThumb(String path, int width, int height) {
+            this.path = path;
+            this.width = width;
+            this.height = height;
+        }
+
+        public static final int CONSTRUCTOR = -227565803;
+
+        @Override
+        public int getConstructor() {
+            return -227565803;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputThumb").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("path = ").append(path);
+            appendLine(s, shift).append("width = ").append(width);
+            appendLine(s, shift).append("height = ").append(height);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class KeyboardButton extends TLObject {
+        public String text;
+        public KeyboardButtonType type;
+
+        public KeyboardButton() {
+        }
+
+        public KeyboardButton(String text, KeyboardButtonType type) {
+            this.text = text;
+            this.type = type;
+        }
+
+        public static final int CONSTRUCTOR = -2069836172;
+
+        @Override
+        public int getConstructor() {
+            return -2069836172;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("KeyboardButton").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("text = ").append(text);
+            appendLine(s, shift).append("type = "); type.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public abstract static class KeyboardButtonType extends TLObject {
+    }
+
+    public static class KeyboardButtonTypeText extends KeyboardButtonType {
+
+        public KeyboardButtonTypeText() {
+        }
+
+        public static final int CONSTRUCTOR = -1773037256;
+
+        @Override
+        public int getConstructor() {
+            return -1773037256;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("KeyboardButtonTypeText").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class KeyboardButtonTypeRequestPhoneNumber extends KeyboardButtonType {
+
+        public KeyboardButtonTypeRequestPhoneNumber() {
+        }
+
+        public static final int CONSTRUCTOR = -1529235527;
+
+        @Override
+        public int getConstructor() {
+            return -1529235527;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("KeyboardButtonTypeRequestPhoneNumber").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class KeyboardButtonTypeRequestLocation extends KeyboardButtonType {
+
+        public KeyboardButtonTypeRequestLocation() {
+        }
+
+        public static final int CONSTRUCTOR = -125661955;
+
+        @Override
+        public int getConstructor() {
+            return -125661955;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("KeyboardButtonTypeRequestLocation").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2140,11 +3606,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("LinkStateNone").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("LinkStateNone").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2161,11 +3627,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("LinkStateKnowsPhoneNumber").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("LinkStateKnowsPhoneNumber").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2182,56 +3648,57 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("LinkStateContact").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("LinkStateContact").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class Location extends TLObject {
-        public double longitude;
         public double latitude;
+        public double longitude;
 
         public Location() {
         }
 
-        public Location(double longitude, double latitude) {
-            this.longitude = longitude;
+        public Location(double latitude, double longitude) {
             this.latitude = latitude;
+            this.longitude = longitude;
         }
 
-        public static final int CONSTRUCTOR = -1691941094;
+        public static final int CONSTRUCTOR = 749028016;
 
         @Override
         public int getConstructor() {
-            return -1691941094;
+            return 749028016;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Location").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Location").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("longitude").append(" = ").append(longitude).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("latitude").append(" = ").append(latitude).append('\n');
+            appendLine(s, shift).append("latitude = ").append(latitude);
+            appendLine(s, shift).append("longitude = ").append(longitude);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class Message extends TLObject {
         public int id;
-        public int fromId;
+        public int senderUserId;
         public long chatId;
         public MessageSendState sendState;
+        public boolean canBeEdited;
         public boolean canBeDeleted;
         public boolean isPost;
         public int date;
         public int editDate;
         public MessageForwardInfo forwardInfo;
         public int replyToMessageId;
-        public int viaBotId;
+        public int viaBotUserId;
         public int views;
         public MessageContent content;
         public ReplyMarkup replyMarkup;
@@ -2239,50 +3706,52 @@ public class TdApi {
         public Message() {
         }
 
-        public Message(int id, int fromId, long chatId, MessageSendState sendState, boolean canBeDeleted, boolean isPost, int date, int editDate, MessageForwardInfo forwardInfo, int replyToMessageId, int viaBotId, int views, MessageContent content, ReplyMarkup replyMarkup) {
+        public Message(int id, int senderUserId, long chatId, MessageSendState sendState, boolean canBeEdited, boolean canBeDeleted, boolean isPost, int date, int editDate, MessageForwardInfo forwardInfo, int replyToMessageId, int viaBotUserId, int views, MessageContent content, ReplyMarkup replyMarkup) {
             this.id = id;
-            this.fromId = fromId;
+            this.senderUserId = senderUserId;
             this.chatId = chatId;
             this.sendState = sendState;
+            this.canBeEdited = canBeEdited;
             this.canBeDeleted = canBeDeleted;
             this.isPost = isPost;
             this.date = date;
             this.editDate = editDate;
             this.forwardInfo = forwardInfo;
             this.replyToMessageId = replyToMessageId;
-            this.viaBotId = viaBotId;
+            this.viaBotUserId = viaBotUserId;
             this.views = views;
             this.content = content;
             this.replyMarkup = replyMarkup;
         }
 
-        public static final int CONSTRUCTOR = -1203578833;
+        public static final int CONSTRUCTOR = 1284920704;
 
         @Override
         public int getConstructor() {
-            return -1203578833;
+            return 1284920704;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Message").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Message").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fromId").append(" = ").append(fromId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("sendState").append(" = "); sendState.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("canBeDeleted").append(" = ").append(canBeDeleted).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isPost").append(" = ").append(isPost).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("date").append(" = ").append(date).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("editDate").append(" = ").append(editDate).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("forwardInfo").append(" = "); forwardInfo.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("replyToMessageId").append(" = ").append(replyToMessageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("viaBotId").append(" = ").append(viaBotId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("views").append(" = ").append(views).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("content").append(" = "); content.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("replyMarkup").append(" = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("senderUserId = ").append(senderUserId);
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("sendState = "); sendState.toStringBuilder(shift, s);
+            appendLine(s, shift).append("canBeEdited = ").append(canBeEdited);
+            appendLine(s, shift).append("canBeDeleted = ").append(canBeDeleted);
+            appendLine(s, shift).append("isPost = ").append(isPost);
+            appendLine(s, shift).append("date = ").append(date);
+            appendLine(s, shift).append("editDate = ").append(editDate);
+            appendLine(s, shift).append("forwardInfo = "); forwardInfo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("replyToMessageId = ").append(replyToMessageId);
+            appendLine(s, shift).append("viaBotUserId = ").append(viaBotUserId);
+            appendLine(s, shift).append("views = ").append(views);
+            appendLine(s, shift).append("content = "); content.toStringBuilder(shift, s);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2292,30 +3761,33 @@ public class TdApi {
     public static class MessageText extends MessageContent {
         public String text;
         public MessageEntity[] entities;
+        public WebPage webPage;
 
         public MessageText() {
         }
 
-        public MessageText(String text, MessageEntity[] entities) {
+        public MessageText(String text, MessageEntity[] entities, WebPage webPage) {
             this.text = text;
             this.entities = entities;
+            this.webPage = webPage;
         }
 
-        public static final int CONSTRUCTOR = -1525886228;
+        public static final int CONSTRUCTOR = 964064453;
 
         @Override
         public int getConstructor() {
-            return -1525886228;
+            return 964064453;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageText").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageText").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("text").append(" = ").append(text).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("entities").append(" = ").append("MessageEntity[]").append(" {").append(Arrays.toString(entities)).append("}\n");
+            appendLine(s, shift).append("text = ").append(text);
+            appendLine(s, shift).append("entities = ").append(Arrays.toString(entities));
+            appendLine(s, shift).append("webPage = "); webPage.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2339,43 +3811,46 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageAnimation").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageAnimation").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("animation").append(" = "); animation.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("caption").append(" = ").append(caption).append('\n');
+            appendLine(s, shift).append("animation = "); animation.toStringBuilder(shift, s);
+            appendLine(s, shift).append("caption = ").append(caption);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class MessageAudio extends MessageContent {
         public Audio audio;
+        public String caption;
         public boolean isListened;
 
         public MessageAudio() {
         }
 
-        public MessageAudio(Audio audio, boolean isListened) {
+        public MessageAudio(Audio audio, String caption, boolean isListened) {
             this.audio = audio;
+            this.caption = caption;
             this.isListened = isListened;
         }
 
-        public static final int CONSTRUCTOR = 1604677406;
+        public static final int CONSTRUCTOR = 226441982;
 
         @Override
         public int getConstructor() {
-            return 1604677406;
+            return 226441982;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageAudio").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageAudio").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("audio").append(" = "); audio.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isListened").append(" = ").append(isListened).append('\n');
+            appendLine(s, shift).append("audio = "); audio.toStringBuilder(shift, s);
+            appendLine(s, shift).append("caption = ").append(caption);
+            appendLine(s, shift).append("isListened = ").append(isListened);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2399,13 +3874,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageDocument").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageDocument").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("document").append(" = "); document.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("caption").append(" = ").append(caption).append('\n');
+            appendLine(s, shift).append("document = "); document.toStringBuilder(shift, s);
+            appendLine(s, shift).append("caption = ").append(caption);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2429,13 +3904,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessagePhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessagePhoto").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photo").append(" = "); photo.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("caption").append(" = ").append(caption).append('\n');
+            appendLine(s, shift).append("photo = "); photo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("caption = ").append(caption);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2457,12 +3932,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageSticker").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageSticker").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("sticker").append(" = "); sticker.toStringBuilder(shift, s);
+            appendLine(s, shift).append("sticker = "); sticker.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2486,76 +3961,46 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageVideo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageVideo").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("video").append(" = "); video.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("caption").append(" = ").append(caption).append('\n');
+            appendLine(s, shift).append("video = "); video.toStringBuilder(shift, s);
+            appendLine(s, shift).append("caption = ").append(caption);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class MessageVoice extends MessageContent {
         public Voice voice;
+        public String caption;
         public boolean isListened;
 
         public MessageVoice() {
         }
 
-        public MessageVoice(Voice voice, boolean isListened) {
+        public MessageVoice(Voice voice, String caption, boolean isListened) {
             this.voice = voice;
+            this.caption = caption;
             this.isListened = isListened;
         }
 
-        public static final int CONSTRUCTOR = 590783451;
+        public static final int CONSTRUCTOR = -631462405;
 
         @Override
         public int getConstructor() {
-            return 590783451;
+            return -631462405;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageVoice").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageVoice").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("voice").append(" = "); voice.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isListened").append(" = ").append(isListened).append('\n');
+            appendLine(s, shift).append("voice = "); voice.toStringBuilder(shift, s);
+            appendLine(s, shift).append("caption = ").append(caption);
+            appendLine(s, shift).append("isListened = ").append(isListened);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class MessageWebPage extends MessageContent {
-        public String text;
-        public MessageEntity[] entities;
-        public WebPage webPage;
-
-        public MessageWebPage() {
-        }
-
-        public MessageWebPage(String text, MessageEntity[] entities, WebPage webPage) {
-            this.text = text;
-            this.entities = entities;
-            this.webPage = webPage;
-        }
-
-        public static final int CONSTRUCTOR = -1978747464;
-
-        @Override
-        public int getConstructor() {
-            return -1978747464;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageWebPage").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("text").append(" = ").append(text).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("entities").append(" = ").append("MessageEntity[]").append(" {").append(Arrays.toString(entities)).append("}\n");
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("webPage").append(" = "); webPage.toStringBuilder(shift, s);
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2577,117 +4022,123 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageLocation").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageLocation").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("location").append(" = "); location.toStringBuilder(shift, s);
+            appendLine(s, shift).append("location = "); location.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class MessageVenue extends MessageContent {
-        public Location location;
-        public String title;
-        public String address;
-        public String provider;
-        public String venueId;
+        public Venue venue;
 
         public MessageVenue() {
         }
 
-        public MessageVenue(Location location, String title, String address, String provider, String venueId) {
-            this.location = location;
-            this.title = title;
-            this.address = address;
-            this.provider = provider;
-            this.venueId = venueId;
+        public MessageVenue(Venue venue) {
+            this.venue = venue;
         }
 
-        public static final int CONSTRUCTOR = 586749589;
+        public static final int CONSTRUCTOR = -2146492043;
 
         @Override
         public int getConstructor() {
-            return 586749589;
+            return -2146492043;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageVenue").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageVenue").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("location").append(" = "); location.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("address").append(" = ").append(address).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("provider").append(" = ").append(provider).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("venueId").append(" = ").append(venueId).append('\n');
+            appendLine(s, shift).append("venue = "); venue.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class MessageContact extends MessageContent {
-        public String phoneNumber;
-        public String firstName;
-        public String lastName;
-        public int userId;
+        public Contact contact;
 
         public MessageContact() {
         }
 
-        public MessageContact(String phoneNumber, String firstName, String lastName, int userId) {
-            this.phoneNumber = phoneNumber;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.userId = userId;
+        public MessageContact(Contact contact) {
+            this.contact = contact;
         }
 
-        public static final int CONSTRUCTOR = 216059403;
+        public static final int CONSTRUCTOR = -512684966;
 
         @Override
         public int getConstructor() {
-            return 216059403;
+            return -512684966;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageContact").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageContact").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("phoneNumber").append(" = ").append(phoneNumber).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("firstName").append(" = ").append(firstName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastName").append(" = ").append(lastName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
+            appendLine(s, shift).append("contact = "); contact.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class MessageGame extends MessageContent {
+        public Game game;
+
+        public MessageGame() {
+        }
+
+        public MessageGame(Game game) {
+            this.game = game;
+        }
+
+        public static final int CONSTRUCTOR = -69441162;
+
+        @Override
+        public int getConstructor() {
+            return -69441162;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageGame").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("game = "); game.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class MessageGroupChatCreate extends MessageContent {
         public String title;
-        public User[] participants;
+        public User[] members;
 
         public MessageGroupChatCreate() {
         }
 
-        public MessageGroupChatCreate(String title, User[] participants) {
+        public MessageGroupChatCreate(String title, User[] members) {
             this.title = title;
-            this.participants = participants;
+            this.members = members;
         }
 
-        public static final int CONSTRUCTOR = -1856328772;
+        public static final int CONSTRUCTOR = 201696375;
 
         @Override
         public int getConstructor() {
-            return -1856328772;
+            return 201696375;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageGroupChatCreate").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageGroupChatCreate").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("participants").append(" = ").append("User[]").append(" {").append(Arrays.toString(participants)).append("}\n");
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("members = ").append(Arrays.toString(members));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2709,12 +4160,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageChannelChatCreate").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageChannelChatCreate").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
+            appendLine(s, shift).append("title = ").append(title);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2736,12 +4187,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageChatChangeTitle").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageChatChangeTitle").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
+            appendLine(s, shift).append("title = ").append(title);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2763,12 +4214,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageChatChangePhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageChatChangePhoto").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photo").append(" = "); photo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("photo = "); photo.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2785,92 +4236,92 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageChatDeletePhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageChatDeletePhoto").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class MessageChatAddParticipants extends MessageContent {
-        public User[] participants;
+    public static class MessageChatAddMembers extends MessageContent {
+        public User[] members;
 
-        public MessageChatAddParticipants() {
+        public MessageChatAddMembers() {
         }
 
-        public MessageChatAddParticipants(User[] participants) {
-            this.participants = participants;
+        public MessageChatAddMembers(User[] members) {
+            this.members = members;
         }
 
-        public static final int CONSTRUCTOR = 1759366874;
+        public static final int CONSTRUCTOR = 423474768;
 
         @Override
         public int getConstructor() {
-            return 1759366874;
+            return 423474768;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageChatAddParticipants").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageChatAddMembers").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("participants").append(" = ").append("User[]").append(" {").append(Arrays.toString(participants)).append("}\n");
+            appendLine(s, shift).append("members = ").append(Arrays.toString(members));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class MessageChatJoinByLink extends MessageContent {
-        public int inviterId;
+        public int inviterUserId;
 
         public MessageChatJoinByLink() {
         }
 
-        public MessageChatJoinByLink(int inviterId) {
-            this.inviterId = inviterId;
+        public MessageChatJoinByLink(int inviterUserId) {
+            this.inviterUserId = inviterUserId;
         }
 
-        public static final int CONSTRUCTOR = 1832922905;
+        public static final int CONSTRUCTOR = 1774397587;
 
         @Override
         public int getConstructor() {
-            return 1832922905;
+            return 1774397587;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageChatJoinByLink").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageChatJoinByLink").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inviterId").append(" = ").append(inviterId).append('\n');
+            appendLine(s, shift).append("inviterUserId = ").append(inviterUserId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class MessageChatDeleteParticipant extends MessageContent {
+    public static class MessageChatDeleteMember extends MessageContent {
         public User user;
 
-        public MessageChatDeleteParticipant() {
+        public MessageChatDeleteMember() {
         }
 
-        public MessageChatDeleteParticipant(User user) {
+        public MessageChatDeleteMember(User user) {
             this.user = user;
         }
 
-        public static final int CONSTRUCTOR = 2091163657;
+        public static final int CONSTRUCTOR = 640851473;
 
         @Override
         public int getConstructor() {
-            return 2091163657;
+            return 640851473;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageChatDeleteParticipant").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageChatDeleteMember").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("user").append(" = "); user.toStringBuilder(shift, s);
+            appendLine(s, shift).append("user = "); user.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2892,12 +4343,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageChatMigrateTo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageChatMigrateTo").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channelId").append(" = ").append(channelId).append('\n');
+            appendLine(s, shift).append("channelId = ").append(channelId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2921,34 +4372,73 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageChatMigrateFrom").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageChatMigrateFrom").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("groupId").append(" = ").append(groupId).append('\n');
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("groupId = ").append(groupId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class MessageDeleted extends MessageContent {
+    public static class MessagePinMessage extends MessageContent {
+        public int messageId;
 
-        public MessageDeleted() {
+        public MessagePinMessage() {
         }
 
-        public static final int CONSTRUCTOR = 2145503191;
+        public MessagePinMessage(int messageId) {
+            this.messageId = messageId;
+        }
+
+        public static final int CONSTRUCTOR = 206180326;
 
         @Override
         public int getConstructor() {
-            return 2145503191;
+            return 206180326;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageDeleted").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessagePinMessage").append(" {");
             shift += 2;
+            appendLine(s, shift).append("messageId = ").append(messageId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class MessageGameScore extends MessageContent {
+        public int gameMessageId;
+        public long gameId;
+        public int score;
+
+        public MessageGameScore() {
+        }
+
+        public MessageGameScore(int gameMessageId, long gameId, int score) {
+            this.gameMessageId = gameMessageId;
+            this.gameId = gameId;
+            this.score = score;
+        }
+
+        public static final int CONSTRUCTOR = 535384543;
+
+        @Override
+        public int getConstructor() {
+            return 535384543;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageGameScore").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("gameMessageId = ").append(gameMessageId);
+            appendLine(s, shift).append("gameId = ").append(gameId);
+            appendLine(s, shift).append("score = ").append(score);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2965,11 +4455,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageUnsupported").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageUnsupported").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -2996,13 +4486,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageEntityMention").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageEntityMention").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("length").append(" = ").append(length).append('\n');
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("length = ").append(length);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3026,13 +4516,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageEntityHashtag").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageEntityHashtag").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("length").append(" = ").append(length).append('\n');
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("length = ").append(length);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3056,13 +4546,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageEntityBotCommand").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageEntityBotCommand").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("length").append(" = ").append(length).append('\n');
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("length = ").append(length);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3086,13 +4576,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageEntityUrl").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageEntityUrl").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("length").append(" = ").append(length).append('\n');
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("length = ").append(length);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3116,13 +4606,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageEntityEmail").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageEntityEmail").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("length").append(" = ").append(length).append('\n');
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("length = ").append(length);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3146,13 +4636,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageEntityBold").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageEntityBold").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("length").append(" = ").append(length).append('\n');
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("length = ").append(length);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3176,13 +4666,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageEntityItalic").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageEntityItalic").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("length").append(" = ").append(length).append('\n');
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("length = ").append(length);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3206,13 +4696,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageEntityCode").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageEntityCode").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("length").append(" = ").append(length).append('\n');
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("length = ").append(length);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3236,13 +4726,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageEntityPre").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageEntityPre").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("length").append(" = ").append(length).append('\n');
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("length = ").append(length);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3268,14 +4758,14 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageEntityPreCode").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageEntityPreCode").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("length").append(" = ").append(length).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("language").append(" = ").append(language).append('\n');
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("length = ").append(length);
+            appendLine(s, shift).append("language = ").append(language);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3301,104 +4791,116 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageEntityTextUrl").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageEntityTextUrl").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("length").append(" = ").append(length).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("url").append(" = ").append(url).append('\n');
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("length = ").append(length);
+            appendLine(s, shift).append("url = ").append(url);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class MessageEntityMentionName extends MessageEntity {
+        public int offset;
+        public int length;
+        public int userId;
+
+        public MessageEntityMentionName() {
+        }
+
+        public MessageEntityMentionName(int offset, int length, int userId) {
+            this.offset = offset;
+            this.length = length;
+            this.userId = userId;
+        }
+
+        public static final int CONSTRUCTOR = 892193368;
+
+        @Override
+        public int getConstructor() {
+            return 892193368;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageEntityMentionName").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("length = ").append(length);
+            appendLine(s, shift).append("userId = ").append(userId);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
     public abstract static class MessageForwardInfo extends TLObject {
     }
 
-    public static class MessageNotForwarded extends MessageForwardInfo {
-
-        public MessageNotForwarded() {
-        }
-
-        public static final int CONSTRUCTOR = 1151377659;
-
-        @Override
-        public int getConstructor() {
-            return 1151377659;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageNotForwarded").append(" {\n");
-            shift += 2;
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
     public static class MessageForwardedFromUser extends MessageForwardInfo {
-        public int userId;
+        public int senderUserId;
         public int date;
 
         public MessageForwardedFromUser() {
         }
 
-        public MessageForwardedFromUser(int userId, int date) {
-            this.userId = userId;
+        public MessageForwardedFromUser(int senderUserId, int date) {
+            this.senderUserId = senderUserId;
             this.date = date;
         }
 
-        public static final int CONSTRUCTOR = 449683284;
+        public static final int CONSTRUCTOR = -721966663;
 
         @Override
         public int getConstructor() {
-            return 449683284;
+            return -721966663;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageForwardedFromUser").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageForwardedFromUser").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("date").append(" = ").append(date).append('\n');
+            appendLine(s, shift).append("senderUserId = ").append(senderUserId);
+            appendLine(s, shift).append("date = ").append(date);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class MessageForwardedFromChannel extends MessageForwardInfo {
-        public int channelId;
+    public static class MessageForwardedPost extends MessageForwardInfo {
+        public long chatId;
+        public int senderUserId;
         public int date;
-        public int userId;
         public int messageId;
 
-        public MessageForwardedFromChannel() {
+        public MessageForwardedPost() {
         }
 
-        public MessageForwardedFromChannel(int channelId, int date, int userId, int messageId) {
-            this.channelId = channelId;
+        public MessageForwardedPost(long chatId, int senderUserId, int date, int messageId) {
+            this.chatId = chatId;
+            this.senderUserId = senderUserId;
             this.date = date;
-            this.userId = userId;
             this.messageId = messageId;
         }
 
-        public static final int CONSTRUCTOR = 572357536;
+        public static final int CONSTRUCTOR = -163738338;
 
         @Override
         public int getConstructor() {
-            return 572357536;
+            return -163738338;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageForwardedFromChannel").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageForwardedPost").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channelId").append(" = ").append(channelId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("date").append(" = ").append(date).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageId").append(" = ").append(messageId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("senderUserId = ").append(senderUserId);
+            appendLine(s, shift).append("date = ").append(date);
+            appendLine(s, shift).append("messageId = ").append(messageId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3418,11 +4920,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageIsIncoming").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageIsIncoming").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3439,11 +4941,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageIsBeingSent").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageIsBeingSent").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3460,11 +4962,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageIsSuccessfullySent").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageIsSuccessfullySent").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3481,11 +4983,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageIsFailedToSend").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageIsFailedToSend").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3509,46 +5011,46 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Messages").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Messages").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("totalCount").append(" = ").append(totalCount).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messages").append(" = ").append("Message[]").append(" {").append(Arrays.toString(messages)).append("}\n");
+            appendLine(s, shift).append("totalCount = ").append(totalCount);
+            appendLine(s, shift).append("messages = ").append(Arrays.toString(messages));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class NotificationSettings extends TLObject {
         public int muteFor;
         public String sound;
-        public boolean showPreviews;
+        public boolean showPreview;
 
         public NotificationSettings() {
         }
 
-        public NotificationSettings(int muteFor, String sound, boolean showPreviews) {
+        public NotificationSettings(int muteFor, String sound, boolean showPreview) {
             this.muteFor = muteFor;
             this.sound = sound;
-            this.showPreviews = showPreviews;
+            this.showPreview = showPreview;
         }
 
-        public static final int CONSTRUCTOR = 824630963;
+        public static final int CONSTRUCTOR = -1244785780;
 
         @Override
         public int getConstructor() {
-            return 824630963;
+            return -1244785780;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("NotificationSettings").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("NotificationSettings").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("muteFor").append(" = ").append(muteFor).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("sound").append(" = ").append(sound).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("showPreviews").append(" = ").append(showPreviews).append('\n');
+            appendLine(s, shift).append("muteFor = ").append(muteFor);
+            appendLine(s, shift).append("sound = ").append(sound);
+            appendLine(s, shift).append("showPreview = ").append(showPreview);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3573,12 +5075,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("NotificationSettingsForChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("NotificationSettingsForChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3595,11 +5097,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("NotificationSettingsForPrivateChats").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("NotificationSettingsForPrivateChats").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3616,11 +5118,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("NotificationSettingsForGroupChats").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("NotificationSettingsForGroupChats").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3637,11 +5139,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("NotificationSettingsForAllChats").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("NotificationSettingsForAllChats").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3658,11 +5160,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Ok").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Ok").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3687,12 +5189,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("OptionBoolean").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("OptionBoolean").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = ").append(value).append('\n');
+            appendLine(s, shift).append("value = ").append(value);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3709,11 +5211,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("OptionEmpty").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("OptionEmpty").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3735,12 +5237,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("OptionInteger").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("OptionInteger").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = ").append(value).append('\n');
+            appendLine(s, shift).append("value = ").append(value);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3762,75 +5264,42 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("OptionString").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("OptionString").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = ").append(value).append('\n');
+            appendLine(s, shift).append("value = ").append(value);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class Photo extends TLObject {
         public long id;
-        public PhotoSize[] photos;
+        public PhotoSize[] sizes;
 
         public Photo() {
         }
 
-        public Photo(long id, PhotoSize[] photos) {
+        public Photo(long id, PhotoSize[] sizes) {
             this.id = id;
-            this.photos = photos;
+            this.sizes = sizes;
         }
 
-        public static final int CONSTRUCTOR = 700401344;
+        public static final int CONSTRUCTOR = 811378213;
 
         @Override
         public int getConstructor() {
-            return 700401344;
+            return 811378213;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Photo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Photo").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photos").append(" = ").append("PhotoSize[]").append(" {").append(Arrays.toString(photos)).append("}\n");
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("sizes = ").append(Arrays.toString(sizes));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class PhotoCrop extends TLObject {
-        public double left;
-        public double top;
-        public double width;
-
-        public PhotoCrop() {
-        }
-
-        public PhotoCrop(double left, double top, double width) {
-            this.left = left;
-            this.top = top;
-            this.width = width;
-        }
-
-        public static final int CONSTRUCTOR = -1565529698;
-
-        @Override
-        public int getConstructor() {
-            return -1565529698;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("PhotoCrop").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("left").append(" = ").append(left).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("top").append(" = ").append(top).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("width").append(" = ").append(width).append('\n');
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3858,15 +5327,15 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("PhotoSize").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("PhotoSize").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("type").append(" = ").append(type).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photo").append(" = "); photo.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("width").append(" = ").append(width).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("height").append(" = ").append(height).append('\n');
+            appendLine(s, shift).append("type = ").append(type);
+            appendLine(s, shift).append("photo = "); photo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("width = ").append(width);
+            appendLine(s, shift).append("height = ").append(height);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3892,39 +5361,18 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ProfilePhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ProfilePhoto").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("small").append(" = "); small.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("big").append(" = "); big.toStringBuilder(shift, s);
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("small = "); small.toStringBuilder(shift, s);
+            appendLine(s, shift).append("big = "); big.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public abstract static class ReplyMarkup extends TLObject {
-    }
-
-    public static class ReplyMarkupNone extends ReplyMarkup {
-
-        public ReplyMarkupNone() {
-        }
-
-        public static final int CONSTRUCTOR = -1623666456;
-
-        @Override
-        public int getConstructor() {
-            return -1623666456;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ReplyMarkupNone").append(" {\n");
-            shift += 2;
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
     }
 
     public static class ReplyMarkupHideKeyboard extends ReplyMarkup {
@@ -3945,12 +5393,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ReplyMarkupHideKeyboard").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ReplyMarkupHideKeyboard").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("personal").append(" = ").append(personal).append('\n');
+            appendLine(s, shift).append("personal = ").append(personal);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -3972,17 +5420,17 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ReplyMarkupForceReply").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ReplyMarkupForceReply").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("personal").append(" = ").append(personal).append('\n');
+            appendLine(s, shift).append("personal = ").append(personal);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class ReplyMarkupShowKeyboard extends ReplyMarkup {
-        public String[][] rows;
+        public KeyboardButton[][] rows;
         public boolean resizeKeyboard;
         public boolean oneTime;
         public boolean personal;
@@ -3990,30 +5438,57 @@ public class TdApi {
         public ReplyMarkupShowKeyboard() {
         }
 
-        public ReplyMarkupShowKeyboard(String[][] rows, boolean resizeKeyboard, boolean oneTime, boolean personal) {
+        public ReplyMarkupShowKeyboard(KeyboardButton[][] rows, boolean resizeKeyboard, boolean oneTime, boolean personal) {
             this.rows = rows;
             this.resizeKeyboard = resizeKeyboard;
             this.oneTime = oneTime;
             this.personal = personal;
         }
 
-        public static final int CONSTRUCTOR = 22090330;
+        public static final int CONSTRUCTOR = -840982893;
 
         @Override
         public int getConstructor() {
-            return 22090330;
+            return -840982893;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ReplyMarkupShowKeyboard").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ReplyMarkupShowKeyboard").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("rows").append(" = ").append("String[][]").append(" {").append(Arrays.deepToString(rows)).append("}\n");
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("resizeKeyboard").append(" = ").append(resizeKeyboard).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("oneTime").append(" = ").append(oneTime).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("personal").append(" = ").append(personal).append('\n');
+            appendLine(s, shift).append("rows = ").append(Arrays.deepToString(rows));
+            appendLine(s, shift).append("resizeKeyboard = ").append(resizeKeyboard);
+            appendLine(s, shift).append("oneTime = ").append(oneTime);
+            appendLine(s, shift).append("personal = ").append(personal);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class ReplyMarkupInlineKeyboard extends ReplyMarkup {
+        public InlineKeyboardButton[][] rows;
+
+        public ReplyMarkupInlineKeyboard() {
+        }
+
+        public ReplyMarkupInlineKeyboard(InlineKeyboardButton[][] rows) {
+            this.rows = rows;
+        }
+
+        public static final int CONSTRUCTOR = -619317658;
+
+        @Override
+        public int getConstructor() {
+            return -619317658;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ReplyMarkupInlineKeyboard").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("rows = ").append(Arrays.deepToString(rows));
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4033,11 +5508,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchMessagesFilterEmpty").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterEmpty").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4054,11 +5529,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchMessagesFilterAnimation").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterAnimation").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4075,11 +5550,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchMessagesFilterAudio").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterAudio").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4096,11 +5571,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchMessagesFilterDocument").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterDocument").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4117,11 +5592,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchMessagesFilterPhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterPhoto").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4138,11 +5613,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchMessagesFilterVideo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterVideo").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4159,11 +5634,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchMessagesFilterVoice").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterVoice").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4180,11 +5655,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchMessagesFilterPhotoAndVideo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterPhotoAndVideo").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4201,15 +5676,37 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchMessagesFilterUrl").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterUrl").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class SearchMessagesFilterChatPhoto extends SearchMessagesFilter {
+
+        public SearchMessagesFilterChatPhoto() {
+        }
+
+        public static final int CONSTRUCTOR = -1247751329;
+
+        @Override
+        public int getConstructor() {
+            return -1247751329;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterChatPhoto").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class SecretChat extends TLObject {
+        public int id;
         public int userId;
         public int state;
         public int ttl;
@@ -4217,28 +5714,30 @@ public class TdApi {
         public SecretChat() {
         }
 
-        public SecretChat(int userId, int state, int ttl) {
+        public SecretChat(int id, int userId, int state, int ttl) {
+            this.id = id;
             this.userId = userId;
             this.state = state;
             this.ttl = ttl;
         }
 
-        public static final int CONSTRUCTOR = -1398715296;
+        public static final int CONSTRUCTOR = 1575069994;
 
         @Override
         public int getConstructor() {
-            return -1398715296;
+            return 1575069994;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SecretChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SecretChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("state").append(" = ").append(state).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("ttl").append(" = ").append(ttl).append('\n');
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("userId = ").append(userId);
+            appendLine(s, shift).append("state = ").append(state);
+            appendLine(s, shift).append("ttl = ").append(ttl);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4262,13 +5761,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SecretChatFull").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SecretChatFull").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("secretChat").append(" = "); secretChat.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("keyHash").append(" = ").append(keyHash).append('\n');
+            appendLine(s, shift).append("secretChat = "); secretChat.toStringBuilder(shift, s);
+            appendLine(s, shift).append("keyHash = ").append(keyHash);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4288,11 +5787,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendMessageTypingAction").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessageTypingAction").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4309,11 +5808,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendMessageCancelAction").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessageCancelAction").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4330,11 +5829,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendMessageRecordVideoAction").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessageRecordVideoAction").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4356,12 +5855,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendMessageUploadVideoAction").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessageUploadVideoAction").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("progress").append(" = ").append(progress).append('\n');
+            appendLine(s, shift).append("progress = ").append(progress);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4378,11 +5877,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendMessageRecordVoiceAction").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessageRecordVoiceAction").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4404,12 +5903,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendMessageUploadVoiceAction").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessageUploadVoiceAction").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("progress").append(" = ").append(progress).append('\n');
+            appendLine(s, shift).append("progress = ").append(progress);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4431,12 +5930,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendMessageUploadPhotoAction").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessageUploadPhotoAction").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("progress").append(" = ").append(progress).append('\n');
+            appendLine(s, shift).append("progress = ").append(progress);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4458,12 +5957,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendMessageUploadDocumentAction").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessageUploadDocumentAction").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("progress").append(" = ").append(progress).append('\n');
+            appendLine(s, shift).append("progress = ").append(progress);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4480,11 +5979,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendMessageGeoLocationAction").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessageGeoLocationAction").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4501,11 +6000,53 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendMessageChooseContactAction").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessageChooseContactAction").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class SendMessageStartPlayGameAction extends SendMessageAction {
+
+        public SendMessageStartPlayGameAction() {
+        }
+
+        public static final int CONSTRUCTOR = -2099820430;
+
+        @Override
+        public int getConstructor() {
+            return -2099820430;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessageStartPlayGameAction").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class SendMessageStopPlayGameAction extends SendMessageAction {
+
+        public SendMessageStopPlayGameAction() {
+        }
+
+        public static final int CONSTRUCTOR = 911329680;
+
+        @Override
+        public int getConstructor() {
+            return 911329680;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessageStopPlayGameAction").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4539,18 +6080,18 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Sticker").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Sticker").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("setId").append(" = ").append(setId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("width").append(" = ").append(width).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("height").append(" = ").append(height).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("emoji").append(" = ").append(emoji).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("rating").append(" = ").append(rating).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("thumb").append(" = "); thumb.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("sticker").append(" = "); sticker.toStringBuilder(shift, s);
+            appendLine(s, shift).append("setId = ").append(setId);
+            appendLine(s, shift).append("width = ").append(width);
+            appendLine(s, shift).append("height = ").append(height);
+            appendLine(s, shift).append("emoji = ").append(emoji);
+            appendLine(s, shift).append("rating = ").append(rating);
+            appendLine(s, shift).append("thumb = "); thumb.toStringBuilder(shift, s);
+            appendLine(s, shift).append("sticker = "); sticker.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4586,19 +6127,19 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("StickerSet").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("StickerSet").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("name").append(" = ").append(name).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("rating").append(" = ").append(rating).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isInstalled").append(" = ").append(isInstalled).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isEnabled").append(" = ").append(isEnabled).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isOfficial").append(" = ").append(isOfficial).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("stickers").append(" = ").append("Sticker[]").append(" {").append(Arrays.toString(stickers)).append("}\n");
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("name = ").append(name);
+            appendLine(s, shift).append("rating = ").append(rating);
+            appendLine(s, shift).append("isInstalled = ").append(isInstalled);
+            appendLine(s, shift).append("isEnabled = ").append(isEnabled);
+            appendLine(s, shift).append("isOfficial = ").append(isOfficial);
+            appendLine(s, shift).append("stickers = ").append(Arrays.toString(stickers));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4634,19 +6175,19 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("StickerSetInfo").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("StickerSetInfo").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("name").append(" = ").append(name).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("rating").append(" = ").append(rating).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isInstalled").append(" = ").append(isInstalled).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isEnabled").append(" = ").append(isEnabled).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isOfficial").append(" = ").append(isOfficial).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("size").append(" = ").append(size).append('\n');
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("name = ").append(name);
+            appendLine(s, shift).append("rating = ").append(rating);
+            appendLine(s, shift).append("isInstalled = ").append(isInstalled);
+            appendLine(s, shift).append("isEnabled = ").append(isEnabled);
+            appendLine(s, shift).append("isOfficial = ").append(isOfficial);
+            appendLine(s, shift).append("size = ").append(size);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4668,12 +6209,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("StickerSets").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("StickerSets").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("sets").append(" = ").append("StickerSetInfo[]").append(" {").append(Arrays.toString(sets)).append("}\n");
+            appendLine(s, shift).append("sets = ").append(Arrays.toString(sets));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4695,12 +6236,57 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Stickers").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Stickers").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("stickers").append(" = ").append("Sticker[]").append(" {").append(Arrays.toString(stickers)).append("}\n");
+            appendLine(s, shift).append("stickers = ").append(Arrays.toString(stickers));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public abstract static class TextParseMode extends TLObject {
+    }
+
+    public static class TextParseModeMarkdown extends TextParseMode {
+
+        public TextParseModeMarkdown() {
+        }
+
+        public static final int CONSTRUCTOR = 969225580;
+
+        @Override
+        public int getConstructor() {
+            return 969225580;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TextParseModeMarkdown").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class TextParseModeHTML extends TextParseMode {
+
+        public TextParseModeHTML() {
+        }
+
+        public static final int CONSTRUCTOR = 1660208627;
+
+        @Override
+        public int getConstructor() {
+            return 1660208627;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TextParseModeHTML").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4709,94 +6295,97 @@ public class TdApi {
 
     public static class UpdateNewMessage extends Update {
         public Message message;
+        public boolean disableNotification;
 
         public UpdateNewMessage() {
         }
 
-        public UpdateNewMessage(Message message) {
+        public UpdateNewMessage(Message message, boolean disableNotification) {
             this.message = message;
+            this.disableNotification = disableNotification;
         }
 
-        public static final int CONSTRUCTOR = -563105266;
+        public static final int CONSTRUCTOR = 1098732806;
 
         @Override
         public int getConstructor() {
-            return -563105266;
+            return 1098732806;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateNewMessage").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateNewMessage").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("message").append(" = "); message.toStringBuilder(shift, s);
+            appendLine(s, shift).append("message = "); message.toStringBuilder(shift, s);
+            appendLine(s, shift).append("disableNotification = ").append(disableNotification);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class UpdateMessageId extends Update {
-        public long chatId;
-        public int oldId;
-        public int newId;
+    public static class UpdateMessageSendSucceeded extends Update {
+        public Message message;
+        public int oldMessageId;
 
-        public UpdateMessageId() {
+        public UpdateMessageSendSucceeded() {
         }
 
-        public UpdateMessageId(long chatId, int oldId, int newId) {
-            this.chatId = chatId;
-            this.oldId = oldId;
-            this.newId = newId;
+        public UpdateMessageSendSucceeded(Message message, int oldMessageId) {
+            this.message = message;
+            this.oldMessageId = oldMessageId;
         }
 
-        public static final int CONSTRUCTOR = 1840811241;
+        public static final int CONSTRUCTOR = -272606842;
 
         @Override
         public int getConstructor() {
-            return 1840811241;
+            return -272606842;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateMessageId").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateMessageSendSucceeded").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("oldId").append(" = ").append(oldId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("newId").append(" = ").append(newId).append('\n');
+            appendLine(s, shift).append("message = "); message.toStringBuilder(shift, s);
+            appendLine(s, shift).append("oldMessageId = ").append(oldMessageId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class UpdateMessageDate extends Update {
+    public static class UpdateMessageSendFailed extends Update {
         public long chatId;
         public int messageId;
-        public int newDate;
+        public int errorCode;
+        public String errorMessage;
 
-        public UpdateMessageDate() {
+        public UpdateMessageSendFailed() {
         }
 
-        public UpdateMessageDate(long chatId, int messageId, int newDate) {
+        public UpdateMessageSendFailed(long chatId, int messageId, int errorCode, String errorMessage) {
             this.chatId = chatId;
             this.messageId = messageId;
-            this.newDate = newDate;
+            this.errorCode = errorCode;
+            this.errorMessage = errorMessage;
         }
 
-        public static final int CONSTRUCTOR = 211076103;
+        public static final int CONSTRUCTOR = -1711539093;
 
         @Override
         public int getConstructor() {
-            return 211076103;
+            return -1711539093;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateMessageDate").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateMessageSendFailed").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageId").append(" = ").append(messageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("newDate").append(" = ").append(newDate).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
+            appendLine(s, shift).append("errorCode = ").append(errorCode);
+            appendLine(s, shift).append("errorMessage = ").append(errorMessage);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4822,50 +6411,50 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateMessageContent").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateMessageContent").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageId").append(" = ").append(messageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("newContent").append(" = "); newContent.toStringBuilder(shift, s);
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
+            appendLine(s, shift).append("newContent = "); newContent.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class UpdateMessageSendFailed extends Update {
+    public static class UpdateMessageEdited extends Update {
         public long chatId;
         public int messageId;
-        public int errorCode;
-        public String errorDescription;
+        public int editDate;
+        public ReplyMarkup replyMarkup;
 
-        public UpdateMessageSendFailed() {
+        public UpdateMessageEdited() {
         }
 
-        public UpdateMessageSendFailed(long chatId, int messageId, int errorCode, String errorDescription) {
+        public UpdateMessageEdited(long chatId, int messageId, int editDate, ReplyMarkup replyMarkup) {
             this.chatId = chatId;
             this.messageId = messageId;
-            this.errorCode = errorCode;
-            this.errorDescription = errorDescription;
+            this.editDate = editDate;
+            this.replyMarkup = replyMarkup;
         }
 
-        public static final int CONSTRUCTOR = 2098937137;
+        public static final int CONSTRUCTOR = -1312681878;
 
         @Override
         public int getConstructor() {
-            return 2098937137;
+            return -1312681878;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateMessageSendFailed").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateMessageEdited").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageId").append(" = ").append(messageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("errorCode").append(" = ").append(errorCode).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("errorDescription").append(" = ").append(errorDescription).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
+            appendLine(s, shift).append("editDate = ").append(editDate);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4891,14 +6480,14 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateMessageViews").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateMessageViews").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageId").append(" = ").append(messageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("views").append(" = ").append(views).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
+            appendLine(s, shift).append("views = ").append(views);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4920,12 +6509,42 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chat").append(" = "); chat.toStringBuilder(shift, s);
+            appendLine(s, shift).append("chat = "); chat.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class UpdateChatTopMessage extends Update {
+        public long chatId;
+        public Message topMessage;
+
+        public UpdateChatTopMessage() {
+        }
+
+        public UpdateChatTopMessage(long chatId, Message topMessage) {
+            this.chatId = chatId;
+            this.topMessage = topMessage;
+        }
+
+        public static final int CONSTRUCTOR = 281918326;
+
+        @Override
+        public int getConstructor() {
+            return 281918326;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChatTopMessage").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("topMessage = "); topMessage.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4949,13 +6568,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateChatOrder").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChatOrder").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("order").append(" = ").append(order).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("order = ").append(order);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -4979,13 +6598,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateChatTitle").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChatTitle").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("title = ").append(title);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5009,13 +6628,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateChatPhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChatPhoto").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photo").append(" = "); photo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("photo = "); photo.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5041,14 +6660,14 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateChatReadInbox").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChatReadInbox").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastReadInboxMessageId").append(" = ").append(lastReadInboxMessageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("unreadCount").append(" = ").append(unreadCount).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("lastReadInboxMessageId = ").append(lastReadInboxMessageId);
+            appendLine(s, shift).append("unreadCount = ").append(unreadCount);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5072,13 +6691,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateChatReadOutbox").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChatReadOutbox").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastReadOutboxMessageId").append(" = ").append(lastReadOutboxMessageId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("lastReadOutboxMessageId = ").append(lastReadOutboxMessageId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5102,13 +6721,43 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateChatReplyMarkup").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChatReplyMarkup").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("replyMarkupMessageId").append(" = ").append(replyMarkupMessageId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("replyMarkupMessageId = ").append(replyMarkupMessageId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class UpdateChatDraftMessage extends Update {
+        public long chatId;
+        public DraftMessage draftMessage;
+
+        public UpdateChatDraftMessage() {
+        }
+
+        public UpdateChatDraftMessage(long chatId, DraftMessage draftMessage) {
+            this.chatId = chatId;
+            this.draftMessage = draftMessage;
+        }
+
+        public static final int CONSTRUCTOR = 602781138;
+
+        @Override
+        public int getConstructor() {
+            return 602781138;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChatDraftMessage").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("draftMessage = "); draftMessage.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5132,13 +6781,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateNotificationSettings").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateNotificationSettings").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("scope").append(" = "); scope.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("notificationSettings").append(" = "); notificationSettings.toStringBuilder(shift, s);
+            appendLine(s, shift).append("scope = "); scope.toStringBuilder(shift, s);
+            appendLine(s, shift).append("notificationSettings = "); notificationSettings.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5162,13 +6811,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateDeleteMessages").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateDeleteMessages").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageIds").append(" = ").append("int[]").append(" {").append(Arrays.toString(messageIds)).append("}\n");
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageIds = ").append(Arrays.toString(messageIds));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5194,14 +6843,14 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateUserAction").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateUserAction").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("action").append(" = "); action.toStringBuilder(shift, s);
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("userId = ").append(userId);
+            appendLine(s, shift).append("action = "); action.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5225,13 +6874,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateUserStatus").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateUserStatus").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("status").append(" = "); status.toStringBuilder(shift, s);
+            appendLine(s, shift).append("userId = ").append(userId);
+            appendLine(s, shift).append("status = "); status.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5253,12 +6902,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateUser").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateUser").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("user").append(" = "); user.toStringBuilder(shift, s);
+            appendLine(s, shift).append("user = "); user.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5280,12 +6929,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateGroup").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateGroup").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("group").append(" = "); group.toStringBuilder(shift, s);
+            appendLine(s, shift).append("group = "); group.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5307,12 +6956,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateChannel").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChannel").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channel").append(" = "); channel.toStringBuilder(shift, s);
+            appendLine(s, shift).append("channel = "); channel.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5326,20 +6975,47 @@ public class TdApi {
             this.secretChat = secretChat;
         }
 
-        public static final int CONSTRUCTOR = -1172216513;
+        public static final int CONSTRUCTOR = -1666903253;
 
         @Override
         public int getConstructor() {
-            return -1172216513;
+            return -1666903253;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateSecretChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateSecretChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("secretChat").append(" = "); secretChat.toStringBuilder(shift, s);
+            appendLine(s, shift).append("secretChat = "); secretChat.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class UpdateChannelFull extends Update {
+        public ChannelFull channelFull;
+
+        public UpdateChannelFull() {
+        }
+
+        public UpdateChannelFull(ChannelFull channelFull) {
+            this.channelFull = channelFull;
+        }
+
+        public static final int CONSTRUCTOR = 1140192938;
+
+        @Override
+        public int getConstructor() {
+            return 1140192938;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChannelFull").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("channelFull = "); channelFull.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5363,13 +7039,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateUserBlocked").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateUserBlocked").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isBlocked").append(" = ").append(isBlocked).append('\n');
+            appendLine(s, shift).append("userId = ").append(userId);
+            appendLine(s, shift).append("isBlocked = ").append(isBlocked);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5395,14 +7071,14 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateNewAuthorization").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateNewAuthorization").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("date").append(" = ").append(date).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("device").append(" = ").append(device).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("location").append(" = ").append(location).append('\n');
+            appendLine(s, shift).append("date = ").append(date);
+            appendLine(s, shift).append("device = ").append(device);
+            appendLine(s, shift).append("location = ").append(location);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5428,14 +7104,14 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateFileProgress").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateFileProgress").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fileId").append(" = ").append(fileId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("size").append(" = ").append(size).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("ready").append(" = ").append(ready).append('\n');
+            appendLine(s, shift).append("fileId = ").append(fileId);
+            appendLine(s, shift).append("size = ").append(size);
+            appendLine(s, shift).append("ready = ").append(ready);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5457,12 +7133,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateFile").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateFile").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("file").append(" = "); file.toStringBuilder(shift, s);
+            appendLine(s, shift).append("file = "); file.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5486,13 +7162,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateOption").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateOption").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("name").append(" = ").append(name).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = "); value.toStringBuilder(shift, s);
+            appendLine(s, shift).append("name = ").append(name);
+            appendLine(s, shift).append("value = "); value.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5509,11 +7185,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateStickers").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateStickers").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5530,80 +7206,170 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateSavedAnimations").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateSavedAnimations").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class UpdateNewInlineQuery extends Update {
         public long id;
-        public int fromId;
+        public int senderUserId;
+        public Location userLocation;
         public String query;
         public String offset;
 
         public UpdateNewInlineQuery() {
         }
 
-        public UpdateNewInlineQuery(long id, int fromId, String query, String offset) {
+        public UpdateNewInlineQuery(long id, int senderUserId, Location userLocation, String query, String offset) {
             this.id = id;
-            this.fromId = fromId;
+            this.senderUserId = senderUserId;
+            this.userLocation = userLocation;
             this.query = query;
             this.offset = offset;
         }
 
-        public static final int CONSTRUCTOR = -286842233;
+        public static final int CONSTRUCTOR = -820108313;
 
         @Override
         public int getConstructor() {
-            return -286842233;
+            return -820108313;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateNewInlineQuery").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateNewInlineQuery").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fromId").append(" = ").append(fromId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("query").append(" = ").append(query).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("senderUserId = ").append(senderUserId);
+            appendLine(s, shift).append("userLocation = "); userLocation.toStringBuilder(shift, s);
+            appendLine(s, shift).append("query = ").append(query);
+            appendLine(s, shift).append("offset = ").append(offset);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class UpdateNewChosenInlineResult extends Update {
-        public int fromId;
+        public int senderUserId;
+        public Location userLocation;
         public String query;
         public String resultId;
+        public String inlineMessageId;
 
         public UpdateNewChosenInlineResult() {
         }
 
-        public UpdateNewChosenInlineResult(int fromId, String query, String resultId) {
-            this.fromId = fromId;
+        public UpdateNewChosenInlineResult(int senderUserId, Location userLocation, String query, String resultId, String inlineMessageId) {
+            this.senderUserId = senderUserId;
+            this.userLocation = userLocation;
             this.query = query;
             this.resultId = resultId;
+            this.inlineMessageId = inlineMessageId;
         }
 
-        public static final int CONSTRUCTOR = -1602350604;
+        public static final int CONSTRUCTOR = -867559680;
 
         @Override
         public int getConstructor() {
-            return -1602350604;
+            return -867559680;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateNewChosenInlineResult").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateNewChosenInlineResult").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fromId").append(" = ").append(fromId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("query").append(" = ").append(query).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("resultId").append(" = ").append(resultId).append('\n');
+            appendLine(s, shift).append("senderUserId = ").append(senderUserId);
+            appendLine(s, shift).append("userLocation = "); userLocation.toStringBuilder(shift, s);
+            appendLine(s, shift).append("query = ").append(query);
+            appendLine(s, shift).append("resultId = ").append(resultId);
+            appendLine(s, shift).append("inlineMessageId = ").append(inlineMessageId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class UpdateNewCallbackQuery extends Update {
+        public long id;
+        public int senderUserId;
+        public long chatId;
+        public int messageId;
+        public long chatInstance;
+        public CallbackQueryPayload payload;
+
+        public UpdateNewCallbackQuery() {
+        }
+
+        public UpdateNewCallbackQuery(long id, int senderUserId, long chatId, int messageId, long chatInstance, CallbackQueryPayload payload) {
+            this.id = id;
+            this.senderUserId = senderUserId;
+            this.chatId = chatId;
+            this.messageId = messageId;
+            this.chatInstance = chatInstance;
+            this.payload = payload;
+        }
+
+        public static final int CONSTRUCTOR = -469662806;
+
+        @Override
+        public int getConstructor() {
+            return -469662806;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateNewCallbackQuery").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("senderUserId = ").append(senderUserId);
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
+            appendLine(s, shift).append("chatInstance = ").append(chatInstance);
+            appendLine(s, shift).append("payload = "); payload.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class UpdateNewInlineCallbackQuery extends Update {
+        public long id;
+        public int senderUserId;
+        public String inlineMessageId;
+        public long chatInstance;
+        public CallbackQueryPayload payload;
+
+        public UpdateNewInlineCallbackQuery() {
+        }
+
+        public UpdateNewInlineCallbackQuery(long id, int senderUserId, String inlineMessageId, long chatInstance, CallbackQueryPayload payload) {
+            this.id = id;
+            this.senderUserId = senderUserId;
+            this.inlineMessageId = inlineMessageId;
+            this.chatInstance = chatInstance;
+            this.payload = payload;
+        }
+
+        public static final int CONSTRUCTOR = -1564879277;
+
+        @Override
+        public int getConstructor() {
+            return -1564879277;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateNewInlineCallbackQuery").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("senderUserId = ").append(senderUserId);
+            appendLine(s, shift).append("inlineMessageId = ").append(inlineMessageId);
+            appendLine(s, shift).append("chatInstance = ").append(chatInstance);
+            appendLine(s, shift).append("payload = "); payload.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5649,57 +7415,60 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("User").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("User").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("firstName").append(" = ").append(firstName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastName").append(" = ").append(lastName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("username").append(" = ").append(username).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("phoneNumber").append(" = ").append(phoneNumber).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("status").append(" = "); status.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("profilePhoto").append(" = "); profilePhoto.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("myLink").append(" = "); myLink.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("foreignLink").append(" = "); foreignLink.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isVerified").append(" = ").append(isVerified).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("restrictionReason").append(" = ").append(restrictionReason).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("haveAccess").append(" = ").append(haveAccess).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("type").append(" = "); type.toStringBuilder(shift, s);
+            appendLine(s, shift).append("id = ").append(id);
+            appendLine(s, shift).append("firstName = ").append(firstName);
+            appendLine(s, shift).append("lastName = ").append(lastName);
+            appendLine(s, shift).append("username = ").append(username);
+            appendLine(s, shift).append("phoneNumber = ").append(phoneNumber);
+            appendLine(s, shift).append("status = "); status.toStringBuilder(shift, s);
+            appendLine(s, shift).append("profilePhoto = "); profilePhoto.toStringBuilder(shift, s);
+            appendLine(s, shift).append("myLink = "); myLink.toStringBuilder(shift, s);
+            appendLine(s, shift).append("foreignLink = "); foreignLink.toStringBuilder(shift, s);
+            appendLine(s, shift).append("isVerified = ").append(isVerified);
+            appendLine(s, shift).append("restrictionReason = ").append(restrictionReason);
+            appendLine(s, shift).append("haveAccess = ").append(haveAccess);
+            appendLine(s, shift).append("type = "); type.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class UserFull extends TLObject {
         public User user;
         public boolean isBlocked;
+        public String about;
         public BotInfo botInfo;
 
         public UserFull() {
         }
 
-        public UserFull(User user, boolean isBlocked, BotInfo botInfo) {
+        public UserFull(User user, boolean isBlocked, String about, BotInfo botInfo) {
             this.user = user;
             this.isBlocked = isBlocked;
+            this.about = about;
             this.botInfo = botInfo;
         }
 
-        public static final int CONSTRUCTOR = -1158674134;
+        public static final int CONSTRUCTOR = -539848475;
 
         @Override
         public int getConstructor() {
-            return -1158674134;
+            return -539848475;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UserFull").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserFull").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("user").append(" = "); user.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isBlocked").append(" = ").append(isBlocked).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("botInfo").append(" = "); botInfo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("user = "); user.toStringBuilder(shift, s);
+            appendLine(s, shift).append("isBlocked = ").append(isBlocked);
+            appendLine(s, shift).append("about = ").append(about);
+            appendLine(s, shift).append("botInfo = "); botInfo.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5723,13 +7492,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UserProfilePhotos").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserProfilePhotos").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("totalCount").append(" = ").append(totalCount).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photos").append(" = ").append("Photo[]").append(" {").append(Arrays.toString(photos)).append("}\n");
+            appendLine(s, shift).append("totalCount = ").append(totalCount);
+            appendLine(s, shift).append("photos = ").append(Arrays.toString(photos));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5749,11 +7518,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UserStatusEmpty").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserStatusEmpty").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5775,12 +7544,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UserStatusOnline").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserStatusOnline").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("expires").append(" = ").append(expires).append('\n');
+            appendLine(s, shift).append("expires = ").append(expires);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5802,12 +7571,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UserStatusOffline").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserStatusOffline").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("wasOnline").append(" = ").append(wasOnline).append('\n');
+            appendLine(s, shift).append("wasOnline = ").append(wasOnline);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5824,11 +7593,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UserStatusRecently").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserStatusRecently").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5845,11 +7614,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UserStatusLastWeek").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserStatusLastWeek").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5866,11 +7635,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UserStatusLastMonth").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserStatusLastMonth").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5890,11 +7659,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UserTypeGeneral").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserTypeGeneral").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5911,11 +7680,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UserTypeDeleted").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserTypeDeleted").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5924,34 +7693,37 @@ public class TdApi {
         public boolean canReadAllGroupChatMessages;
         public boolean isInline;
         public String inlineQueryPlaceholder;
+        public boolean needLocation;
 
         public UserTypeBot() {
         }
 
-        public UserTypeBot(boolean canJoinGroupChats, boolean canReadAllGroupChatMessages, boolean isInline, String inlineQueryPlaceholder) {
+        public UserTypeBot(boolean canJoinGroupChats, boolean canReadAllGroupChatMessages, boolean isInline, String inlineQueryPlaceholder, boolean needLocation) {
             this.canJoinGroupChats = canJoinGroupChats;
             this.canReadAllGroupChatMessages = canReadAllGroupChatMessages;
             this.isInline = isInline;
             this.inlineQueryPlaceholder = inlineQueryPlaceholder;
+            this.needLocation = needLocation;
         }
 
-        public static final int CONSTRUCTOR = 1075507465;
+        public static final int CONSTRUCTOR = -610455780;
 
         @Override
         public int getConstructor() {
-            return 1075507465;
+            return -610455780;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UserTypeBot").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserTypeBot").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("canJoinGroupChats").append(" = ").append(canJoinGroupChats).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("canReadAllGroupChatMessages").append(" = ").append(canReadAllGroupChatMessages).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isInline").append(" = ").append(isInline).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inlineQueryPlaceholder").append(" = ").append(inlineQueryPlaceholder).append('\n');
+            appendLine(s, shift).append("canJoinGroupChats = ").append(canJoinGroupChats);
+            appendLine(s, shift).append("canReadAllGroupChatMessages = ").append(canReadAllGroupChatMessages);
+            appendLine(s, shift).append("isInline = ").append(isInline);
+            appendLine(s, shift).append("inlineQueryPlaceholder = ").append(inlineQueryPlaceholder);
+            appendLine(s, shift).append("needLocation = ").append(needLocation);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -5968,38 +7740,80 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UserTypeUnknown").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserTypeUnknown").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class Users extends TLObject {
+        public int totalCount;
         public User[] users;
 
         public Users() {
         }
 
-        public Users(User[] users) {
+        public Users(int totalCount, User[] users) {
+            this.totalCount = totalCount;
             this.users = users;
         }
 
-        public static final int CONSTRUCTOR = -53148716;
+        public static final int CONSTRUCTOR = 469005719;
 
         @Override
         public int getConstructor() {
-            return -53148716;
+            return 469005719;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Users").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Users").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("users").append(" = ").append("User[]").append(" {").append(Arrays.toString(users)).append("}\n");
+            appendLine(s, shift).append("totalCount = ").append(totalCount);
+            appendLine(s, shift).append("users = ").append(Arrays.toString(users));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class Venue extends TLObject {
+        public Location location;
+        public String title;
+        public String address;
+        public String provider;
+        public String id;
+
+        public Venue() {
+        }
+
+        public Venue(Location location, String title, String address, String provider, String id) {
+            this.location = location;
+            this.title = title;
+            this.address = address;
+            this.provider = provider;
+            this.id = id;
+        }
+
+        public static final int CONSTRUCTOR = -674687867;
+
+        @Override
+        public int getConstructor() {
+            return -674687867;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Venue").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("location = "); location.toStringBuilder(shift, s);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("address = ").append(address);
+            appendLine(s, shift).append("provider = ").append(provider);
+            appendLine(s, shift).append("id = ").append(id);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6033,18 +7847,18 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Video").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Video").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("duration").append(" = ").append(duration).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("width").append(" = ").append(width).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("height").append(" = ").append(height).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fileName").append(" = ").append(fileName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("mimeType").append(" = ").append(mimeType).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("thumb").append(" = "); thumb.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("video").append(" = "); video.toStringBuilder(shift, s);
+            appendLine(s, shift).append("duration = ").append(duration);
+            appendLine(s, shift).append("width = ").append(width);
+            appendLine(s, shift).append("height = ").append(height);
+            appendLine(s, shift).append("fileName = ").append(fileName);
+            appendLine(s, shift).append("mimeType = ").append(mimeType);
+            appendLine(s, shift).append("thumb = "); thumb.toStringBuilder(shift, s);
+            appendLine(s, shift).append("video = "); video.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6072,15 +7886,72 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("Voice").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Voice").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("duration").append(" = ").append(duration).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("waveform").append(" = ").append("bytes { "); { for (byte k : waveform) { int b = (int)k & 255; s.append(HEX_CHARACTERS[b >> 4]).append(HEX_CHARACTERS[b & 15]).append(' '); } } s.append("}\n");
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("mimeType").append(" = ").append(mimeType).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("voice").append(" = "); voice.toStringBuilder(shift, s);
+            appendLine(s, shift).append("duration = ").append(duration);
+            appendLine(s, shift).append("waveform = ").append("bytes { "); { for (byte k : waveform) { int b = (int)k & 255; s.append(HEX_CHARACTERS[b >> 4]).append(HEX_CHARACTERS[b & 15]).append(' '); } } s.append('}');
+            appendLine(s, shift).append("mimeType = ").append(mimeType);
+            appendLine(s, shift).append("voice = "); voice.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class Wallpaper extends TLObject {
+        public PhotoSize[] sizes;
+        public int color;
+
+        public Wallpaper() {
+        }
+
+        public Wallpaper(PhotoSize[] sizes, int color) {
+            this.sizes = sizes;
+            this.color = color;
+        }
+
+        public static final int CONSTRUCTOR = -803346388;
+
+        @Override
+        public int getConstructor() {
+            return -803346388;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Wallpaper").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("sizes = ").append(Arrays.toString(sizes));
+            appendLine(s, shift).append("color = ").append(color);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class Wallpapers extends TLObject {
+        public Wallpaper[] wallpapers;
+
+        public Wallpapers() {
+        }
+
+        public Wallpapers(Wallpaper[] wallpapers) {
+            this.wallpapers = wallpapers;
+        }
+
+        public static final int CONSTRUCTOR = 877926640;
+
+        @Override
+        public int getConstructor() {
+            return 877926640;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("Wallpapers").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("wallpapers = ").append(Arrays.toString(wallpapers));
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6099,13 +7970,16 @@ public class TdApi {
         public int duration;
         public String author;
         public Animation animation;
+        public Audio audio;
         public Document document;
         public Sticker sticker;
+        public Video video;
+        public Voice voice;
 
         public WebPage() {
         }
 
-        public WebPage(String url, String displayUrl, String type, String siteName, String title, String description, Photo photo, String embedUrl, String embedType, int embedWidth, int embedHeight, int duration, String author, Animation animation, Document document, Sticker sticker) {
+        public WebPage(String url, String displayUrl, String type, String siteName, String title, String description, Photo photo, String embedUrl, String embedType, int embedWidth, int embedHeight, int duration, String author, Animation animation, Audio audio, Document document, Sticker sticker, Video video, Voice voice) {
             this.url = url;
             this.displayUrl = displayUrl;
             this.type = type;
@@ -6120,39 +7994,45 @@ public class TdApi {
             this.duration = duration;
             this.author = author;
             this.animation = animation;
+            this.audio = audio;
             this.document = document;
             this.sticker = sticker;
+            this.video = video;
+            this.voice = voice;
         }
 
-        public static final int CONSTRUCTOR = -839747118;
+        public static final int CONSTRUCTOR = -268383594;
 
         @Override
         public int getConstructor() {
-            return -839747118;
+            return -268383594;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("WebPage").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("WebPage").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("url").append(" = ").append(url).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("displayUrl").append(" = ").append(displayUrl).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("type").append(" = ").append(type).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("siteName").append(" = ").append(siteName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("description").append(" = ").append(description).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photo").append(" = "); photo.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("embedUrl").append(" = ").append(embedUrl).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("embedType").append(" = ").append(embedType).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("embedWidth").append(" = ").append(embedWidth).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("embedHeight").append(" = ").append(embedHeight).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("duration").append(" = ").append(duration).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("author").append(" = ").append(author).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("animation").append(" = "); animation.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("document").append(" = "); document.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("sticker").append(" = "); sticker.toStringBuilder(shift, s);
+            appendLine(s, shift).append("url = ").append(url);
+            appendLine(s, shift).append("displayUrl = ").append(displayUrl);
+            appendLine(s, shift).append("type = ").append(type);
+            appendLine(s, shift).append("siteName = ").append(siteName);
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("description = ").append(description);
+            appendLine(s, shift).append("photo = "); photo.toStringBuilder(shift, s);
+            appendLine(s, shift).append("embedUrl = ").append(embedUrl);
+            appendLine(s, shift).append("embedType = ").append(embedType);
+            appendLine(s, shift).append("embedWidth = ").append(embedWidth);
+            appendLine(s, shift).append("embedHeight = ").append(embedHeight);
+            appendLine(s, shift).append("duration = ").append(duration);
+            appendLine(s, shift).append("author = ").append(author);
+            appendLine(s, shift).append("animation = "); animation.toStringBuilder(shift, s);
+            appendLine(s, shift).append("audio = "); audio.toStringBuilder(shift, s);
+            appendLine(s, shift).append("document = "); document.toStringBuilder(shift, s);
+            appendLine(s, shift).append("sticker = "); sticker.toStringBuilder(shift, s);
+            appendLine(s, shift).append("video = "); video.toStringBuilder(shift, s);
+            appendLine(s, shift).append("voice = "); voice.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6174,12 +8054,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestBytes").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestBytes").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = ").append("bytes { "); { for (byte k : value) { int b = (int)k & 255; s.append(HEX_CHARACTERS[b >> 4]).append(HEX_CHARACTERS[b & 15]).append(' '); } } s.append("}\n");
+            appendLine(s, shift).append("value = ").append("bytes { "); { for (byte k : value) { int b = (int)k & 255; s.append(HEX_CHARACTERS[b >> 4]).append(HEX_CHARACTERS[b & 15]).append(' '); } } s.append('}');
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6196,11 +8076,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestEmpty").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestEmpty").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6222,12 +8102,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestInt").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestInt").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = ").append(value).append('\n');
+            appendLine(s, shift).append("value = ").append(value);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6249,12 +8129,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestString").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestString").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = ").append(value).append('\n');
+            appendLine(s, shift).append("value = ").append(value);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6276,12 +8156,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestVectorInt").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestVectorInt").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = ").append("int[]").append(" {").append(Arrays.toString(value)).append("}\n");
+            appendLine(s, shift).append("value = ").append(Arrays.toString(value));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6303,12 +8183,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestVectorIntObject").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestVectorIntObject").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = ").append("TestInt[]").append(" {").append(Arrays.toString(value)).append("}\n");
+            appendLine(s, shift).append("value = ").append(Arrays.toString(value));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6330,12 +8210,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestVectorString").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestVectorString").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = ").append("String[]").append(" {").append(Arrays.toString(value)).append("}\n");
+            appendLine(s, shift).append("value = ").append(Arrays.toString(value));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6357,75 +8237,75 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestVectorStringObject").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestVectorStringObject").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = ").append("TestString[]").append(" {").append(Arrays.toString(value)).append("}\n");
+            appendLine(s, shift).append("value = ").append(Arrays.toString(value));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class AddChatParticipant extends TLFunction {
+    public static class AddChatMember extends TLFunction {
         public long chatId;
         public int userId;
         public int forwardLimit;
 
-        public AddChatParticipant() {
+        public AddChatMember() {
         }
 
-        public AddChatParticipant(long chatId, int userId, int forwardLimit) {
+        public AddChatMember(long chatId, int userId, int forwardLimit) {
             this.chatId = chatId;
             this.userId = userId;
             this.forwardLimit = forwardLimit;
         }
 
-        public static final int CONSTRUCTOR = 572126454;
+        public static final int CONSTRUCTOR = 1252828345;
 
         @Override
         public int getConstructor() {
-            return 572126454;
+            return 1252828345;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("AddChatParticipant").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AddChatMember").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("forwardLimit").append(" = ").append(forwardLimit).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("userId = ").append(userId);
+            appendLine(s, shift).append("forwardLimit = ").append(forwardLimit);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class AddChatParticipants extends TLFunction {
+    public static class AddChatMembers extends TLFunction {
         public long chatId;
         public int[] userIds;
 
-        public AddChatParticipants() {
+        public AddChatMembers() {
         }
 
-        public AddChatParticipants(long chatId, int[] userIds) {
+        public AddChatMembers(long chatId, int[] userIds) {
             this.chatId = chatId;
             this.userIds = userIds;
         }
 
-        public static final int CONSTRUCTOR = 1218907097;
+        public static final int CONSTRUCTOR = 693690362;
 
         @Override
         public int getConstructor() {
-            return 1218907097;
+            return 693690362;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("AddChatParticipants").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AddChatMembers").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userIds").append(" = ").append("int[]").append(" {").append(Arrays.toString(userIds)).append("}\n");
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("userIds = ").append(Arrays.toString(userIds));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6447,12 +8327,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("AddRecentlyFoundChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AddRecentlyFoundChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6474,51 +8354,93 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("AddSavedAnimation").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AddSavedAnimation").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("animation").append(" = "); animation.toStringBuilder(shift, s);
+            appendLine(s, shift).append("animation = "); animation.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class AnswerCallbackQuery extends TLFunction {
+        public long callbackQueryId;
+        public String text;
+        public boolean showAlert;
+        public String url;
+
+        public AnswerCallbackQuery() {
+        }
+
+        public AnswerCallbackQuery(long callbackQueryId, String text, boolean showAlert, String url) {
+            this.callbackQueryId = callbackQueryId;
+            this.text = text;
+            this.showAlert = showAlert;
+            this.url = url;
+        }
+
+        public static final int CONSTRUCTOR = 373886252;
+
+        @Override
+        public int getConstructor() {
+            return 373886252;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AnswerCallbackQuery").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("callbackQueryId = ").append(callbackQueryId);
+            appendLine(s, shift).append("text = ").append(text);
+            appendLine(s, shift).append("showAlert = ").append(showAlert);
+            appendLine(s, shift).append("url = ").append(url);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class AnswerInlineQuery extends TLFunction {
         public long inlineQueryId;
         public boolean isPersonal;
-        public InlineQueryResult[] results;
+        public InputInlineQueryResult[] results;
         public int cacheTime;
         public String nextOffset;
+        public String switchPmText;
+        public String switchPmParameter;
 
         public AnswerInlineQuery() {
         }
 
-        public AnswerInlineQuery(long inlineQueryId, boolean isPersonal, InlineQueryResult[] results, int cacheTime, String nextOffset) {
+        public AnswerInlineQuery(long inlineQueryId, boolean isPersonal, InputInlineQueryResult[] results, int cacheTime, String nextOffset, String switchPmText, String switchPmParameter) {
             this.inlineQueryId = inlineQueryId;
             this.isPersonal = isPersonal;
             this.results = results;
             this.cacheTime = cacheTime;
             this.nextOffset = nextOffset;
+            this.switchPmText = switchPmText;
+            this.switchPmParameter = switchPmParameter;
         }
 
-        public static final int CONSTRUCTOR = -545035034;
+        public static final int CONSTRUCTOR = 1529641829;
 
         @Override
         public int getConstructor() {
-            return -545035034;
+            return 1529641829;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("AnswerInlineQuery").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("AnswerInlineQuery").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inlineQueryId").append(" = ").append(inlineQueryId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isPersonal").append(" = ").append(isPersonal).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("results").append(" = ").append("InlineQueryResult[]").append(" {").append(Arrays.toString(results)).append("}\n");
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("cacheTime").append(" = ").append(cacheTime).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("nextOffset").append(" = ").append(nextOffset).append('\n');
+            appendLine(s, shift).append("inlineQueryId = ").append(inlineQueryId);
+            appendLine(s, shift).append("isPersonal = ").append(isPersonal);
+            appendLine(s, shift).append("results = ").append(Arrays.toString(results));
+            appendLine(s, shift).append("cacheTime = ").append(cacheTime);
+            appendLine(s, shift).append("nextOffset = ").append(nextOffset);
+            appendLine(s, shift).append("switchPmText = ").append(switchPmText);
+            appendLine(s, shift).append("switchPmParameter = ").append(switchPmParameter);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6540,12 +8462,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("BlockUser").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("BlockUser").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
+            appendLine(s, shift).append("userId = ").append(userId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6567,12 +8489,66 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("CancelDownloadFile").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CancelDownloadFile").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fileId").append(" = ").append(fileId).append('\n');
+            appendLine(s, shift).append("fileId = ").append(fileId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class ChangeAbout extends TLFunction {
+        public String about;
+
+        public ChangeAbout() {
+        }
+
+        public ChangeAbout(String about) {
+            this.about = about;
+        }
+
+        public static final int CONSTRUCTOR = -1364842334;
+
+        @Override
+        public int getConstructor() {
+            return -1364842334;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeAbout").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("about = ").append(about);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class ChangeAccountTtl extends TLFunction {
+        public AccountTtl ttl;
+
+        public ChangeAccountTtl() {
+        }
+
+        public ChangeAccountTtl(AccountTtl ttl) {
+            this.ttl = ttl;
+        }
+
+        public static final int CONSTRUCTOR = -1079644217;
+
+        @Override
+        public int getConstructor() {
+            return -1079644217;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeAccountTtl").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("ttl = "); ttl.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6596,13 +8572,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChangeChannelAbout").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeChannelAbout").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channelId").append(" = ").append(channelId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("about").append(" = ").append(about).append('\n');
+            appendLine(s, shift).append("channelId = ").append(channelId);
+            appendLine(s, shift).append("about = ").append(about);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6618,87 +8594,114 @@ public class TdApi {
             this.username = username;
         }
 
-        public static final int CONSTRUCTOR = -393592521;
+        public static final int CONSTRUCTOR = -1681482857;
 
         @Override
         public int getConstructor() {
-            return -393592521;
+            return -1681482857;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChangeChannelUsername").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeChannelUsername").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channelId").append(" = ").append(channelId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("username").append(" = ").append(username).append('\n');
+            appendLine(s, shift).append("channelId = ").append(channelId);
+            appendLine(s, shift).append("username = ").append(username);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class ChangeChatParticipantRole extends TLFunction {
+    public static class ChangeChatDraftMessage extends TLFunction {
         public long chatId;
-        public int userId;
-        public ChatParticipantRole role;
+        public DraftMessage draftMessage;
 
-        public ChangeChatParticipantRole() {
+        public ChangeChatDraftMessage() {
         }
 
-        public ChangeChatParticipantRole(long chatId, int userId, ChatParticipantRole role) {
+        public ChangeChatDraftMessage(long chatId, DraftMessage draftMessage) {
             this.chatId = chatId;
-            this.userId = userId;
-            this.role = role;
+            this.draftMessage = draftMessage;
         }
 
-        public static final int CONSTRUCTOR = -1967351300;
+        public static final int CONSTRUCTOR = 1572219043;
 
         @Override
         public int getConstructor() {
-            return -1967351300;
+            return 1572219043;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChangeChatParticipantRole").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeChatDraftMessage").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("role").append(" = "); role.toStringBuilder(shift, s);
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("draftMessage = "); draftMessage.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class ChangeChatMemberStatus extends TLFunction {
+        public long chatId;
+        public int userId;
+        public ChatMemberStatus status;
+
+        public ChangeChatMemberStatus() {
+        }
+
+        public ChangeChatMemberStatus(long chatId, int userId, ChatMemberStatus status) {
+            this.chatId = chatId;
+            this.userId = userId;
+            this.status = status;
+        }
+
+        public static final int CONSTRUCTOR = -1725424647;
+
+        @Override
+        public int getConstructor() {
+            return -1725424647;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeChatMemberStatus").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("userId = ").append(userId);
+            appendLine(s, shift).append("status = "); status.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class ChangeChatPhoto extends TLFunction {
         public long chatId;
         public InputFile photo;
-        public PhotoCrop crop;
 
         public ChangeChatPhoto() {
         }
 
-        public ChangeChatPhoto(long chatId, InputFile photo, PhotoCrop crop) {
+        public ChangeChatPhoto(long chatId, InputFile photo) {
             this.chatId = chatId;
             this.photo = photo;
-            this.crop = crop;
         }
 
-        public static final int CONSTRUCTOR = 1565887063;
+        public static final int CONSTRUCTOR = -452848448;
 
         @Override
         public int getConstructor() {
-            return 1565887063;
+            return -452848448;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChangeChatPhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeChatPhoto").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photo").append(" = "); photo.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("crop").append(" = "); crop.toStringBuilder(shift, s);
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("photo = "); photo.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6722,13 +8725,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChangeChatTitle").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeChatTitle").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("title = ").append(title);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6752,13 +8755,46 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChangeName").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeName").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("firstName").append(" = ").append(firstName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastName").append(" = ").append(lastName).append('\n');
+            appendLine(s, shift).append("firstName = ").append(firstName);
+            appendLine(s, shift).append("lastName = ").append(lastName);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class ChangePhoneNumber extends TLFunction {
+        public String phoneNumber;
+        public boolean allowFlashCall;
+        public boolean isCurrentPhoneNumber;
+
+        public ChangePhoneNumber() {
+        }
+
+        public ChangePhoneNumber(String phoneNumber, boolean allowFlashCall, boolean isCurrentPhoneNumber) {
+            this.phoneNumber = phoneNumber;
+            this.allowFlashCall = allowFlashCall;
+            this.isCurrentPhoneNumber = isCurrentPhoneNumber;
+        }
+
+        public static final int CONSTRUCTOR = 1329283881;
+
+        @Override
+        public int getConstructor() {
+            return 1329283881;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangePhoneNumber").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("phoneNumber = ").append(phoneNumber);
+            appendLine(s, shift).append("allowFlashCall = ").append(allowFlashCall);
+            appendLine(s, shift).append("isCurrentPhoneNumber = ").append(isCurrentPhoneNumber);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6780,12 +8816,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ChangeUsername").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeUsername").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("username").append(" = ").append(username).append('\n');
+            appendLine(s, shift).append("username = ").append(username);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6807,39 +8843,45 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("CheckAuthBotToken").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CheckAuthBotToken").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("token").append(" = ").append(token).append('\n');
+            appendLine(s, shift).append("token = ").append(token);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class CheckAuthCode extends TLFunction {
         public String code;
+        public String firstName;
+        public String lastName;
 
         public CheckAuthCode() {
         }
 
-        public CheckAuthCode(String code) {
+        public CheckAuthCode(String code, String firstName, String lastName) {
             this.code = code;
+            this.firstName = firstName;
+            this.lastName = lastName;
         }
 
-        public static final int CONSTRUCTOR = 1145501069;
+        public static final int CONSTRUCTOR = -1636693521;
 
         @Override
         public int getConstructor() {
-            return 1145501069;
+            return -1636693521;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("CheckAuthCode").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CheckAuthCode").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("code").append(" = ").append(code).append('\n');
+            appendLine(s, shift).append("code = ").append(code);
+            appendLine(s, shift).append("firstName = ").append(firstName);
+            appendLine(s, shift).append("lastName = ").append(lastName);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6861,12 +8903,39 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("CheckAuthPassword").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CheckAuthPassword").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("password").append(" = ").append(password).append('\n');
+            appendLine(s, shift).append("password = ").append(password);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class CheckChangePhoneNumberCode extends TLFunction {
+        public String code;
+
+        public CheckChangePhoneNumberCode() {
+        }
+
+        public CheckChangePhoneNumberCode(String code) {
+            this.code = code;
+        }
+
+        public static final int CONSTRUCTOR = 1010764228;
+
+        @Override
+        public int getConstructor() {
+            return 1010764228;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CheckChangePhoneNumberCode").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("code = ").append(code);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6888,12 +8957,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("CheckChatInviteLink").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CheckChatInviteLink").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inviteLink").append(" = ").append(inviteLink).append('\n');
+            appendLine(s, shift).append("inviteLink = ").append(inviteLink);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6915,12 +8984,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("CloseChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CloseChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6942,12 +9011,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("CreateChannelChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CreateChannelChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channelId").append(" = ").append(channelId).append('\n');
+            appendLine(s, shift).append("channelId = ").append(channelId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -6969,78 +9038,75 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("CreateGroupChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CreateGroupChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("groupId").append(" = ").append(groupId).append('\n');
+            appendLine(s, shift).append("groupId = ").append(groupId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class CreateNewChannelChat extends TLFunction {
         public String title;
-        public boolean isBroadcast;
         public boolean isSupergroup;
         public String about;
 
         public CreateNewChannelChat() {
         }
 
-        public CreateNewChannelChat(String title, boolean isBroadcast, boolean isSupergroup, String about) {
+        public CreateNewChannelChat(String title, boolean isSupergroup, String about) {
             this.title = title;
-            this.isBroadcast = isBroadcast;
             this.isSupergroup = isSupergroup;
             this.about = about;
         }
 
-        public static final int CONSTRUCTOR = 1818605150;
+        public static final int CONSTRUCTOR = -1547755747;
 
         @Override
         public int getConstructor() {
-            return 1818605150;
+            return -1547755747;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("CreateNewChannelChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CreateNewChannelChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isBroadcast").append(" = ").append(isBroadcast).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isSupergroup").append(" = ").append(isSupergroup).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("about").append(" = ").append(about).append('\n');
+            appendLine(s, shift).append("title = ").append(title);
+            appendLine(s, shift).append("isSupergroup = ").append(isSupergroup);
+            appendLine(s, shift).append("about = ").append(about);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class CreateNewGroupChat extends TLFunction {
-        public int[] participantIds;
+        public int[] userIds;
         public String title;
 
         public CreateNewGroupChat() {
         }
 
-        public CreateNewGroupChat(int[] participantIds, String title) {
-            this.participantIds = participantIds;
+        public CreateNewGroupChat(int[] userIds, String title) {
+            this.userIds = userIds;
             this.title = title;
         }
 
-        public static final int CONSTRUCTOR = 253168424;
+        public static final int CONSTRUCTOR = -1513123868;
 
         @Override
         public int getConstructor() {
-            return 253168424;
+            return -1513123868;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("CreateNewGroupChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CreateNewGroupChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("participantIds").append(" = ").append("int[]").append(" {").append(Arrays.toString(participantIds)).append("}\n");
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
+            appendLine(s, shift).append("userIds = ").append(Arrays.toString(userIds));
+            appendLine(s, shift).append("title = ").append(title);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7062,12 +9128,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("CreateNewSecretChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CreateNewSecretChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
+            appendLine(s, shift).append("userId = ").append(userId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7089,12 +9155,93 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("CreatePrivateChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CreatePrivateChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
+            appendLine(s, shift).append("userId = ").append(userId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class CreateSecretChat extends TLFunction {
+        public int secretChatId;
+
+        public CreateSecretChat() {
+        }
+
+        public CreateSecretChat(int secretChatId) {
+            this.secretChatId = secretChatId;
+        }
+
+        public static final int CONSTRUCTOR = -74300012;
+
+        @Override
+        public int getConstructor() {
+            return -74300012;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("CreateSecretChat").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("secretChatId = ").append(secretChatId);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class DeleteAccount extends TLFunction {
+        public String reason;
+
+        public DeleteAccount() {
+        }
+
+        public DeleteAccount(String reason) {
+            this.reason = reason;
+        }
+
+        public static final int CONSTRUCTOR = -1203056508;
+
+        @Override
+        public int getConstructor() {
+            return -1203056508;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteAccount").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("reason = ").append(reason);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class DeleteAuthorization extends TLFunction {
+        public long authorizationId;
+
+        public DeleteAuthorization() {
+        }
+
+        public DeleteAuthorization(long authorizationId) {
+            this.authorizationId = authorizationId;
+        }
+
+        public static final int CONSTRUCTOR = -834637761;
+
+        @Override
+        public int getConstructor() {
+            return -834637761;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteAuthorization").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("authorizationId = ").append(authorizationId);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7116,39 +9263,42 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("DeleteChannel").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteChannel").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channelId").append(" = ").append(channelId).append('\n');
+            appendLine(s, shift).append("channelId = ").append(channelId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class DeleteChatHistory extends TLFunction {
         public long chatId;
+        public boolean removeFromChatList;
 
         public DeleteChatHistory() {
         }
 
-        public DeleteChatHistory(long chatId) {
+        public DeleteChatHistory(long chatId, boolean removeFromChatList) {
             this.chatId = chatId;
+            this.removeFromChatList = removeFromChatList;
         }
 
-        public static final int CONSTRUCTOR = -1065852609;
+        public static final int CONSTRUCTOR = 987906679;
 
         @Override
         public int getConstructor() {
-            return -1065852609;
+            return 987906679;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("DeleteChatHistory").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteChatHistory").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("removeFromChatList = ").append(removeFromChatList);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7172,13 +9322,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("DeleteChatReplyMarkup").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteChatReplyMarkup").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageId").append(" = ").append(messageId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7200,12 +9350,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("DeleteContacts").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteContacts").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userIds").append(" = ").append("int[]").append(" {").append(Arrays.toString(userIds)).append("}\n");
+            appendLine(s, shift).append("userIds = ").append(Arrays.toString(userIds));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7229,13 +9379,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("DeleteMessages").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteMessages").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageIds").append(" = ").append("int[]").append(" {").append(Arrays.toString(messageIds)).append("}\n");
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageIds = ").append(Arrays.toString(messageIds));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7257,12 +9407,39 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("DeleteProfilePhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteProfilePhoto").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("profilePhotoId").append(" = ").append(profilePhotoId).append('\n');
+            appendLine(s, shift).append("profilePhotoId = ").append(profilePhotoId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class DeleteRecentlyFoundChat extends TLFunction {
+        public long chatId;
+
+        public DeleteRecentlyFoundChat() {
+        }
+
+        public DeleteRecentlyFoundChat(long chatId) {
+            this.chatId = chatId;
+        }
+
+        public static final int CONSTRUCTOR = 1317692233;
+
+        @Override
+        public int getConstructor() {
+            return 1317692233;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteRecentlyFoundChat").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7279,11 +9456,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("DeleteRecentlyFoundChats").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteRecentlyFoundChats").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7305,12 +9482,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("DeleteSavedAnimation").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteSavedAnimation").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("animation").append(" = "); animation.toStringBuilder(shift, s);
+            appendLine(s, shift).append("animation = "); animation.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7332,12 +9509,213 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("DownloadFile").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DownloadFile").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fileId").append(" = ").append(fileId).append('\n');
+            appendLine(s, shift).append("fileId = ").append(fileId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class EditInlineMessageCaption extends TLFunction {
+        public String inlineMessageId;
+        public ReplyMarkup replyMarkup;
+        public String caption;
+
+        public EditInlineMessageCaption() {
+        }
+
+        public EditInlineMessageCaption(String inlineMessageId, ReplyMarkup replyMarkup, String caption) {
+            this.inlineMessageId = inlineMessageId;
+            this.replyMarkup = replyMarkup;
+            this.caption = caption;
+        }
+
+        public static final int CONSTRUCTOR = 676019578;
+
+        @Override
+        public int getConstructor() {
+            return 676019578;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("EditInlineMessageCaption").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("inlineMessageId = ").append(inlineMessageId);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("caption = ").append(caption);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class EditInlineMessageReplyMarkup extends TLFunction {
+        public String inlineMessageId;
+        public ReplyMarkup replyMarkup;
+
+        public EditInlineMessageReplyMarkup() {
+        }
+
+        public EditInlineMessageReplyMarkup(String inlineMessageId, ReplyMarkup replyMarkup) {
+            this.inlineMessageId = inlineMessageId;
+            this.replyMarkup = replyMarkup;
+        }
+
+        public static final int CONSTRUCTOR = -67565858;
+
+        @Override
+        public int getConstructor() {
+            return -67565858;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("EditInlineMessageReplyMarkup").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("inlineMessageId = ").append(inlineMessageId);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class EditInlineMessageText extends TLFunction {
+        public String inlineMessageId;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public EditInlineMessageText() {
+        }
+
+        public EditInlineMessageText(String inlineMessageId, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.inlineMessageId = inlineMessageId;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = -855457307;
+
+        @Override
+        public int getConstructor() {
+            return -855457307;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("EditInlineMessageText").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("inlineMessageId = ").append(inlineMessageId);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class EditMessageCaption extends TLFunction {
+        public long chatId;
+        public int messageId;
+        public ReplyMarkup replyMarkup;
+        public String caption;
+
+        public EditMessageCaption() {
+        }
+
+        public EditMessageCaption(long chatId, int messageId, ReplyMarkup replyMarkup, String caption) {
+            this.chatId = chatId;
+            this.messageId = messageId;
+            this.replyMarkup = replyMarkup;
+            this.caption = caption;
+        }
+
+        public static final int CONSTRUCTOR = 702735393;
+
+        @Override
+        public int getConstructor() {
+            return 702735393;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("EditMessageCaption").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("caption = ").append(caption);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class EditMessageReplyMarkup extends TLFunction {
+        public long chatId;
+        public int messageId;
+        public ReplyMarkup replyMarkup;
+
+        public EditMessageReplyMarkup() {
+        }
+
+        public EditMessageReplyMarkup(long chatId, int messageId, ReplyMarkup replyMarkup) {
+            this.chatId = chatId;
+            this.messageId = messageId;
+            this.replyMarkup = replyMarkup;
+        }
+
+        public static final int CONSTRUCTOR = -1344470531;
+
+        @Override
+        public int getConstructor() {
+            return -1344470531;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("EditMessageReplyMarkup").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class EditMessageText extends TLFunction {
+        public long chatId;
+        public int messageId;
+        public ReplyMarkup replyMarkup;
+        public InputMessageContent inputMessageContent;
+
+        public EditMessageText() {
+        }
+
+        public EditMessageText(long chatId, int messageId, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
+            this.chatId = chatId;
+            this.messageId = messageId;
+            this.replyMarkup = replyMarkup;
+            this.inputMessageContent = inputMessageContent;
+        }
+
+        public static final int CONSTRUCTOR = 1316368529;
+
+        @Override
+        public int getConstructor() {
+            return 1316368529;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("EditMessageText").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7359,12 +9737,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ExportChatInviteLink").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ExportChatInviteLink").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7372,41 +9750,59 @@ public class TdApi {
         public long chatId;
         public long fromChatId;
         public int[] messageIds;
-        public boolean isPost;
         public boolean disableNotification;
         public boolean fromBackground;
 
         public ForwardMessages() {
         }
 
-        public ForwardMessages(long chatId, long fromChatId, int[] messageIds, boolean isPost, boolean disableNotification, boolean fromBackground) {
+        public ForwardMessages(long chatId, long fromChatId, int[] messageIds, boolean disableNotification, boolean fromBackground) {
             this.chatId = chatId;
             this.fromChatId = fromChatId;
             this.messageIds = messageIds;
-            this.isPost = isPost;
             this.disableNotification = disableNotification;
             this.fromBackground = fromBackground;
         }
 
-        public static final int CONSTRUCTOR = -1620591163;
+        public static final int CONSTRUCTOR = 716825012;
 
         @Override
         public int getConstructor() {
-            return -1620591163;
+            return 716825012;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ForwardMessages").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ForwardMessages").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fromChatId").append(" = ").append(fromChatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageIds").append(" = ").append("int[]").append(" {").append(Arrays.toString(messageIds)).append("}\n");
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isPost").append(" = ").append(isPost).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("disableNotification").append(" = ").append(disableNotification).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fromBackground").append(" = ").append(fromBackground).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("fromChatId = ").append(fromChatId);
+            appendLine(s, shift).append("messageIds = ").append(Arrays.toString(messageIds));
+            appendLine(s, shift).append("disableNotification = ").append(disableNotification);
+            appendLine(s, shift).append("fromBackground = ").append(fromBackground);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class GetAccountTtl extends TLFunction {
+
+        public GetAccountTtl() {
+        }
+
+        public static final int CONSTRUCTOR = -443905161;
+
+        @Override
+        public int getConstructor() {
+            return -443905161;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetAccountTtl").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7423,11 +9819,95 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetAuthState").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetAuthState").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class GetAuthorizations extends TLFunction {
+
+        public GetAuthorizations() {
+        }
+
+        public static final int CONSTRUCTOR = -1232858954;
+
+        @Override
+        public int getConstructor() {
+            return -1232858954;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetAuthorizations").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class GetBlockedUsers extends TLFunction {
+        public int offset;
+        public int limit;
+
+        public GetBlockedUsers() {
+        }
+
+        public GetBlockedUsers(int offset, int limit) {
+            this.offset = offset;
+            this.limit = limit;
+        }
+
+        public static final int CONSTRUCTOR = 9255073;
+
+        @Override
+        public int getConstructor() {
+            return 9255073;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetBlockedUsers").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("limit = ").append(limit);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class GetCallbackQueryAnswer extends TLFunction {
+        public long chatId;
+        public int messageId;
+        public CallbackQueryPayload payload;
+
+        public GetCallbackQueryAnswer() {
+        }
+
+        public GetCallbackQueryAnswer(long chatId, int messageId, CallbackQueryPayload payload) {
+            this.chatId = chatId;
+            this.messageId = messageId;
+            this.payload = payload;
+        }
+
+        public static final int CONSTRUCTOR = 693485097;
+
+        @Override
+        public int getConstructor() {
+            return 693485097;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetCallbackQueryAnswer").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
+            appendLine(s, shift).append("payload = "); payload.toStringBuilder(shift, s);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7449,12 +9929,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetChannel").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetChannel").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channelId").append(" = ").append(channelId).append('\n');
+            appendLine(s, shift).append("channelId = ").append(channelId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7476,48 +9956,48 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetChannelFull").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetChannelFull").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channelId").append(" = ").append(channelId).append('\n');
+            appendLine(s, shift).append("channelId = ").append(channelId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class GetChannelParticipants extends TLFunction {
+    public static class GetChannelMembers extends TLFunction {
         public int channelId;
-        public ChannelParticipantsFilter filter;
+        public ChannelMembersFilter filter;
         public int offset;
         public int limit;
 
-        public GetChannelParticipants() {
+        public GetChannelMembers() {
         }
 
-        public GetChannelParticipants(int channelId, ChannelParticipantsFilter filter, int offset, int limit) {
+        public GetChannelMembers(int channelId, ChannelMembersFilter filter, int offset, int limit) {
             this.channelId = channelId;
             this.filter = filter;
             this.offset = offset;
             this.limit = limit;
         }
 
-        public static final int CONSTRUCTOR = -1920911169;
+        public static final int CONSTRUCTOR = 2116707652;
 
         @Override
         public int getConstructor() {
-            return -1920911169;
+            return 2116707652;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetChannelParticipants").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetChannelMembers").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channelId").append(" = ").append(channelId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("filter").append(" = "); filter.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("limit").append(" = ").append(limit).append('\n');
+            appendLine(s, shift).append("channelId = ").append(channelId);
+            appendLine(s, shift).append("filter = "); filter.toStringBuilder(shift, s);
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("limit = ").append(limit);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7539,48 +10019,78 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class GetChatHistory extends TLFunction {
         public long chatId;
-        public int fromId;
+        public int fromMessageId;
         public int offset;
         public int limit;
 
         public GetChatHistory() {
         }
 
-        public GetChatHistory(long chatId, int fromId, int offset, int limit) {
+        public GetChatHistory(long chatId, int fromMessageId, int offset, int limit) {
             this.chatId = chatId;
-            this.fromId = fromId;
+            this.fromMessageId = fromMessageId;
             this.offset = offset;
             this.limit = limit;
         }
 
-        public static final int CONSTRUCTOR = 1089149649;
+        public static final int CONSTRUCTOR = 851842897;
 
         @Override
         public int getConstructor() {
-            return 1089149649;
+            return 851842897;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetChatHistory").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetChatHistory").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fromId").append(" = ").append(fromId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("limit").append(" = ").append(limit).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("fromMessageId = ").append(fromMessageId);
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("limit = ").append(limit);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class GetChatMember extends TLFunction {
+        public long chatId;
+        public int userId;
+
+        public GetChatMember() {
+        }
+
+        public GetChatMember(long chatId, int userId) {
+            this.chatId = chatId;
+            this.userId = userId;
+        }
+
+        public static final int CONSTRUCTOR = 1885026956;
+
+        @Override
+        public int getConstructor() {
+            return 1885026956;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetChatMember").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("userId = ").append(userId);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7606,35 +10116,14 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetChats").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetChats").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offsetOrder").append(" = ").append(offsetOrder).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offsetChatId").append(" = ").append(offsetChatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("limit").append(" = ").append(limit).append('\n');
+            appendLine(s, shift).append("offsetOrder = ").append(offsetOrder);
+            appendLine(s, shift).append("offsetChatId = ").append(offsetChatId);
+            appendLine(s, shift).append("limit = ").append(limit);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class GetContacts extends TLFunction {
-
-        public GetContacts() {
-        }
-
-        public static final int CONSTRUCTOR = 854387241;
-
-        @Override
-        public int getConstructor() {
-            return 854387241;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetContacts").append(" {\n");
-            shift += 2;
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7656,12 +10145,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetFile").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetFile").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fileId").append(" = ").append(fileId).append('\n');
+            appendLine(s, shift).append("fileId = ").append(fileId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7683,12 +10172,45 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetFilePersistent").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetFilePersistent").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("persistentFileId").append(" = ").append(persistentFileId).append('\n');
+            appendLine(s, shift).append("persistentFileId = ").append(persistentFileId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class GetGameHighScores extends TLFunction {
+        public long chatId;
+        public int messageId;
+        public int userId;
+
+        public GetGameHighScores() {
+        }
+
+        public GetGameHighScores(long chatId, int messageId, int userId) {
+            this.chatId = chatId;
+            this.messageId = messageId;
+            this.userId = userId;
+        }
+
+        public static final int CONSTRUCTOR = 1287568611;
+
+        @Override
+        public int getConstructor() {
+            return 1287568611;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetGameHighScores").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
+            appendLine(s, shift).append("userId = ").append(userId);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7710,12 +10232,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetGroup").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetGroup").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("groupId").append(" = ").append(groupId).append('\n');
+            appendLine(s, shift).append("groupId = ").append(groupId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7737,45 +10259,81 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetGroupFull").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetGroupFull").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("groupId").append(" = ").append(groupId).append('\n');
+            appendLine(s, shift).append("groupId = ").append(groupId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class GetInlineGameHighScores extends TLFunction {
+        public String inlineMessageId;
+        public int userId;
+
+        public GetInlineGameHighScores() {
+        }
+
+        public GetInlineGameHighScores(String inlineMessageId, int userId) {
+            this.inlineMessageId = inlineMessageId;
+            this.userId = userId;
+        }
+
+        public static final int CONSTRUCTOR = 1458552156;
+
+        @Override
+        public int getConstructor() {
+            return 1458552156;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetInlineGameHighScores").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("inlineMessageId = ").append(inlineMessageId);
+            appendLine(s, shift).append("userId = ").append(userId);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class GetInlineQueryResults extends TLFunction {
         public int botUserId;
+        public long chatId;
+        public Location userLocation;
         public String query;
         public String offset;
 
         public GetInlineQueryResults() {
         }
 
-        public GetInlineQueryResults(int botUserId, String query, String offset) {
+        public GetInlineQueryResults(int botUserId, long chatId, Location userLocation, String query, String offset) {
             this.botUserId = botUserId;
+            this.chatId = chatId;
+            this.userLocation = userLocation;
             this.query = query;
             this.offset = offset;
         }
 
-        public static final int CONSTRUCTOR = -1653782635;
+        public static final int CONSTRUCTOR = 992897566;
 
         @Override
         public int getConstructor() {
-            return -1653782635;
+            return 992897566;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetInlineQueryResults").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetInlineQueryResults").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("botUserId").append(" = ").append(botUserId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("query").append(" = ").append(query).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
+            appendLine(s, shift).append("botUserId = ").append(botUserId);
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("userLocation = "); userLocation.toStringBuilder(shift, s);
+            appendLine(s, shift).append("query = ").append(query);
+            appendLine(s, shift).append("offset = ").append(offset);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7792,11 +10350,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetMe").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetMe").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7820,13 +10378,43 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetMessage").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetMessage").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageId").append(" = ").append(messageId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class GetMessages extends TLFunction {
+        public long chatId;
+        public int[] messageIds;
+
+        public GetMessages() {
+        }
+
+        public GetMessages(long chatId, int[] messageIds) {
+            this.chatId = chatId;
+            this.messageIds = messageIds;
+        }
+
+        public static final int CONSTRUCTOR = 1391199071;
+
+        @Override
+        public int getConstructor() {
+            return 1391199071;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetMessages").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageIds = ").append(Arrays.toString(messageIds));
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7848,12 +10436,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetNotificationSettings").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetNotificationSettings").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("scope").append(" = "); scope.toStringBuilder(shift, s);
+            appendLine(s, shift).append("scope = "); scope.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7875,12 +10463,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetOption").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetOption").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("name").append(" = ").append(name).append('\n');
+            appendLine(s, shift).append("name = ").append(name);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7897,11 +10485,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetRecentInlineBots").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetRecentInlineBots").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7918,11 +10506,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetSavedAnimations").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetSavedAnimations").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7944,12 +10532,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetStickerSet").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetStickerSet").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("setId").append(" = ").append(setId).append('\n');
+            appendLine(s, shift).append("setId = ").append(setId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7971,12 +10559,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetStickerSets").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetStickerSets").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("onlyEnabled").append(" = ").append(onlyEnabled).append('\n');
+            appendLine(s, shift).append("onlyEnabled = ").append(onlyEnabled);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -7998,12 +10586,33 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetStickers").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetStickers").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("emoji").append(" = ").append(emoji).append('\n');
+            appendLine(s, shift).append("emoji = ").append(emoji);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class GetSupportUser extends TLFunction {
+
+        public GetSupportUser() {
+        }
+
+        public static final int CONSTRUCTOR = -1733497700;
+
+        @Override
+        public int getConstructor() {
+            return -1733497700;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetSupportUser").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8025,12 +10634,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetUser").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetUser").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
+            appendLine(s, shift).append("userId = ").append(userId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8052,12 +10661,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetUserFull").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetUserFull").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
+            appendLine(s, shift).append("userId = ").append(userId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8083,14 +10692,35 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetUserProfilePhotos").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetUserProfilePhotos").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offset").append(" = ").append(offset).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("limit").append(" = ").append(limit).append('\n');
+            appendLine(s, shift).append("userId = ").append(userId);
+            appendLine(s, shift).append("offset = ").append(offset);
+            appendLine(s, shift).append("limit = ").append(limit);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class GetWallpapers extends TLFunction {
+
+        public GetWallpapers() {
+        }
+
+        public static final int CONSTRUCTOR = 2097518555;
+
+        @Override
+        public int getConstructor() {
+            return 2097518555;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetWallpapers").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8112,12 +10742,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("GetWebPagePreview").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("GetWebPagePreview").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageText").append(" = ").append(messageText).append('\n');
+            appendLine(s, shift).append("messageText = ").append(messageText);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8139,39 +10769,39 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ImportChatInviteLink").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ImportChatInviteLink").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inviteLink").append(" = ").append(inviteLink).append('\n');
+            appendLine(s, shift).append("inviteLink = ").append(inviteLink);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class ImportContacts extends TLFunction {
-        public InputContact[] inputContacts;
+        public Contact[] contacts;
 
         public ImportContacts() {
         }
 
-        public ImportContacts(InputContact[] inputContacts) {
-            this.inputContacts = inputContacts;
+        public ImportContacts(Contact[] contacts) {
+            this.contacts = contacts;
         }
 
-        public static final int CONSTRUCTOR = 577501086;
+        public static final int CONSTRUCTOR = -1365609265;
 
         @Override
         public int getConstructor() {
-            return 577501086;
+            return -1365609265;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ImportContacts").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ImportContacts").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inputContacts").append(" = ").append("InputContact[]").append(" {").append(Arrays.toString(inputContacts)).append("}\n");
+            appendLine(s, shift).append("contacts = ").append(Arrays.toString(contacts));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8193,12 +10823,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MigrateGroupChatToChannelChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MigrateGroupChatToChannelChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8220,12 +10850,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("OpenChat").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("OpenChat").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8249,13 +10879,46 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("OpenMessageContent").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("OpenMessageContent").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageId").append(" = ").append(messageId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class PinChannelMessage extends TLFunction {
+        public int channelId;
+        public int messageId;
+        public boolean disableNotification;
+
+        public PinChannelMessage() {
+        }
+
+        public PinChannelMessage(int channelId, int messageId, boolean disableNotification) {
+            this.channelId = channelId;
+            this.messageId = messageId;
+            this.disableNotification = disableNotification;
+        }
+
+        public static final int CONSTRUCTOR = -2024026179;
+
+        @Override
+        public int getConstructor() {
+            return -2024026179;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("PinChannelMessage").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("channelId = ").append(channelId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
+            appendLine(s, shift).append("disableNotification = ").append(disableNotification);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8277,12 +10940,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("RecoverAuthPassword").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("RecoverAuthPassword").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("recoverCode").append(" = ").append(recoverCode).append('\n');
+            appendLine(s, shift).append("recoverCode = ").append(recoverCode);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8299,11 +10962,53 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("RequestAuthPasswordRecovery").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("RequestAuthPasswordRecovery").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class ResendAuthCode extends TLFunction {
+
+        public ResendAuthCode() {
+        }
+
+        public static final int CONSTRUCTOR = -2105917663;
+
+        @Override
+        public int getConstructor() {
+            return -2105917663;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ResendAuthCode").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class ResendChangePhoneNumberCode extends TLFunction {
+
+        public ResendChangePhoneNumberCode() {
+        }
+
+        public static final int CONSTRUCTOR = -866825426;
+
+        @Override
+        public int getConstructor() {
+            return -866825426;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ResendChangePhoneNumberCode").append(" {");
+            shift += 2;
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8325,39 +11030,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ResetAuth").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ResetAuth").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("force").append(" = ").append(force).append('\n');
+            appendLine(s, shift).append("force = ").append(force);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class SearchChannel extends TLFunction {
-        public String username;
-
-        public SearchChannel() {
-        }
-
-        public SearchChannel(String username) {
-            this.username = username;
-        }
-
-        public static final int CONSTRUCTOR = -1374578750;
-
-        @Override
-        public int getConstructor() {
-            return -1374578750;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchChannel").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("username").append(" = ").append(username).append('\n');
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8366,40 +11044,37 @@ public class TdApi {
         public String query;
         public int fromMessageId;
         public int limit;
-        public boolean importantOnly;
         public SearchMessagesFilter filter;
 
         public SearchChatMessages() {
         }
 
-        public SearchChatMessages(long chatId, String query, int fromMessageId, int limit, boolean importantOnly, SearchMessagesFilter filter) {
+        public SearchChatMessages(long chatId, String query, int fromMessageId, int limit, SearchMessagesFilter filter) {
             this.chatId = chatId;
             this.query = query;
             this.fromMessageId = fromMessageId;
             this.limit = limit;
-            this.importantOnly = importantOnly;
             this.filter = filter;
         }
 
-        public static final int CONSTRUCTOR = 174458122;
+        public static final int CONSTRUCTOR = -12337489;
 
         @Override
         public int getConstructor() {
-            return 174458122;
+            return -12337489;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchChatMessages").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchChatMessages").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("query").append(" = ").append(query).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fromMessageId").append(" = ").append(fromMessageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("limit").append(" = ").append(limit).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("importantOnly").append(" = ").append(importantOnly).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("filter").append(" = "); filter.toStringBuilder(shift, s);
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("query = ").append(query);
+            appendLine(s, shift).append("fromMessageId = ").append(fromMessageId);
+            appendLine(s, shift).append("limit = ").append(limit);
+            appendLine(s, shift).append("filter = "); filter.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8423,13 +11098,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchChats").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchChats").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("query").append(" = ").append(query).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("limit").append(" = ").append(limit).append('\n');
+            appendLine(s, shift).append("query = ").append(query);
+            appendLine(s, shift).append("limit = ").append(limit);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8445,21 +11120,21 @@ public class TdApi {
             this.limit = limit;
         }
 
-        public static final int CONSTRUCTOR = -358629071;
+        public static final int CONSTRUCTOR = 511929675;
 
         @Override
         public int getConstructor() {
-            return -358629071;
+            return 511929675;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchContacts").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchContacts").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("query").append(" = ").append(query).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("limit").append(" = ").append(limit).append('\n');
+            appendLine(s, shift).append("query = ").append(query);
+            appendLine(s, shift).append("limit = ").append(limit);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8489,16 +11164,43 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchMessages").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessages").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("query").append(" = ").append(query).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offsetDate").append(" = ").append(offsetDate).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offsetChatId").append(" = ").append(offsetChatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("offsetMessageId").append(" = ").append(offsetMessageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("limit").append(" = ").append(limit).append('\n');
+            appendLine(s, shift).append("query = ").append(query);
+            appendLine(s, shift).append("offsetDate = ").append(offsetDate);
+            appendLine(s, shift).append("offsetChatId = ").append(offsetChatId);
+            appendLine(s, shift).append("offsetMessageId = ").append(offsetMessageId);
+            appendLine(s, shift).append("limit = ").append(limit);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class SearchPublicChat extends TLFunction {
+        public String username;
+
+        public SearchPublicChat() {
+        }
+
+        public SearchPublicChat(String username) {
+            this.username = username;
+        }
+
+        public static final int CONSTRUCTOR = 857135533;
+
+        @Override
+        public int getConstructor() {
+            return 857135533;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchPublicChat").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("username = ").append(username);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8520,12 +11222,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchPublicChats").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchPublicChats").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("usernamePrefix").append(" = ").append(usernamePrefix).append('\n');
+            appendLine(s, shift).append("usernamePrefix = ").append(usernamePrefix);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8547,39 +11249,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchStickerSet").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchStickerSet").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("name").append(" = ").append(name).append('\n');
+            appendLine(s, shift).append("name = ").append(name);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class SearchUser extends TLFunction {
-        public String username;
-
-        public SearchUser() {
-        }
-
-        public SearchUser(String username) {
-            this.username = username;
-        }
-
-        public static final int CONSTRUCTOR = 1973882035;
-
-        @Override
-        public int getConstructor() {
-            return 1973882035;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SearchUser").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("username").append(" = ").append(username).append('\n');
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8605,14 +11280,14 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendBotStartMessage").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendBotStartMessage").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("botUserId").append(" = ").append(botUserId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("parameter").append(" = ").append(parameter).append('\n');
+            appendLine(s, shift).append("botUserId = ").append(botUserId);
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("parameter = ").append(parameter);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8636,20 +11311,19 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendChatAction").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendChatAction").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("action").append(" = "); action.toStringBuilder(shift, s);
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("action = "); action.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class SendInlineQueryResultMessage extends TLFunction {
         public long chatId;
         public int replyToMessageId;
-        public boolean isPost;
         public boolean disableNotification;
         public boolean fromBackground;
         public long queryId;
@@ -8658,138 +11332,211 @@ public class TdApi {
         public SendInlineQueryResultMessage() {
         }
 
-        public SendInlineQueryResultMessage(long chatId, int replyToMessageId, boolean isPost, boolean disableNotification, boolean fromBackground, long queryId, String resultId) {
+        public SendInlineQueryResultMessage(long chatId, int replyToMessageId, boolean disableNotification, boolean fromBackground, long queryId, String resultId) {
             this.chatId = chatId;
             this.replyToMessageId = replyToMessageId;
-            this.isPost = isPost;
             this.disableNotification = disableNotification;
             this.fromBackground = fromBackground;
             this.queryId = queryId;
             this.resultId = resultId;
         }
 
-        public static final int CONSTRUCTOR = -351697766;
+        public static final int CONSTRUCTOR = -1342090907;
 
         @Override
         public int getConstructor() {
-            return -351697766;
+            return -1342090907;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendInlineQueryResultMessage").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendInlineQueryResultMessage").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("replyToMessageId").append(" = ").append(replyToMessageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isPost").append(" = ").append(isPost).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("disableNotification").append(" = ").append(disableNotification).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fromBackground").append(" = ").append(fromBackground).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("queryId").append(" = ").append(queryId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("resultId").append(" = ").append(resultId).append('\n');
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("replyToMessageId = ").append(replyToMessageId);
+            appendLine(s, shift).append("disableNotification = ").append(disableNotification);
+            appendLine(s, shift).append("fromBackground = ").append(fromBackground);
+            appendLine(s, shift).append("queryId = ").append(queryId);
+            appendLine(s, shift).append("resultId = ").append(resultId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class SendMessage extends TLFunction {
         public long chatId;
         public int replyToMessageId;
-        public boolean isPost;
         public boolean disableNotification;
         public boolean fromBackground;
         public ReplyMarkup replyMarkup;
-        public InputMessageContent message;
+        public InputMessageContent inputMessageContent;
 
         public SendMessage() {
         }
 
-        public SendMessage(long chatId, int replyToMessageId, boolean isPost, boolean disableNotification, boolean fromBackground, ReplyMarkup replyMarkup, InputMessageContent message) {
+        public SendMessage(long chatId, int replyToMessageId, boolean disableNotification, boolean fromBackground, ReplyMarkup replyMarkup, InputMessageContent inputMessageContent) {
             this.chatId = chatId;
             this.replyToMessageId = replyToMessageId;
-            this.isPost = isPost;
             this.disableNotification = disableNotification;
             this.fromBackground = fromBackground;
             this.replyMarkup = replyMarkup;
-            this.message = message;
+            this.inputMessageContent = inputMessageContent;
         }
 
-        public static final int CONSTRUCTOR = 1813785991;
+        public static final int CONSTRUCTOR = 777848191;
 
         @Override
         public int getConstructor() {
-            return 1813785991;
+            return 777848191;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SendMessage").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SendMessage").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("replyToMessageId").append(" = ").append(replyToMessageId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isPost").append(" = ").append(isPost).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("disableNotification").append(" = ").append(disableNotification).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fromBackground").append(" = ").append(fromBackground).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("replyMarkup").append(" = "); replyMarkup.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("message").append(" = "); message.toStringBuilder(shift, s);
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("replyToMessageId = ").append(replyToMessageId);
+            appendLine(s, shift).append("disableNotification = ").append(disableNotification);
+            appendLine(s, shift).append("fromBackground = ").append(fromBackground);
+            appendLine(s, shift).append("replyMarkup = "); replyMarkup.toStringBuilder(shift, s);
+            appendLine(s, shift).append("inputMessageContent = "); inputMessageContent.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
-    public static class SetAuthName extends TLFunction {
-        public String firstName;
-        public String lastName;
+    public static class SetAlarm extends TLFunction {
+        public double seconds;
 
-        public SetAuthName() {
+        public SetAlarm() {
         }
 
-        public SetAuthName(String firstName, String lastName) {
-            this.firstName = firstName;
-            this.lastName = lastName;
+        public SetAlarm(double seconds) {
+            this.seconds = seconds;
         }
 
-        public static final int CONSTRUCTOR = 2074658130;
+        public static final int CONSTRUCTOR = -873497067;
 
         @Override
         public int getConstructor() {
-            return 2074658130;
+            return -873497067;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SetAuthName").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SetAlarm").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("firstName").append(" = ").append(firstName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastName").append(" = ").append(lastName).append('\n');
+            appendLine(s, shift).append("seconds = ").append(seconds);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class SetAuthPhoneNumber extends TLFunction {
         public String phoneNumber;
+        public boolean allowFlashCall;
+        public boolean isCurrentPhoneNumber;
 
         public SetAuthPhoneNumber() {
         }
 
-        public SetAuthPhoneNumber(String phoneNumber) {
+        public SetAuthPhoneNumber(String phoneNumber, boolean allowFlashCall, boolean isCurrentPhoneNumber) {
             this.phoneNumber = phoneNumber;
+            this.allowFlashCall = allowFlashCall;
+            this.isCurrentPhoneNumber = isCurrentPhoneNumber;
         }
 
-        public static final int CONSTRUCTOR = 1502564090;
+        public static final int CONSTRUCTOR = 270883354;
 
         @Override
         public int getConstructor() {
-            return 1502564090;
+            return 270883354;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SetAuthPhoneNumber").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SetAuthPhoneNumber").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("phoneNumber").append(" = ").append(phoneNumber).append('\n');
+            appendLine(s, shift).append("phoneNumber = ").append(phoneNumber);
+            appendLine(s, shift).append("allowFlashCall = ").append(allowFlashCall);
+            appendLine(s, shift).append("isCurrentPhoneNumber = ").append(isCurrentPhoneNumber);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class SetGameScore extends TLFunction {
+        public long chatId;
+        public int messageId;
+        public boolean editMessage;
+        public int userId;
+        public int score;
+
+        public SetGameScore() {
+        }
+
+        public SetGameScore(long chatId, int messageId, boolean editMessage, int userId, int score) {
+            this.chatId = chatId;
+            this.messageId = messageId;
+            this.editMessage = editMessage;
+            this.userId = userId;
+            this.score = score;
+        }
+
+        public static final int CONSTRUCTOR = 395584402;
+
+        @Override
+        public int getConstructor() {
+            return 395584402;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SetGameScore").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageId = ").append(messageId);
+            appendLine(s, shift).append("editMessage = ").append(editMessage);
+            appendLine(s, shift).append("userId = ").append(userId);
+            appendLine(s, shift).append("score = ").append(score);
+            shift -= 2;
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class SetInlineGameScore extends TLFunction {
+        public String inlineMessageId;
+        public boolean editMessage;
+        public int userId;
+        public int score;
+
+        public SetInlineGameScore() {
+        }
+
+        public SetInlineGameScore(String inlineMessageId, boolean editMessage, int userId, int score) {
+            this.inlineMessageId = inlineMessageId;
+            this.editMessage = editMessage;
+            this.userId = userId;
+            this.score = score;
+        }
+
+        public static final int CONSTRUCTOR = 1403858858;
+
+        @Override
+        public int getConstructor() {
+            return 1403858858;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SetInlineGameScore").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("inlineMessageId = ").append(inlineMessageId);
+            appendLine(s, shift).append("editMessage = ").append(editMessage);
+            appendLine(s, shift).append("userId = ").append(userId);
+            appendLine(s, shift).append("score = ").append(score);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8813,13 +11560,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SetNotificationSettings").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SetNotificationSettings").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("scope").append(" = "); scope.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("notificationSettings").append(" = "); notificationSettings.toStringBuilder(shift, s);
+            appendLine(s, shift).append("scope = "); scope.toStringBuilder(shift, s);
+            appendLine(s, shift).append("notificationSettings = "); notificationSettings.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8843,43 +11590,40 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SetOption").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SetOption").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("name").append(" = ").append(name).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = "); value.toStringBuilder(shift, s);
+            appendLine(s, shift).append("name = ").append(name);
+            appendLine(s, shift).append("value = "); value.toStringBuilder(shift, s);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
     public static class SetProfilePhoto extends TLFunction {
         public String photoPath;
-        public PhotoCrop crop;
 
         public SetProfilePhoto() {
         }
 
-        public SetProfilePhoto(String photoPath, PhotoCrop crop) {
+        public SetProfilePhoto(String photoPath) {
             this.photoPath = photoPath;
-            this.crop = crop;
         }
 
-        public static final int CONSTRUCTOR = -652884715;
+        public static final int CONSTRUCTOR = 508736004;
 
         @Override
         public int getConstructor() {
-            return -652884715;
+            return 508736004;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("SetProfilePhoto").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SetProfilePhoto").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photoPath").append(" = ").append(photoPath).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("crop").append(" = "); crop.toStringBuilder(shift, s);
+            appendLine(s, shift).append("photoPath = ").append(photoPath);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8901,12 +11645,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestCallBytes").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestCallBytes").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("x").append(" = ").append("bytes { "); { for (byte k : x) { int b = (int)k & 255; s.append(HEX_CHARACTERS[b >> 4]).append(HEX_CHARACTERS[b & 15]).append(' '); } } s.append("}\n");
+            appendLine(s, shift).append("x = ").append("bytes { "); { for (byte k : x) { int b = (int)k & 255; s.append(HEX_CHARACTERS[b >> 4]).append(HEX_CHARACTERS[b & 15]).append(' '); } } s.append('}');
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8923,11 +11667,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestCallEmpty").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestCallEmpty").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8949,12 +11693,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestCallString").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestCallString").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("x").append(" = ").append(x).append('\n');
+            appendLine(s, shift).append("x = ").append(x);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -8976,12 +11720,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestCallVectorInt").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestCallVectorInt").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("x").append(" = ").append("int[]").append(" {").append(Arrays.toString(x)).append("}\n");
+            appendLine(s, shift).append("x = ").append(Arrays.toString(x));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -9003,12 +11747,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestCallVectorIntObject").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestCallVectorIntObject").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("x").append(" = ").append("TestInt[]").append(" {").append(Arrays.toString(x)).append("}\n");
+            appendLine(s, shift).append("x = ").append(Arrays.toString(x));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -9030,12 +11774,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestCallVectorString").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestCallVectorString").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("x").append(" = ").append("String[]").append(" {").append(Arrays.toString(x)).append("}\n");
+            appendLine(s, shift).append("x = ").append(Arrays.toString(x));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -9057,12 +11801,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestCallVectorStringObject").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestCallVectorStringObject").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("x").append(" = ").append("TestString[]").append(" {").append(Arrays.toString(x)).append("}\n");
+            appendLine(s, shift).append("x = ").append(Arrays.toString(x));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -9084,12 +11828,12 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestSquareInt").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestSquareInt").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("x").append(" = ").append(x).append('\n');
+            appendLine(s, shift).append("x = ").append(x);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -9106,41 +11850,11 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("TestTestNet").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("TestTestNet").append(" {");
             shift += 2;
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class ToggleChannelComments extends TLFunction {
-        public int channelId;
-        public boolean isBroadcast;
-
-        public ToggleChannelComments() {
-        }
-
-        public ToggleChannelComments(int channelId, boolean isBroadcast) {
-            this.channelId = channelId;
-            this.isBroadcast = isBroadcast;
-        }
-
-        public static final int CONSTRUCTOR = 1326940102;
-
-        @Override
-        public int getConstructor() {
-            return 1326940102;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ToggleChannelComments").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channelId").append(" = ").append(channelId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isBroadcast").append(" = ").append(isBroadcast).append('\n');
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -9156,21 +11870,21 @@ public class TdApi {
             this.anyoneCanInvite = anyoneCanInvite;
         }
 
-        public static final int CONSTRUCTOR = 1029576155;
+        public static final int CONSTRUCTOR = 1454440041;
 
         @Override
         public int getConstructor() {
-            return 1029576155;
+            return 1454440041;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ToggleChannelInvites").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ToggleChannelInvites").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channelId").append(" = ").append(channelId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("anyoneCanInvite").append(" = ").append(anyoneCanInvite).append('\n');
+            appendLine(s, shift).append("channelId = ").append(channelId);
+            appendLine(s, shift).append("anyoneCanInvite = ").append(anyoneCanInvite);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -9186,21 +11900,21 @@ public class TdApi {
             this.signMessages = signMessages;
         }
 
-        public static final int CONSTRUCTOR = 775614344;
+        public static final int CONSTRUCTOR = -329182347;
 
         @Override
         public int getConstructor() {
-            return 775614344;
+            return -329182347;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ToggleChannelSignMessages").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ToggleChannelSignMessages").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("channelId").append(" = ").append(channelId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("signMessages").append(" = ").append(signMessages).append('\n');
+            appendLine(s, shift).append("channelId = ").append(channelId);
+            appendLine(s, shift).append("signMessages = ").append(signMessages);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -9216,21 +11930,21 @@ public class TdApi {
             this.anyoneCanEdit = anyoneCanEdit;
         }
 
-        public static final int CONSTRUCTOR = 1816585875;
+        public static final int CONSTRUCTOR = 970466546;
 
         @Override
         public int getConstructor() {
-            return 1816585875;
+            return 970466546;
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ToggleGroupEditors").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ToggleGroupEditors").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("groupId").append(" = ").append(groupId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("anyoneCanEdit").append(" = ").append(anyoneCanEdit).append('\n');
+            appendLine(s, shift).append("groupId = ").append(groupId);
+            appendLine(s, shift).append("anyoneCanEdit = ").append(anyoneCanEdit);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -9252,12 +11966,39 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UnblockUser").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UnblockUser").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
+            appendLine(s, shift).append("userId = ").append(userId);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
+        }
+    }
+
+    public static class UnpinChannelMessage extends TLFunction {
+        public int channelId;
+
+        public UnpinChannelMessage() {
+        }
+
+        public UnpinChannelMessage(int channelId) {
+            this.channelId = channelId;
+        }
+
+        public static final int CONSTRUCTOR = -1650033548;
+
+        @Override
+        public int getConstructor() {
+            return -1650033548;
+        }
+
+        @Override
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UnpinChannelMessage").append(" {");
+            shift += 2;
+            appendLine(s, shift).append("channelId = ").append(channelId);
+            shift -= 2;
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -9283,14 +12024,14 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateStickerSet").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateStickerSet").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("setId").append(" = ").append(setId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isInstalled").append(" = ").append(isInstalled).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isEnabled").append(" = ").append(isEnabled).append('\n');
+            appendLine(s, shift).append("setId = ").append(setId);
+            appendLine(s, shift).append("isInstalled = ").append(isInstalled);
+            appendLine(s, shift).append("isEnabled = ").append(isEnabled);
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 
@@ -9314,13 +12055,13 @@ public class TdApi {
         }
 
         @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("ViewMessages").append(" {\n");
+        void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ViewMessages").append(" {");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageIds").append(" = ").append("int[]").append(" {").append(Arrays.toString(messageIds)).append("}\n");
+            appendLine(s, shift).append("chatId = ").append(chatId);
+            appendLine(s, shift).append("messageIds = ").append(Arrays.toString(messageIds));
             shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+            appendLine(s, shift).append("}");
         }
     }
 

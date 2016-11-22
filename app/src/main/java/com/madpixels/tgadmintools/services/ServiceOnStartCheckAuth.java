@@ -16,8 +16,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
  * Created by Snake on 22.05.2016.
  */
 public class ServiceOnStartCheckAuth extends Service{
-
-
+    
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Проверяем авторизацию и запускаем всякие сервисы
@@ -25,32 +24,23 @@ public class ServiceOnStartCheckAuth extends Service{
         TgH.send(new TdApi.GetAuthState(), new Client.ResultHandler() {
             @Override
             public void onResult(final TdApi.TLObject object) {
-                if(TgUtils.isError(object)){
+                if(!TgUtils.isAuthorized(object)) {
                     stopSelf();
-                }else{
-                    TdApi.AuthState as = (TdApi.AuthState) object;
-                    if(as.getConstructor()== TdApi.AuthStateOk.CONSTRUCTOR){
-                        TgH.getProfile(new Client.ResultHandler() {// После получения профиля запускаем
-                            @Override
-                            public void onResult(TdApi.TLObject object) {
-                                onAuthtorized();
-                            }
-                        });
-                    }else{
-                        stopSelf();
-                    }
+                    return;
                 }
+
+                onAuthorized();
             }
         });
 
         return START_NOT_STICKY;
     }
 
-    void onAuthtorized(){
+    void onAuthorized(){
         MainActivity.initializeLanguage(this);
         ServiceUnbanTask.registerTask(getBaseContext());
         ServiceAutoKicker.registerTask(getBaseContext());
-        ServiceAntispam.start(getBaseContext());
+        ServiceChatTask.start(getBaseContext());
         ServiceGarbageCollector.start(getBaseContext());
     }
 

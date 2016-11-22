@@ -63,7 +63,7 @@ public class DialogInputValue extends AlertDialog{
                     onSetValueCallback.onSetValue(value);
             }
         });
-        setButton(BUTTON_NEGATIVE, context.getString(R.string.cancel), new OnClickListener() {
+        setButton(BUTTON_NEGATIVE, context.getString(R.string.btnCancel), new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 

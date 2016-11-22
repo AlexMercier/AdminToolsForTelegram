@@ -1,10 +1,14 @@
 package com.madpixels.tgadmintools.activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -28,8 +32,9 @@ import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.db.DBHelper;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
-import com.madpixels.tgadmintools.services.ServiceAntispam;
 import com.madpixels.tgadmintools.services.ServiceAutoKicker;
+import com.madpixels.tgadmintools.services.ServiceBackgroundStarter;
+import com.madpixels.tgadmintools.services.ServiceChatTask;
 import com.madpixels.tgadmintools.services.ServiceGarbageCollector;
 import com.madpixels.tgadmintools.services.ServiceUnbanTask;
 import com.madpixels.tgadmintools.utils.Analytics;
@@ -46,7 +51,7 @@ import libs.AdHelper;
 
 public class MainActivity extends ActivityExtended {
 
-    public static boolean WRITE_LOG = false;
+
 
     TextView tvAdditionalStatus;
 
@@ -58,13 +63,15 @@ public class MainActivity extends ActivityExtended {
         UIUtils.setToolbar(this, R.id.toolbar);
         AdHelper.setup(this);
 
+        if(savedInstanceState==null){
+            onAppUpgrade();
+        }
+
         tvAdditionalStatus = (TextView) findViewById(R.id.tvAdditionalStatus);
 
         Button btnClearCache = (Button) findViewById(R.id.btnClearCache);
         final Button btnStop = (Button) findViewById(R.id.btnStop);
         final CheckBox checkBoxWriteLog = (CheckBox) findViewById(R.id.checkBoxWriteLog);
-
-
 
         if(!BuildConfig.DEBUG) {
             btnClearCache.setVisibility(View.GONE);
@@ -86,9 +93,8 @@ public class MainActivity extends ActivityExtended {
         checkBoxWriteLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                WRITE_LOG = checkBoxWriteLog.isChecked();
-                MyLog.WRITE_TO_FILE=WRITE_LOG;
-                MyToast.toast(getApplication(), "write is " + (WRITE_LOG ? "enabled" : "disabled"));
+                MyLog.WRITE_TO_FILE=checkBoxWriteLog.isChecked();;
+                MyToast.toast(getApplication(), "write is " + (MyLog.WRITE_TO_FILE ? "enabled" : "disabled"));
             }
         });
 
@@ -122,6 +128,40 @@ public class MainActivity extends ActivityExtended {
                 TgH.clearCache(mContext);
             }
         }, 1300);
+
+        if(BuildConfig.DEBUG) {// for debug write log only
+            checkStoragePermissions();
+        }
+    }
+
+    private boolean checkStoragePermissions() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            int hasReadStorage = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+            if (hasReadStorage != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Const.ACTION_REQUEST_STORAGE_PERMISSION);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == Const.ACTION_REQUEST_STORAGE_PERMISSION && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                MyToast.toast(mContext, "Storage permission granted");
+            }
+
+        }
+    }
+
+    private void onAppUpgrade() {
+        int oldVersion = Sets.getInteger("TgAppVersion", 0);
+        if(BuildConfig.VERSION_CODE>oldVersion){
+            Sets.set("TgAppVersion", BuildConfig.VERSION_CODE);
+        }
+
     }
 
     public static void initializeLanguage(Context c) {
@@ -185,7 +225,7 @@ public class MainActivity extends ActivityExtended {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title_logout)
                 .setMessage(R.string.dialog_text_logout)
-               .setNegativeButton(R.string.cancel, null)
+               .setNegativeButton(R.string.btnCancel, null)
                 .setPositiveButton(R.string.btnContinue, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -215,8 +255,8 @@ public class MainActivity extends ActivityExtended {
             TdApi.Error e = (TdApi.Error) object;
             switch (e.code) {
                 case 400:
-                    MyToast.toast(MainActivity.this, e.text);
-                    switch (e.text){
+                    MyToast.toast(MainActivity.this, e.message);
+                    switch (e.message){
                         case "PHONE_CODE_INVALID":
                             showLoginDialog(TdApi.AuthStateWaitCode.CONSTRUCTOR);
                             break;
@@ -227,31 +267,31 @@ public class MainActivity extends ActivityExtended {
                             showLoginDialog(TdApi.AuthStateWaitPassword.CONSTRUCTOR);
                             break;
                         default:
-                            Analytics.sendReport("AuthError", e.text, e.toString());
+                            Analytics.sendReport("AuthError", e.message, e.toString());
                             showInstantErrorDialog(e);
                             break;
                     }
                     break;
                 default:
-                    Analytics.sendReport("AuthError", e.text, e.toString());
+                    Analytics.sendReport("AuthError", e.message, e.toString());
                     showInstantErrorDialog(e);
                     break;
             }
             return;
         }
 
-        TdApi.AuthState as = (TdApi.AuthState) object;
-        switch (as.getConstructor()) {
+        TdApi.AuthState authState = (TdApi.AuthState) object;
+        switch (authState.getConstructor()) {
             case TdApi.AuthStateWaitCode.CONSTRUCTOR:
                 tvAdditionalStatus.setText("Requared sms code...");
-                showLoginDialog(as.getConstructor());
+                showLoginDialog(authState.getConstructor());
                 break;
             case TdApi.AuthStateWaitPhoneNumber.CONSTRUCTOR:
-                showLoginDialog(as.getConstructor());
+                showLoginDialog(authState.getConstructor());
                 break;
             case TdApi.AuthStateWaitPassword.CONSTRUCTOR:
                 tvAdditionalStatus.setText("Requared login password...");
-                showLoginDialog(as.getConstructor());
+                showLoginDialog(authState.getConstructor());
                 break;
             case TdApi.AuthStateOk.CONSTRUCTOR:
                 tvAdditionalStatus.setText("Status: Authorized");
@@ -268,7 +308,7 @@ public class MainActivity extends ActivityExtended {
                 startActivity(new Intent(mContext, ActivityGroupsList.class));
                 ServiceUnbanTask.registerTask(mContext);
                 ServiceAutoKicker.registerTask(mContext);
-                ServiceAntispam.start(mContext);
+                ServiceChatTask.start(mContext);
                 ServiceGarbageCollector.start(mContext);
 
 
@@ -287,9 +327,10 @@ public class MainActivity extends ActivityExtended {
 
     private void stopApplication() {
         TG.stopClient();
-        ServiceAntispam.stop(this);
+        ServiceChatTask.stop(this);
         ServiceAutoKicker.stop(mContext);
         ServiceUnbanTask.unregister(mContext);
+        ServiceBackgroundStarter.stop(mContext);
     }
 
     private void startApplication() {
@@ -297,7 +338,7 @@ public class MainActivity extends ActivityExtended {
         TgH.sendOnUi(new TdApi.GetAuthState(), new Client.ResultHandler() {
             @Override
             public void onResult(final TdApi.TLObject object) {
-                ServiceAntispam.start(mContext);
+                ServiceChatTask.start(mContext);
                 ServiceAutoKicker.registerTask(mContext);
                 ServiceUnbanTask.registerTask(mContext);
             }
@@ -350,20 +391,21 @@ public class MainActivity extends ActivityExtended {
                 TdApi.TLFunction func = null;
                 switch (action) {
                     case TdApi.AuthStateWaitPhoneNumber.CONSTRUCTOR:
-                        func = new TdApi.SetAuthPhoneNumber(text);
+                        func = new TdApi.SetAuthPhoneNumber(text, false, true);
                         break;
                     case TdApi.AuthStateWaitCode.CONSTRUCTOR:
-                        func = new TdApi.CheckAuthCode(text);
+                        func = new TdApi.CheckAuthCode(text, null, null);
                         break;
                     case TdApi.AuthStateWaitPassword.CONSTRUCTOR:
                         func = new TdApi.CheckAuthPassword(text);
                         break;
                 }
 
-                Client c = TgH.TG();
+                //Client c = TgH.TG();
                 eEditText.setEnabled(false);
                 login.setText(R.string.label_loading);
-                c.send(func, new Client.ResultHandler() {
+                login.setEnabled(false);
+                TgH.send(func, new Client.ResultHandler() {
                     @Override
                     public void onResult(final TdApi.TLObject object) {
                         runOnUiThread(new Runnable() {
@@ -392,7 +434,7 @@ public class MainActivity extends ActivityExtended {
         new AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setTitle("Auth error")
-                .setMessage("Error code: " + e.code + "\nError message: " + e.text + "\n" +
+                .setMessage("Error code: " + e.code + "\nError message: " + e.message + "\n" +
                         "Try again?")
                 .setPositiveButton("Login", new DialogInterface.OnClickListener() {
                     @Override

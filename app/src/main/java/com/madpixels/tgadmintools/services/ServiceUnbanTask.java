@@ -11,9 +11,9 @@ import android.support.annotation.Nullable;
 import com.madpixels.apphelpers.MyLog;
 import com.madpixels.apphelpers.Utils;
 import com.madpixels.tgadmintools.BuildConfig;
-import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.db.DBHelper;
 import com.madpixels.tgadmintools.entities.BanTask;
+import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
 import com.madpixels.tgadmintools.utils.LogUtil;
 
@@ -23,6 +23,8 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import java.util.ArrayList;
 
 /**
+ * Service to lift expired bans
+ *
  * Created by Snake on 26.02.2016.
  */
 public class ServiceUnbanTask extends Service {
@@ -32,9 +34,10 @@ public class ServiceUnbanTask extends Service {
     public static void registerTask(Context context) {
         long ts = DBHelper.getInstance().getBanListFirst();
         if (ts == 0) return;
-        if (ts < System.currentTimeMillis()) {
+        if (ts < System.currentTimeMillis()) {// has expired bans. Start service emmidiatly
            context.startService(new Intent(context, ServiceUnbanTask.class));
         } else {
+            //has bans but expiration time has not come yet. Register task at closest expiration time
             Intent myIntent = new Intent(context, ServiceUnbanTask.class);
             PendingIntent pi = PendingIntent.getService(context, 0, myIntent, 0);
 
@@ -91,7 +94,7 @@ public class ServiceUnbanTask extends Service {
         if(TgUtils.isGroup(ban.chatType)){
             DBHelper.getInstance().removeUserFromAutoKick(ban.chat_id, ban.user_id);
         }
-        final TdApi.TLFunction fReturnUser = new TdApi.AddChatParticipant(ban.chat_id, ban.user_id, 0);
+        final TdApi.TLFunction fReturnUser = new TdApi.AddChatMember(ban.chat_id, ban.user_id, 0);
         TgH.TG().send(fReturnUser, new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
@@ -127,7 +130,7 @@ public class ServiceUnbanTask extends Service {
 
     private void removeFromBanList(final BanTask ban){
         if(TgUtils.isSuperGroup(ban.chatType)) {
-            TdApi.TLFunction f = new TdApi.ChangeChatParticipantRole(ban.chat_id, ban.user_id, new TdApi.ChatParticipantRoleLeft());
+            TdApi.TLFunction f = new TdApi.ChangeChatMemberStatus(ban.chat_id, ban.user_id, new TdApi.ChatMemberStatusLeft());
             TgH.TG().send(f, new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
@@ -138,7 +141,7 @@ public class ServiceUnbanTask extends Service {
                         next();
                     }else{
                         // Load banned users for load user
-                        TdApi.TLFunction f1 = new TdApi.GetChannelParticipants(ban.from_id, new TdApi.ChannelParticipantsKicked(), 0, 100);
+                        TdApi.TLFunction f1 = new TdApi.GetChannelMembers(ban.from_id, new TdApi.ChannelMembersKicked(), 0, 100);
                         TgH.send(f1);
 
                         TdApi.TLFunction f = new TdApi.GetUser(ban.user_id);

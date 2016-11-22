@@ -20,13 +20,13 @@ android {
         applicationId "com.madpixels.tgadmintools"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 40
+        versionCode 50
         if(arch=="v7a"){
             versionCode versionCode + 1
         }
-        versionName "1.0.0"
+        versionName "1.0.2"
 
-        def buildDate = "15.07.2016"
+        def buildDate = "22.11.2016"
         resValue "string", "buildDate", buildDate
     }
 
@@ -67,7 +67,7 @@ android {
             debuggable false
             jniDebuggable false
             minifyEnabled false
-            shrinkResources true
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
 
         }
@@ -97,9 +97,9 @@ android {
         dev {
             ndk {
                 if (arch == "x86") {
-                    abiFilter "x86"
+                   // abiFilter "x86"
                 } else {
-                    abiFilter "armeabi-v7a"
+                   // abiFilter "armeabi-v7a"
                 }
             }
         }
@@ -108,11 +108,11 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    productionCompile fileTree(include: ['*.jar'], dir: 'libs\\appodeal')
+    // productionCompile fileTree(include: ['*.jar'], dir: 'libs\\appodeal')
     productionCompile 'com.google.android.gms:play-services-ads:7.3.0'
     compile project(':AppHelperLib')
     compile 'io.github.rockerhieu:emojicon:1.4.1'
-    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.0.2'
     compile 'ch.acra:acra:4.9.0'
-    compile 'com.yandex.android:mobmetricalib:2.41@aar'
+    compile 'com.yandex.android:mobmetricalib:2.51'
 }

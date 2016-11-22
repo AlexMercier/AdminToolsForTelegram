@@ -26,7 +26,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/cancel"
+            android:text="@string/btnCancel"
             android:id="@+id/btnCancel" />
     </LinearLayout>
 

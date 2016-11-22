@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.madpixels.apphelpers.MyLog;
+import com.madpixels.tgadmintools.BuildConfig;
 import com.madpixels.tgadmintools.db.DBHelper;
 import com.madpixels.tgadmintools.entities.Callback;
 import com.madpixels.tgadmintools.helper.TgH;
@@ -24,39 +25,43 @@ import org.drinkless.td.libcore.telegram.TdApi;
 public class ServiceAutoKicker extends Service {
 
     static boolean IS_RUNNING = false;
+    private static boolean isStoppedByUser = false;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         MyLog.log("ServiceAutoKicker started");
-        isManualStop = false;
+        isStoppedByUser = false;
         TgH.init(this, new ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                TgH.setUpdatesHandler(r);
+                if(TgUtils.isOk(object)) // if initialization ok
+                    TgH.setUpdatesHandler(updatesHandler);
+                else{
+                    // show auth error to the user ?
+                }
             }
         });
 
         return START_STICKY;
     }
 
-    final private ResultHandler r = new ResultHandler() {
+    final private ResultHandler updatesHandler = new ResultHandler() {
         @Override
         public void onResult(TdApi.TLObject object) {
             // MyLog.log(object.toString());
             if (object.getConstructor() == TdApi.UpdateNewMessage.CONSTRUCTOR) {
                 TdApi.UpdateNewMessage umsg = (TdApi.UpdateNewMessage) object;
-                if(!umsg.message.canBeDeleted) return;
+                if (!umsg.message.canBeDeleted) return;
                 if (umsg.message.content.getConstructor() == TdApi.MessageChatJoinByLink.CONSTRUCTOR) {
                     //TODO add invited and etc, and remove from autokick when invited by admin.
                     long chat_id = umsg.message.chatId;
-                    int user_id = umsg.message.fromId;
+                    int user_id = umsg.message.senderUserId;
                     checkUserForKick(chat_id, user_id);
-                }
-                else if(umsg.message.content.getConstructor() == TdApi.MessageChatAddParticipants.CONSTRUCTOR){
-                    TdApi.MessageChatAddParticipants chatAddParticipants = (TdApi.MessageChatAddParticipants) umsg.message.content;
-                    TdApi.User[] participiants = chatAddParticipants.participants;
-                    for(TdApi.User user:participiants){
-                        checkUserCanBeInvited(umsg.message.chatId, umsg.message.fromId, user);
+                } else if (umsg.message.content.getConstructor() == TdApi.MessageChatAddMembers.CONSTRUCTOR) {
+                    TdApi.MessageChatAddMembers chatAddParticipants = (TdApi.MessageChatAddMembers) umsg.message.content;
+                    TdApi.User[] participiants = chatAddParticipants.members;
+                    for (TdApi.User user : participiants) {
+                        checkUserCanBeInvited(umsg.message.chatId, umsg.message.senderUserId, user);
                     }
                 }
             }
@@ -77,12 +82,12 @@ public class ServiceAutoKicker extends Service {
     }
 
 
-    void checkUserCanBeInvited(final long chatId, final int fromId, final TdApi.User user){
+    void checkUserCanBeInvited(final long chatId, final int fromId, final TdApi.User user) {
         if (DBHelper.getInstance().isUserKicked(chatId, user.id)) {
             TgH.send(new TdApi.GetChat(chatId), new ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
-                    if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR){
+                    if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR) {
                         final TdApi.Chat chat = (TdApi.Chat) object;
                         AdminUtils.checkUserIsAdminInChat((TdApi.Chat) object, fromId, new Callback() {
                             @Override
@@ -102,7 +107,7 @@ public class ServiceAutoKicker extends Service {
                                 }
                             }
                         });
-                }
+                    }
                 }
             });
         }
@@ -113,16 +118,16 @@ public class ServiceAutoKicker extends Service {
             @Override
             public void onResult(TdApi.TLObject object) {
                 TdApi.Chat c = (TdApi.Chat) object;
-                logKickAction(c,user_id);
+                logKickAction(c, user_id);
             }
         });
     }
 
-    private void logKickAction(TdApi.Chat chat, int userId ){
+    private void logKickAction(TdApi.Chat chat, int userId) {
         LogUtil.logAutoKickUser(chat.id, chat.type.getConstructor(), userId, chat.title);
     }
 
-    void unbanUserOnInvitedByAdmin(TdApi.Chat chat, TdApi.User user, int adminId){
+    void unbanUserOnInvitedByAdmin(TdApi.Chat chat, TdApi.User user, int adminId) {
         DBHelper.getInstance().removeUserFromAutoKick(chat.id, user.id);
         DBHelper.getInstance().removeBanTask(chat.id, user.id);
         LogUtil.logUserUnbannedByInvite(chat, user, adminId);
@@ -131,9 +136,9 @@ public class ServiceAutoKicker extends Service {
 
     @Override
     public void onDestroy() {
-        TgH.removeUpdatesHandler(r);
+        TgH.removeUpdatesHandler(updatesHandler);
         IS_RUNNING = false;
-        if (isManualStop == false) {
+        if (isStoppedByUser == false) {
             registerTask(getBaseContext());
         }
         super.onDestroy();
@@ -149,20 +154,22 @@ public class ServiceAutoKicker extends Service {
         if (!IS_RUNNING) {
             IS_RUNNING = true;
             mContext.startService(new Intent(mContext, ServiceAutoKicker.class));
+            ServiceBackgroundStarter.startService(mContext);//run background starter helper
         }
     }
 
     public static void registerTask(Context context) {
-        if (DBHelper.getInstance().getAutoKickCount() > 0) {
+        if (!IS_RUNNING && DBHelper.getInstance().getAutoKickCount() > 0) {
             start(context);
-            LogUtil.showLogNotification("Service AutoKick started");
+            if (BuildConfig.DEBUG)
+                LogUtil.showLogNotification("Service AutoKick started");
         }
     }
 
-    private static boolean isManualStop = false;
+
 
     public static void stop(Context context) {
-        isManualStop = true;
+        isStoppedByUser = true;
         context.stopService(new Intent(context, ServiceAutoKicker.class));
     }
 }

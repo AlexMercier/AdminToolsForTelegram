@@ -20,8 +20,10 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:layout_below="@+id/toolbar"
-        android:orientation="vertical">
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
 
         <LinearLayout
@@ -50,6 +52,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/check_autostart" />
+
+                <CheckBox
+                    android:id="@+id/chkShowServiceAlways"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/check_show_icon_in_bar" />
+
+                <TextView
+                    android:text="@string/text_show_icon_in_system_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView28"
+                    android:layout_marginLeft="8dp" />
+
+
             </LinearLayout>
 
 
@@ -74,6 +91,31 @@
                     android:layout_height="wrap_content"
                     android:text="@string/check_ignore_antispam_for_shared" />
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:background="@color/md_white_1000"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/caption_alerts_title"
+                    android:textColor="@color/md_blue_600"
+                    android:textStyle="bold" />
+
+
+                <EditText
+                    android:hint="@string/text_antispam_alert_title"
+                    android:id="@+id/edtAntispamAlertTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
 
 
             <LinearLayout

@@ -7,103 +7,47 @@
     android:background="@color/md_blue_grey_50"
     android:orientation="vertical"
     android:paddingLeft="8dp"
-    android:paddingRight="8dp">
+    android:paddingRight="8dp" android:paddingTop="8dp">
+
 
     <CheckBox
-        android:id="@+id/chkDelMsgBlackWords"
+        android:id="@+id/chkBlackListedWordsEnabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checked="false"
-        android:text="@string/check_delMsgBlackWords" />
+        android:text="@string/chkBlackListedWords" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_weight="0"
-        android:text="@string/title_list_of_banned_words"
-
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <EditText
-        android:id="@+id/edtBlacklistWords"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:gravity="top|left"
-        android:hint="@string/hint_blackwords"
-        android:maxLines="9"
-        android:minLines="3" />
-
-    <CheckBox
-        android:id="@+id/chkBanForWordBlackList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checked="false"
-        android:text="@string/check_BanForWordBlackList" />
 
     <LinearLayout
         android:id="@+id/layerBanForBlackWord"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingLeft="16dp">
-
-        <CheckBox
-            android:id="@+id/chkAlertOnBlackWordBan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="@string/chtTitleAlertOnBlackWordBan" />
+        android:paddingLeft="8dp">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_allow_count"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:visibility="visible" />
-
-        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginLeft="8dp"
+            android:layout_weight="0"
+            android:text="@string/title_list_of_banned_words"
 
-            <TextView
-                android:id="@+id/tvBanWordsAllowCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:paddingBottom="8dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="4dp"
-                android:text="1"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/text_clickable"
-                android:textStyle="bold" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/chkWarnBeforeBanWord"
-                android:checked="false"
-                android:id="@+id/chkWarnBeforeBanWord" />
+        <TextView
+            android:text="10 banned words" android:maxLines="3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_banwords_warntext"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:visibility="visible" />
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="4dp"
 
-            <EditText android:hint="@string/warntext_banword_last"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"  android:gravity="top|left"
-                android:id="@+id/edtBanWordWarnText"
-                android:nestedScrollingEnabled="false"
-                android:maxLines="2" />
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/text_clickable"
 
-        </LinearLayout>
+            android:id="@+id/tvBannedWordsCount" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -120,7 +64,7 @@
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <EditText
-                android:id="@+id/edtBlackWordBanAgeVal"
+                android:id="@+id/edtBannedWordBanTimesVal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.2"
@@ -130,18 +74,107 @@
                 android:text="5" />
 
             <Spinner
-                android:id="@+id/spinnerBanBlackWordAge"
+                android:id="@+id/spinnerBannedWordBanTimes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0" />
         </LinearLayout>
 
         <CheckBox
-            android:id="@+id/chkReturnOnBlackWordUnban"
+            android:id="@+id/chkReturnOnBannedWordsExpired"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="false"
             android:text="@string/check_return_after_bantime_expired" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_allow_count"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:visibility="visible"
+            android:layout_marginLeft="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvBanWordsAllowCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"  android:text="1"
+                android:paddingBottom="8dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="4dp"
+
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/text_clickable"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_weight="0"
+                android:text="@string/description_user_within_time"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_marginLeft="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <EditText
+                    android:id="@+id/edtBanWordsFloodTimeVal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:ems="10"
+                    android:gravity="center_horizontal"
+                    android:inputType="number"
+                    android:text="5" />
+
+                <Spinner
+                    android:id="@+id/spinnerBanWordsFloodTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_weight="0"
+                android:text="@string/tex_warn_count_for_user_before_ban"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_marginLeft="8dp" />
+
+            <TextView
+                android:id="@+id/tvBtnWarnBanWordsFreq"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_weight="0"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:text="@string/text_warn_on_first_last_warn"
+                android:textAlignment="center"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/md_teal_500"
+                android:layout_marginLeft="8dp" />
+
+
+        </LinearLayout>
+
     </LinearLayout>
 
 

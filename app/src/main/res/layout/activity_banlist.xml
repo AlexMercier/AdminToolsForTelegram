@@ -15,7 +15,7 @@
         android:layout_centerVertical="true" />
 
     <ListView android:dividerHeight="10dp" android:layout_above="@+id/adView"
-        android:id="@+id/listViewBanned"
+        android:id="@+id/listViewBanned" android:paddingBottom="10dp" android:clipToPadding="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/toolbar" />

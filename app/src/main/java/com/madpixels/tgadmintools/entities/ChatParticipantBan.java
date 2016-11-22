@@ -8,16 +8,17 @@ import org.drinkless.td.libcore.telegram.TdApi;
  * Created by Snake on 13.03.2016.
  */
 public class ChatParticipantBan {
-    public TdApi.ChatParticipant chatParticipant;
+
     public String banText;
     public long chat_id;
     public long banDate, banAge;
     public boolean isReturnToChat;
+    public TdApi.User user;
 
     private String strBanDate, strBanExpired;
 
-    public ChatParticipantBan(TdApi.ChatParticipant chatParticipant){
-        this.chatParticipant=chatParticipant;
+    public ChatParticipantBan(TdApi.User chatParticipant){
+        this.user=chatParticipant;
     }
 
     public ChatParticipantBan setChatId(long chat_id) {

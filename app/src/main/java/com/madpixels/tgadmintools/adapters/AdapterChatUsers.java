@@ -34,7 +34,7 @@ import io.github.rockerhieu.emojicon.EmojiconTextView;
 public class AdapterChatUsers extends BaseAdapter {
 
     final LayoutInflater inflater;
-    ArrayList<TdApi.ChatParticipant> list = new ArrayList<>();
+    ArrayList<TdApi.ChatMember> list = new ArrayList<>();
     TgImageGetter imageGetter;
     final Context mContext;
 
@@ -57,7 +57,7 @@ public class AdapterChatUsers extends BaseAdapter {
     }
 
     @Override
-    public TdApi.ChatParticipant getItem(int position) {
+    public TdApi.ChatMember getItem(int position) {
         return list.get(position);
     }
 
@@ -73,7 +73,7 @@ public class AdapterChatUsers extends BaseAdapter {
             view = inflater.inflate(R.layout.list_item_chat_user, parent, false);
         }
 
-        final TdApi.ChatParticipant user = getItem(position);
+        final TdApi.ChatMember member = getItem(position);
 
         final EmojiconTextView tvUserName = UIUtils.getHolderView(view, R.id.tvUserName);
         final TextView tvUserInfo = UIUtils.getHolderView(view, R.id.tvUserInfo);
@@ -81,33 +81,36 @@ public class AdapterChatUsers extends BaseAdapter {
         final ImageView imageAvatar = UIUtils.getHolderView(view, R.id.imageAvatar);
         final ImageView ivIsAdmin = UIUtils.getHolderView(view, R.id.ivIsAdmin);
 
+        TdApi.User user = TgUtils.getUser(member.userId);
 
-        if(user.user.type.getConstructor()== TdApi.UserTypeDeleted.CONSTRUCTOR){
+        if(user.type.getConstructor()== TdApi.UserTypeDeleted.CONSTRUCTOR){
             tvUserName.setText(R.string.user_type_deleted);
             tvUserName.setTextColor(Color.parseColor("#BDBDBD"));
         }else{
-            tvUserName.setText(user.user.firstName + " " + user.user.lastName);
+            tvUserName.setText(user.firstName + " " + user.lastName);
         }
-        if(user.user.username.isEmpty())
+        if(user.username.isEmpty())
             tvUserInfo.setVisibility(View.GONE);
         else{
-            tvUserInfo.setText("@"+user.user.username);
+            tvUserInfo.setText("@"+user.username);
             tvUserInfo.setVisibility(View.VISIBLE);
         }
 
-        if(user.user.type.getConstructor()== TdApi.UserTypeBot.CONSTRUCTOR)
+        if(user.type.getConstructor()== TdApi.UserTypeBot.CONSTRUCTOR)
             ivIsAdmin.setImageResource(R.drawable.user_bot);
         else
-        if(user.role.getConstructor()== TdApi.ChatParticipantRoleAdmin.CONSTRUCTOR)
+        if(member.status.getConstructor()== TdApi.ChatMemberStatusCreator.CONSTRUCTOR)
             ivIsAdmin.setImageResource(R.drawable.user_creator);
-        else if(TgUtils.isUserPrivileged(user.role.getConstructor()))
+        else if(member.status.getConstructor()==TdApi.ChatMemberStatusModerator.CONSTRUCTOR)
+            ivIsAdmin.setImageResource(R.drawable.user_moder);
+
+        else if(member.status.getConstructor()==TdApi.ChatMemberStatusEditor.CONSTRUCTOR)
             ivIsAdmin.setImageResource(R.drawable.user_admin);
         else {
-//            ivIsAdmin.setVisibility(View.GONE);
             ivIsAdmin.setImageDrawable(null);
         }
 
-        Bitmap avatar = imageGetter.getPhoto(user.user.profilePhoto.small.id);
+        Bitmap avatar = user.profilePhoto==null?null:imageGetter.getPhoto(user.profilePhoto.small.id);
         if(avatar!=null) {
             // imageAvatar.setImageBitmap(avatar);
             Drawable drawable = new BitmapDrawable(mContext.getResources(), avatar);
@@ -117,7 +120,7 @@ public class AdapterChatUsers extends BaseAdapter {
         else
             imageAvatar.setImageResource(R.drawable.no_avatar);
 
-        String inviter = getInviter(user.inviterId);
+        String inviter = getInviter(member.inviterUserId);
 
 
         tvInviter.setText(inviter != null ? "Пригласил: "+inviter : "");
@@ -127,7 +130,7 @@ public class AdapterChatUsers extends BaseAdapter {
 
 
 
-    public void addAll(List<TdApi.ChatParticipant> items) {
+    public void addAll(List<TdApi.ChatMember> items) {
         list.addAll(items);
         notifyDataSetChanged();
     }

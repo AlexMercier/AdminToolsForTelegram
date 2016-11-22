@@ -3,6 +3,7 @@ package com.madpixels.tgadmintools.helper;
 import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.util.SparseArray;
 
 import com.madpixels.apphelpers.FileUtils2;
 import com.madpixels.apphelpers.MyLog;
@@ -29,6 +30,8 @@ public class TgH {
     public static int selfProfileId;
     public static String selfProfileUsername;
 
+    public static SparseArray<TdApi.User> users = new SparseArray<>();
+
     private static String getCacheDir(Context c) {
         return c.getCacheDir().getAbsolutePath();
     }
@@ -37,13 +40,32 @@ public class TgH {
         TG.setFileLogEnabled(false);
         TG.setDir(c.getFilesDir().getAbsolutePath());
         TG.setFilesDir(getCacheDir(c) + "/files/");
-        if(!list.isEmpty())
+
+        //if(!list.isEmpty())
             startUpdatesHandler();
     }
 
-    public static void init(Context c, Client.ResultHandler onGetAuthHandler){
+    /**
+     * Init TDLib, check auth state, load profile info and then call resultCallback
+     * @param onGetAuthHandler callback Ok or Error return.
+     */
+    public static void init(Context c, final Client.ResultHandler onGetAuthHandler){
         init(c);
-        TgH.send(new TdApi.GetAuthState(), onGetAuthHandler);
+        TgH.send(new TdApi.GetAuthState(), new Client.ResultHandler() {
+            @Override
+            public void onResult(TdApi.TLObject object) {
+                if(TgUtils.isAuthorized(object)) {
+                    getProfile(new Client.ResultHandler() {
+                        @Override
+                        public void onResult(TdApi.TLObject object) {
+                            onGetAuthHandler.onResult(new TdApi.Ok());
+                        }
+                    });
+                }
+                else
+                    onGetAuthHandler.onResult(new TdApi.Error());
+            }
+        });
     }
 
     public static Client TG() {
@@ -53,12 +75,26 @@ public class TgH {
     private final static Client.ResultHandler LoopUpdateHandler=new Client.ResultHandler() {
         @Override
         public void onResult(TdApi.TLObject object) {
+            if(object.getConstructor()== TdApi.UpdateUser.CONSTRUCTOR){
+                updateUser((TdApi.UpdateUser) object);
+            }
+
             synchronized (LOCK) {
                 for (Client.ResultHandler r : list)
                     r.onResult(object);
             }
         }
     };
+
+    // public static HashMap<Integer, TdApi.User> users = new HashMap<>();
+
+
+    private static void updateUser(TdApi.UpdateUser updateUser) {
+        // MyLog.log("User: "+updateUser.user.firstName+" "+ updateUser.user.lastName);
+        users.put(updateUser.user.id, updateUser.user);
+        //TODO memory leak on long usage
+        // users.put(updateUser.user.id, updateUser.user);
+    }
 
     public static void startUpdatesHandler() {
         TG.setUpdatesHandler(LoopUpdateHandler);
@@ -76,7 +112,7 @@ public class TgH {
 
     public static void setUpdatesHandler(Client.ResultHandler r) {
         list.add(r);
-        if (list.size() == 1)
+        //if (list.size() == 1)
             startUpdatesHandler();
     }
 
@@ -84,8 +120,8 @@ public class TgH {
         synchronized (LOCK) {
             list.remove(r);
         }
-        if (list.isEmpty())
-            TG.stopClient();
+        //if (list.isEmpty())
+        //    TG.stopClient();
     }
 
     public static void markMessageAsReaded(long fromId, int msg_id) {
@@ -143,16 +179,17 @@ public class TgH {
         });
     }
 
-    public static TdApi.ChatParticipant createChatParticipiant(long chat_id, String user_name, int user_id, String user_login) {
-        TdApi.ChatParticipant chatUser = new TdApi.ChatParticipant();
-        chatUser.user = new TdApi.User();
-        chatUser.user.id = user_id;
-        chatUser.user.firstName = user_name;
-        chatUser.user.lastName = "";
-        chatUser.user.username = user_login;
-        chatUser.user.type = new TdApi.UserTypeGeneral();
-        chatUser.user.profilePhoto = new TdApi.ProfilePhoto();
-        chatUser.user.profilePhoto.small = new TdApi.File(0, "", 0, "");
+    public static TdApi.User createChatUser(long chat_id, String user_name, int user_id, String user_login) {
+        TdApi.User chatUser;
+
+        chatUser = new TdApi.User();
+        chatUser.id = user_id;
+        chatUser.firstName = user_name;
+        chatUser.lastName = "";
+        chatUser.username = user_login;
+        chatUser.type = new TdApi.UserTypeGeneral();
+        chatUser.profilePhoto = new TdApi.ProfilePhoto();
+        chatUser.profilePhoto.small = new TdApi.File(0, "", 0, "");
 
         return chatUser;
     }
@@ -181,7 +218,7 @@ public class TgH {
         });
     }
 
-    public static void getProfile() {
+    public static void getProfile() { // load profile without callback
         getProfile(null);
     }
 
@@ -192,13 +229,13 @@ public class TgH {
                 TdApi.User me = (TdApi.User) object;
                 selfProfileId = me.id;
                 selfProfileUsername = me.username;
-                Sets.set(Const.SETS_PROFILE_ID, selfProfileId);
+                Sets.set(Const.SETS_PROFILE_ID, selfProfileId); //save last know profile
                 if(callback!=null)
                     callback.onResult(object);
             }
         });
     }
 
-    //TODO error 429 Too big total timeout 151.000000
+    //TODO error 429 Too big total timeout 151.000000 //profile temporary banned. Check with @SpamBot
 
 }

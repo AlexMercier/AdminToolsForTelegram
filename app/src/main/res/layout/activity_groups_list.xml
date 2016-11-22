@@ -13,8 +13,8 @@ android:background="@color/md_white_1000"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/listChats"
-        android:layout_below="@+id/toolbar"
-        android:layout_above="@+id/adView" />
+        android:layout_above="@+id/adView"
+        android:layout_below="@+id/prgLoadingCachedList" />
 
     <ProgressBar
         android:layout_width="wrap_content"
@@ -24,12 +24,22 @@ android:background="@color/md_white_1000"
         android:layout_centerHorizontal="true"
         android:indeterminate="false" />
 
+    <ProgressBar android:layout_below="@+id/toolbar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/prgLoadingCachedList"
+        android:layout_weight="1"
+        android:indeterminate="true" />
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:id="@+id/adView"></LinearLayout>
+        android:id="@+id/adView">
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"

@@ -12,7 +12,7 @@
     <string name="adminsCount">Admins:</string>
     <string name="participiantsCount">Participiants:</string>
     <string name="hint_short_link_not_created">Short link not created</string>
-    <string name="cancel">Cancel</string>
+    <string name="btnCancel">Cancel</string>
     <string name="btnSave">Save</string>
 
     <string name="error_too_many_public_links">You have created too many public channels</string>
@@ -66,13 +66,13 @@
     <string name="logAction_return_to_chat">Return user to chat after temporary ban expired</string>
     <string name="logAction_autoUnban">Remove user from ban-list after ban expired</string>
     <string name="logAction_banForLink">Ban for spam</string>
-    <string name="logAction_banForSticker">Ban as sticker flood</string>
+    <string name="logAction_banForSticker">Ban for sticker flood</string>
     <string name="logAction_removeLink">Removed message with url</string>
     <string name="logAction_removeSticker">Removed message with sticker</string>
 
-    <string name="hint_warntext_links">Notice text for links</string>
-    <string name="hint_warntext_stickers">Notice text for stickrs</string>
-    <string name="label_allow_count">Allowed count per user</string>
+
+
+    <string name="label_allow_count">Allowed count per user:</string>
     <string name="warntext_links_default_last">Last warning. Stop spam</string>
     <string name="warntext_stickers_default_first">First warning. Stickers flood</string>
     <string name="edit_chat_about_hint">Enter group description</string>
@@ -82,7 +82,7 @@
     <string name="title_group_info">Manage group</string>
     <string name="logAction_stickersFloodWarn">Warn user about ban for stikers-flood</string>
     <string name="logAction_linksFloodWarn">Warn user about ban for spam</string>
-    <string name="text_publish_banreason">User %1$s was banned by reason: %2$s</string>
+    <string name="text_publish_banreason" formatted="false">User %username% was banned by reason: %reason%</string>
     <string name="deleted_accounts_hint">Notice: Telegram not allow to remove deleted accounts, but this accounts self-removed after ~1 week.
         \nSo don\'t worry about that</string>
     <string name="action_log">Events log</string>
@@ -99,7 +99,7 @@
     <string name="btn_yes">Yes</string>
     <string name="chk_remove_messages_links">Remove messages with links</string>
     <string name="chk_remove_messages_stickers">Remove message with stickers</string>
-    <string name="titleLogLifetime" >Clear log after</string>
+    <string name="titleLogLifetime">Clear log after</string>
     <string name="check_anyone_can_invite">Anyone can invite friends</string>
     <string name="check_anyone_can_change_chat">Anyone can change title, photo and invite friends</string>
     <string name="action_chk_show_only_created">Show only created groups</string>
@@ -130,13 +130,13 @@
     <string name="action_unban_all">Unban all</string>
     <string name="textRoleAdmin">Administrator</string>
     <string name="textRoleModerator">Moderator</string>
-    <string name="textChatRole" >Role:</string>
+    <string name="textChatRole">Role:</string>
     <string name="check_enabled">Enable</string>
     <string name="hint_enter_welcome_text">Enter welcome text for joined users</string>
     <string name="hint_chat_description">Chat description</string>
     <string name="labelWelcomeTextForJoinedUsers">Welcome text for new users</string>
     <string name="titleManagingGroups">Managing groups</string>
-    <string name="title_list_of_banned_words">The list of bannned words in chat. Each word at new line</string>
+    <string name="title_list_of_banned_words">The list of banned words in chat:</string>
     <string name="check_BanForWordBlackList">Ban user</string>
     <string name="logAction_banForBlackWord">Ban for word</string>
     <string name="warntext_banword_last">Last warn. Using banned word not allowed</string>
@@ -157,7 +157,7 @@
     <string name="check_remove_leaved_message">Remove \'user left\' message</string>
     <string name="labelOther">Other</string>
     <string name="title_users">Chat members</string>
-    <string name="logAction_banUser">You banned user</string>
+    <string name="logAction_banUser">You banned a user</string>
     <string name="caption_enter_value">Input new value:</string>
     <string name="title_change_value">Change value</string>
     <string name="caption_autostart">Autorun</string>
@@ -169,9 +169,9 @@
     <string name="toast_user_unblacklisted">User was removed from black list</string>
     <string name="toast_user_was_restored_to_chat">User was returned to chat</string>
     <string name="chtTitleAlertOnBlackWordBan">Notify chat on ban</string>
-    <string name="mesage_user_banned_banword">User %1$s was banned for banword</string>
+    <string name="mesage_user_banned_banword">User %1$s was banned for using banned word</string>
     <string name="label_banwords_warntext">Warn message:</string>
-    <string name="chkWarnBeforeBanWord" >Warn before ban</string>
+    <string name="chkWarnBeforeBanWord">Warn before ban</string>
     <string name="action_open_chat_info">Open chat info</string>
     <string name="action_open_userninfo">Open user info</string>
     <string name="logAction_banwordsFloodWarn">Warn user about use of banwords</string>
@@ -180,9 +180,9 @@
     <string name="warntext_banword_first">First warn. Using banned word not allowed</string>
     <string name="action_copy">Copy</string>
     <string name="text_about_app">Tools for Telegram messenger help you to administrate your groups.</string>
-    <string name="button_rate_us" >If you like this app please click to rate us on GooglePlay</string>
+    <string name="button_rate_us">If you like this app please click to rate us on GooglePlay</string>
     <string name="role_moderator">Moderator</string>
-    <string name="role_editor">Admin</string>
+    <string name="role_editor">Editor</string>
     <string name="role_editor_description_supegroup">Admin can invite and ban users, delete all user messages, change supergroup avatar and title</string>
     <string name="role_moderator_description_supergroup">Moderator can only delete messages</string>
     <string name="toast_user_role_changed">User role changed</string>
@@ -204,6 +204,84 @@
 
     <string name="app_thanks_to">Thanks to:</string>
     <string name="thanks_to_list">Ivan Lazcano for Spanish translation</string>
+    <string name="text_notification_descr_background">background service</string>
+    <string name="description_user_within_time">Count of warnings for user within:\n(If user has not violated the rules during this time, the count of warnings will be reset)</string>
+    <string name="text_warn_no_warn_user">No warn user before ban</string>
+    <string name="text_warn_on_last_warn">On last message</string>
+    <string name="text_warn_on_first_warn">On first message</string>
+    <string name="text_warn_on_first_last_warn">On first and last messages</string>
+    <string name="text_warn_on_second_and_last_warn">On 2\'d and last messages</string>
+    <string name="text_warn_always">Warn always</string>
+    <string name="tex_warn_count_for_user_before_ban">Warnings for user:</string>
+    <string name="log_title_group">Group</string>
+    <string name="log_title_username">User</string>
+    <string name="log_title_time">Time</string>
+    <string name="log_title_bantime">Ban for</string>
+    <string name="log_title_banuntil">Ban until</string>
+    <string name="log_title_banurl">Link</string>
+    <string name="log_title_message">Message</string>
+    <string name="log_title_admin">Admin name</string>
+    <string name="log_title_bannedword">Ban word</string>
+    <string name="log_title_ban_reason">Reason</string>
+    <string name="chkBlackListedWords">Blacklisted words enabled</string>
+    <string name="title_set_user_role_admin">Set user role</string>
+    <string name="action_change_user_admin_role">Change moderation role</string>
+    <string name="chk_remove_banword_messages">Remove message containing this word</string>
+    <string name="chk_ban_user_for_banword">Ban user</string>
+    <string name="hint_enter_ban_word">Enter banned word</string>
+    <string name="btnAdd">Add</string>
+    <string name="title_add_banned_word">Add banned word</string>
+    <string name="toast_word_is_empty">Word is empty</string>
+    <string name="chk_remove_messages_voice">Remove message with voice</string>
+    <string name="chkTitleBanForVoice">Ban for voice</string>
+    <string name="logAction_banForVoice">Ban for voice flood</string>
+    <string name="warntext_voice_default_last">Last warning. Voice flood</string>
+    <string name="warntext_voice_default_first">First warning. Voices not allowed</string>
+    <string name="hint_first_user_warning">Message text for first warning</string>
+    <string name="hint_last_user_warning">Message text for last warning</string>
+
+    <string name="stringName1" formatted="false"><![CDATA[<html> \n
+        <b>You can use next short tags to print variables in message</b>: \n
+        <b>%username%</b> - print @username if exists \n
+        <b>%name%</b> - print user First and Last name \n
+        <b>%count%</b> - print current user warnings count \n
+        <b>%max%</b> - print max allowed warnings per user \n
+        <b>%left%</b> - print number of remaining warnings for user \n
+
+        <b>Example</b>: \n
+        <i>%username% warning %count% of %max%! Spam not allowed! \n
+        Remains %left% warnings before you will be banned.</i> \n
+        <b>Will be printed</b>: \n
+        <i>@user warning 1 of 5! Spam not allowed! \n
+        Remains 4 warnings before you will be banned.</i>
+        </html>]]></string>
+    <string name="list_of_banned_words">List of banned words in chat</string>
+    <string name="chk_remove_message_with_banword">Remove\nmessage</string>
+    <string name="chk_ban_user_with_banword">Ban\nuser</string>
+    <string name="action_add_banword">Add word</string>
+    <string name="action_clear_banwords">Clear list</string>
+    <string name="title_dialog_confirm">Confirm action</string>
+    <string name="text_clear_all_banwords_for_chat">Confirm to clear all banned words for this chat?</string>
+    <string name="check_show_icon_in_bar">Always show icon in system bar</string>
+    <string name="text_show_icon_in_system_bar">this option can help if your system kills the app process</string>
+    <string name="text_banned_words_list_empty">List is empty</string>
+    <string name="action_banwords_import_from_chat">Import from other chat banwords list</string>
+    <string name="title_import_words">Select words to import</string>
+    <string name="text_flood_messages_count_per_user">Messages count per user</string>
+    <string name="text_flood_control_watch_within_time">Flood control within time:</string>
+    <string name="logAction_banForFlood">Ban for flood</string>
+    <string name="warntext_flood_default_last">Last warning. Prevent flooding</string>
+    <string name="btnBanUser">Ban</string>
+    <string name="btn_banned_words_list_empty">Banned words list is empty.\nPress to add</string>
+    <string name="banned_words_count">%d banned words for this chat</string>
+    <string name="logAction_delMsgForFlood">Deleted flood message</string>
+    <string name="logAction_removeVoice">Deleted Voice message</string>
+    <string name="text_antispam_alert_title">Antispam alert!</string>
+    <string name="caption_alerts_title">Antispam alert title</string>
+    <string name="action_add_link_to_wl">Add link to white list</string>
+    <string name="title_warning_text_before_ban">Warning text for users before ban:</string>
+    <string name="title_warn_help">formatting help</string>
+    <string name="ban_for_flood">Ban user</string>
 
     <string-array name="ban_times">
         <item>Min.</item>
@@ -225,5 +303,13 @@
         <item>3 days</item>
         <item>1 day</item>
     </string-array>
+
+    <string-array name="times_during_warnings">
+        <item>During all time</item>
+        <item>Min.</item>
+        <item>Hour.</item>
+        <item>Day.</item>
+    </string-array>
+
 
 </resources>

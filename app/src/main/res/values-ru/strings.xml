@@ -9,7 +9,7 @@
     <string name="adminsCount">Админов:</string>
     <string name="participiantsCount">Пользователей:</string>
     <string name="hint_short_link_not_created">Короткая ссылка не задана</string>
-    <string name="cancel">Отмена</string>
+    <string name="btnCancel">Отмена</string>
     <string name="btnSave">Применить</string>
 
     <string name="error_too_many_public_links">Вы уже создали слишком много публичных каналов</string>
@@ -68,9 +68,9 @@
     <string name="logAction_removeSticker">Удалено сообщение со стикером</string>
     <string name="logAction_banForBlackWord">Баз за запрещённое слово</string>
 
-    <string name="hint_warntext_links">Текст предупреждения за ссылки</string>
-    <string name="hint_warntext_stickers">Текст предупреждения за стикеры</string>
-    <string name="label_allow_count">Разрешенное кол-во для каждого юзера</string>
+
+
+    <string name="label_allow_count">Сколько раз можно нарушать правило:</string>
     <string name="warntext_links_default_last">Последнее предупреждение. Прекрати спамить</string>
     <string name="warntext_stickers_default_first">Первое предупреждение. Флуд стикерами</string>
     <string name="warntext_banword_last">Последнее предупреждение. Использование запрещённого слова</string>
@@ -81,7 +81,7 @@
     <string name="title_group_info">Управление группой</string>
     <string name="logAction_stickersFloodWarn">Предупреждение пользователя о стикер-флуде</string>
     <string name="logAction_linksFloodWarn">Предупреждение пользователя о бане за спам</string>
-    <string name="text_publish_banreason">Пользователь %1$s был забанен по причине: %2$s</string>
+    <string name="text_publish_banreason" formatted="false">Пользователь %username% был забанен по причине: %reason%</string>
     <string name="deleted_accounts_hint">В Телеграме нельзя удалить из списка удалённые аккаунты. Просто ждите, они сами пропадут примерно через неделю</string>
     <string name="action_log">Журнал событий</string>
     <string name="action_change_user">Сменить учетную запись</string>
@@ -135,7 +135,7 @@
     <string name="hint_chat_description">Описание чата</string>
     <string name="labelWelcomeTextForJoinedUsers">Текст приветствия для новых юзеров</string>
     <string name="titleManagingGroups">Управление группами</string>
-    <string name="title_list_of_banned_words">Список запрещенных слов в чате. Каждое слово с новой строки</string>
+    <string name="title_list_of_banned_words">Список запрещенных слов в чате:</string>
     <string name="check_BanForWordBlackList">Банить юзера</string>
     <string name="hint_each_whitelink_at_new_line">Каждая ссылка с новой строки</string>
     <string name="hint_blackwords">Введите каждое слово с новой строки</string>
@@ -176,10 +176,10 @@
     <string name="warntext_banword_first">Первое предупреждение. Использование запрещённого слова</string>
     <string name="action_copy">Копировать</string>
     <string name="text_about_app">Приложение для мессенджера Telegram для помощи в администрировании групп.</string>
-    <string name="button_rate_us" >Пожалуйста оцените приложение в GooglePlay</string>
+    <string name="button_rate_us">Пожалуйста оцените приложение в GooglePlay</string>
     <string name="role_moderator">Модератор</string>
-    <string name="role_editor">Админ</string>
-    <string name="role_editor_description_supegroup">Админ может приглашать и банить юзеров, менять аву и описание супергруппы</string>
+    <string name="role_editor">Редактор</string>
+    <string name="role_editor_description_supegroup">Редактор может приглашать и банить юзеров, менять аву и описание супергруппы</string>
     <string name="role_moderator_description_supergroup">Модератор может только удалять сообщения</string>
     <string name="toast_user_role_changed">Привилегии пользователя изменены</string>
     <string name="dialog_group_all_are_admins">В группе установлены права - \'Все Админы\'.\nИзменить управление группой только на администраторов?</string>
@@ -197,6 +197,69 @@
     <string name="label_loading_chats_count">Загрузка списка чатов...</string>
     <string name="action_chats_info">Информация о чатах</string>
     <string name="action_open_group_link">Открыть группу в Телеграм</string>
+    <string name="text_notification_descr_background">фоновой процесс</string>
+    <string name="description_user_within_time">Учитывать предупреждения в течение:\n(Если юзер не нарушал правила в течении указанного времени то предупреждения будут сброшены)</string>
+    <string name="text_warn_no_warn_user">Не предупреждать юзера</string>
+    <string name="text_warn_on_last_warn">Предупреждать при последнем нарушении</string>
+    <string name="text_warn_on_first_warn">При первом нарушении</string>
+    <string name="text_warn_on_first_last_warn">При первом и при последнем нарушении</string>
+    <string name="text_warn_on_second_and_last_warn">При втором и при последнем нарушении</string>
+    <string name="text_warn_always">Каждый раз</string>
+    <string name="tex_warn_count_for_user_before_ban">Сколько раз предупреждать юзера:</string>
+
+    <string name="log_title_group">Группа</string>
+    <string name="log_title_username" >Пользователь</string>
+    <string name="log_title_time">Время</string>
+    <string name="log_title_bantime">Забанен на</string>
+    <string name="log_title_banuntil">Бан до</string>
+    <string name="log_title_banurl">Ссылка</string>
+    <string name="log_title_message">Сообщение</string>
+    <string name="log_title_admin">Имя админа</string>
+    <string name="log_title_bannedword">Запрещённое слово</string>
+    <string name="log_title_ban_reason">Причина</string>
+    <string name="chkBlackListedWords">Чёрный список слов</string>
+    <string name="title_set_user_role_admin">Задать юзеру права</string>
+    <string name="action_change_user_admin_role">Изменить права админа</string>
+    <string name="chk_remove_banword_messages">Удалять сообщения с этим словом</string>
+    <string name="chk_ban_user_for_banword">Банить юзера</string>
+    <string name="hint_enter_ban_word" >Введите слово</string>
+    <string name="btnAdd">Добавить</string>
+    <string name="title_add_banned_word">Добавить новое слово</string>
+    <string name="toast_word_is_empty">Текст пуст</string>
+    <string name="chk_remove_messages_voice">Удалять сообщения с войсами</string>
+    <string name="chkTitleBanForVoice">Бан за войсы</string>
+    <string name="logAction_banForVoice">Бан за флуд войсами</string>
+    <string name="warntext_voice_default_last">Последнее предупреждение. Флуд войсами</string>
+    <string name="warntext_voice_default_first">Первое предупреждение. Войсы запрещены</string>
+    <string name="hint_first_user_warning">Текст сообщения первого предупреждения</string>
+    <string name="hint_last_user_warning">Текст сообщения последнего предупреждения</string>
+    <string name="list_of_banned_words">Список слов запрещённых в чате</string>
+    <string name="chk_remove_message_with_banword">Удалять\nсообщение</string>
+    <string name="chk_ban_user_with_banword">Банить\nюзера</string>
+    <string name="action_add_banword">Добавить слово</string>
+    <string name="action_clear_banwords">Очистить список</string>
+    <string name="title_dialog_confirm">Подтвердить действие</string>
+    <string name="text_clear_all_banwords_for_chat">Вы уверены что хотите удалить все запрещенные слова для этого чата?</string>
+    <string name="check_show_icon_in_bar">Всегда показывать иконку в шторке</string>
+    <string name="text_show_icon_in_system_bar">эта опция может помочь если вдруг ваша система убивает фоновой процесс приложения</string>
+    <string name="text_banned_words_list_empty">Список слов пуст</string>
+    <string name="action_banwords_import_from_chat">Импортировать слова из другого чата</string>
+    <string name="title_import_words">Выберите слова для импорта</string>
+    <string name="text_flood_messages_count_per_user">Разрешённое кол-во сообщений</string>
+    <string name="text_flood_control_watch_within_time">Контролировать в течении времени:</string>
+    <string name="logAction_banForFlood">Бан за флуд</string>
+    <string name="warntext_flood_default_last">Последнее предупреждение. Чрезмерный флуд запрещён</string>
+    <string name="btnBanUser">Забанить</string>
+    <string name="btn_banned_words_list_empty">Список слов пуст.\nНажмите чтобы добавить</string>
+    <string name="banned_words_count">%d запрещенных слов</string>
+    <string name="logAction_delMsgForFlood">Удалено флуд сообщение</string>
+    <string name="logAction_removeVoice">Удалено войс-сообщение</string>
+    <string name="text_antispam_alert_title">Antispam alert!</string>
+    <string name="caption_alerts_title">Заголовок уведомлений антиспама</string>
+    <string name="action_add_link_to_wl">Добавить ссылку в список исключений</string>
+    <string name="title_warning_text_before_ban">Текст предупрежения перед банов:</string>
+    <string name="title_warn_help">справка по форматированию</string>
+    <string name="ban_for_flood">Банить юзера</string>
 
 
     <string-array name="ban_times">
@@ -219,6 +282,13 @@
         <item>Неделя</item>
         <item>3 дня</item>
         <item>1 день</item>
+    </string-array>
+
+    <string-array name="times_during_warnings">
+        <item>В течении всего времени</item>
+        <item>Минут</item>
+        <item>Часов</item>
+        <item>Дней</item>
     </string-array>
 
 </resources>

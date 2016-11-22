@@ -38,9 +38,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="@string/role_editor_description_supegroup"
 
-                    android:layout_gravity="center_horizontal"
+                    android:text="@string/role_moderator_description_supergroup"
+
+
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:layout_marginLeft="16dp" />
 
                 <RadioButton
@@ -54,13 +58,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/role_editor_description_supegroup"
 
-                    android:text="@string/role_moderator_description_supergroup"
-
-
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
+                    android:layout_gravity="center_horizontal"
                     android:layout_marginLeft="16dp" />
             </RadioGroup>
         </LinearLayout>

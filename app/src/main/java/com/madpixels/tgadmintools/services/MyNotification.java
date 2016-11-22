@@ -2,6 +2,7 @@ package com.madpixels.tgadmintools.services;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -36,7 +37,7 @@ public class MyNotification {
     public MyNotification(int id, Context c) {
         this.mContext = c;
         ID = id;
-        Drawable largeIcon = mContext.getResources().getDrawable(R.mipmap.ic_notification_big);
+        Drawable largeIcon = mContext.getResources().getDrawable(R.mipmap.ic_launcher);
 
         mNotificationBuilder = new NotificationCompat.Builder(mContext)
                 .setContentTitle(mContext.getString(R.string.app_name))
@@ -138,5 +139,9 @@ public class MyNotification {
 
     public void setTitile(String title) {
         mNotificationBuilder.setContentTitle(title);
+    }
+
+    public void startForeground(Service s) {
+        s.startForeground(300, mNotificationBuilder.build());
     }
 }

@@ -3,4 +3,5 @@
     <item name="appodealBannerView" type="id" />
 
     <string name="lang_code">en</string>
+    <item name="id_position" type="id" />
 </resources>

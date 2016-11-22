@@ -31,9 +31,14 @@ public class App extends Application{
     public void onCreate() {
         mContext = this;
         MyLog.TAG = "tgadmin";
-        MyLog.WRITE_TO_FILE = BuildConfig.DEBUG && false;
+        MyLog.WRITE_TO_FILE = BuildConfig.DEBUG && true;
         MyLog.IS_ENABLED = BuildConfig.DEBUG && true;
         setupAcra();
+
+        if(BuildConfig.DEBUG){
+//            String s = getFilesDir().getParent()+"/databases/database_773790.db";
+//            new File(s).delete();
+        }
 
         Sets.getInstance().init(this);
         Analytics.setup(this);

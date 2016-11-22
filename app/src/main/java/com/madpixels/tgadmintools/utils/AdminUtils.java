@@ -40,8 +40,8 @@ public class AdminUtils {
     }
 
     public static void getAdminsInSuperGroup(int channelId, final Client.ResultHandler resultHandler) {
-        TdApi.ChannelParticipantsFilter f = new TdApi.ChannelParticipantsAdmins();
-        TgH.send(new TdApi.GetChannelParticipants(channelId, f, 0, 25), new Client.ResultHandler() {
+        TdApi.ChannelMembersFilter f = new TdApi.ChannelMembersAdministrators();
+        TgH.send(new TdApi.GetChannelMembers(channelId, f, 0, 25), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
                 resultHandler.onResult(object);
@@ -60,16 +60,16 @@ public class AdminUtils {
 
                 // TdApi.ChatParticipants s = new TdApi.ChatParticipants();
 
-                ArrayList<TdApi.ChatParticipant> participants = new ArrayList<>();
-                for (TdApi.ChatParticipant cp : group.participants) {
-                    if (TgUtils.isUserPrivileged(cp.role.getConstructor()) ) {
+                ArrayList<TdApi.ChatMember> participants = new ArrayList<>();
+                for (TdApi.ChatMember cp : group.members) {
+                    if (TgUtils.isUserPrivileged(cp.status.getConstructor()) ) {
                         participants.add(cp);
                         //pCallback.onResult(true);
                         //return;
                     }
                 }
-                TdApi.ChatParticipant[] participantsArray = participants.toArray(new TdApi.ChatParticipant[0]);
-                TdApi.ChatParticipants ss = new TdApi.ChatParticipants(participantsArray.length, participantsArray);
+                TdApi.ChatMember[] participantsArray = participants.toArray(new TdApi.ChatMember[0]);
+                TdApi.ChatMembers ss = new TdApi.ChatMembers(participantsArray.length, participantsArray);
                 onResult.onResult(ss);
                 //pCallback.onResult(false);
             }
@@ -77,13 +77,13 @@ public class AdminUtils {
     }
 
     public static void checkIsAdminInSuperGroup(int channelId, final int userid, final Callback pCallback) {
-        TdApi.ChannelParticipantsFilter f = new TdApi.ChannelParticipantsAdmins();
-        TgH.send(new TdApi.GetChannelParticipants(channelId, f, 0, 25), new Client.ResultHandler() {
+        TdApi.ChannelMembersFilter f = new TdApi.ChannelMembersAdministrators();
+        TgH.send(new TdApi.GetChannelMembers(channelId, f, 0, 25), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                TdApi.ChatParticipants users = (TdApi.ChatParticipants) object;
-                for (TdApi.ChatParticipant cp : users.participants) {
-                    if (cp.user.id == userid) {
+                TdApi.ChatMembers users = (TdApi.ChatMembers) object;
+                for (TdApi.ChatMember cp : users.members) {
+                    if (cp.userId == userid) {
                         pCallback.onResult(true);
                         return;
                     }
@@ -102,8 +102,8 @@ public class AdminUtils {
                     return;
                 TdApi.GroupFull group = (TdApi.GroupFull) object;
 
-                for (TdApi.ChatParticipant cp : group.participants) {
-                    if ( cp.user.id == userid && TgUtils.isUserPrivileged(cp.role.getConstructor()) ) {
+                for (TdApi.ChatMember cp : group.members) {
+                    if ( cp.userId == userid && TgUtils.isUserPrivileged(cp.status.getConstructor()) ) {
                         pCallback.onResult(true);
                         return;
                     }
@@ -120,7 +120,7 @@ public class AdminUtils {
     }
 
     public static void kickUser(final long chat_id, final int user_id, @Nullable Client.ResultHandler callback){
-        final TdApi.TLFunction f = new TdApi.ChangeChatParticipantRole(chat_id, user_id, new TdApi.ChatParticipantRoleKicked());
+        final TdApi.TLFunction f = new TdApi.ChangeChatMemberStatus(chat_id, user_id, new TdApi.ChatMemberStatusKicked());
         if(callback==null)
             callback = TgUtils.emptyResultHandler();
         TgH.TG().send(f, callback);

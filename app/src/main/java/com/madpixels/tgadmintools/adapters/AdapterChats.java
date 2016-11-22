@@ -70,16 +70,19 @@ public class AdapterChats extends BaseAdapter{
         final ImageView icon = UIUtils.getView(view, R.id.ivIcon);
         final ImageView imageChatAva = UIUtils.getView(view, R.id.imageChatAva);
 //        info.setVisibility(View.INVISIBLE);
+        // avatar, role, chat.type, channelChatInfo.channel.isSuperGRoup, chat.title
+        Bitmap ava = null;
 
-        Bitmap ava = images.getPhoto(chat.photo.small.id);
+        ava = chat.photo==null?null : images.getPhoto(chat.photo.small.id);
+
         if(ava!=null){
             imageChatAva.setImageBitmap(ava);
         }else{
             imageChatAva.setImageResource(R.drawable.no_avatar);
         }
 
-        TdApi.ChatParticipantRole role = TgUtils.getRole(chat);
-        if(role.getConstructor()== TdApi.ChatParticipantRoleAdmin.CONSTRUCTOR)
+        TdApi.ChatMemberStatus role = TgUtils.getRole(chat);
+        if(role.getConstructor()== TdApi.ChatMemberStatusCreator.CONSTRUCTOR)
             info.setText(R.string.textRoleAdmin);
         else
             info.setText(R.string.textRoleModerator);
@@ -112,5 +115,10 @@ public class AdapterChats extends BaseAdapter{
 
     public void onDestroy(){
         images.onDestroy();
+    }
+
+    public void clear() {
+        list.clear();
+        notifyDataSetChanged();
     }
 }

@@ -75,7 +75,7 @@ public final class TG {
      * By default logging to the file is disabled.
      * Must be called before getClientInstance().
      *
-     * @param is_enabled Directory to store files.
+     * @param is_enabled Is file log should be enabled.
      */
     public static void setFileLogEnabled(boolean is_enabled) {
         synchronized (TG.class) {
@@ -84,11 +84,11 @@ public final class TG {
     }
 
     /**
-     * Enables/disables logging to a file in addition to logging to Android Log.
-     * By default logging to the file is disabled.
+     * Enables/disables using of test Telegram environment.
+     * By default production environment is used.
      * Must be called before getClientInstance().
      *
-     * @param use_test_dc Directory to store files.
+     * @param use_test_dc Is test environment should be used.
      */
     public static void setUseTestDc(boolean use_test_dc) {
         synchronized (TG.class) {
@@ -99,7 +99,8 @@ public final class TG {
     /**
      * This function stops and destroys the Client.
      * No queries are possible after this call, but completely new instance
-     * of a Client with different settings can be obtained through getClientInstance()
+     * of a Client with a different settings can be obtained through
+     * getClientInstance()
      */
     public static void stopClient() {
         if (instance != null) {
@@ -138,8 +139,10 @@ public final class TG {
     }
 
     /**
-     * This function returns singleton object of class Client which can be used for querying TDLib.
-     * setUpdatesHandler(), setDir(), setFilesDir() and setFileLogEnabled() must be called before this function.
+     * This function returns a singleton object of the class Client which can be used for querying TDLib.
+     * setUpdatesHandler(), setDir(), setFilesDir(), setFileLogEnabled() and setUseTestDc() must be called before this function.
+     *
+     * @return Client instance
      */
     public static Client getClientInstance() {
         if (instance == null) {

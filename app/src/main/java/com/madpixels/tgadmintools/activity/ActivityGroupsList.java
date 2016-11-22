@@ -4,8 +4,10 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,11 +27,14 @@ import com.madpixels.apphelpers.ui.ProgressDialogBuilder;
 import com.madpixels.tgadmintools.BuildConfig;
 import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.adapters.AdapterChats;
+import com.madpixels.tgadmintools.db.DBHelper;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -42,8 +47,9 @@ public class ActivityGroupsList extends ActivityExtended {
 
     public static boolean reloadOnResume = false;
     ArrayList<TdApi.Chat> mListAdminChats = new ArrayList<>();
+    ArrayList<JSONObject> chatsCache = null;
 
-    ProgressBar prgLoadingChats;
+    ProgressBar prgLoadingChats, prgLoadingCachedList;
     AdapterChats mAdapter;
     ListView mListViewChats;
     boolean isShowChannels = false, isShowOnlyCreated = false;
@@ -82,7 +88,6 @@ public class ActivityGroupsList extends ActivityExtended {
         UIUtils.setToolbar(this, R.id.toolbar);
         setTitle(R.string.titleManagingGroups);
 
-
         mListViewChats = getView(R.id.listChats);
         View head_list_count = UIUtils.inflate(mContext, R.layout.header_list_count);
         tvListCount = UIUtils.getView(head_list_count, R.id.tvListCount);
@@ -95,10 +100,14 @@ public class ActivityGroupsList extends ActivityExtended {
         registerForContextMenu(mListViewChats);
         mListViewChats.setOnItemClickListener(onItemClickListener);
         tvLoadingCount = getView(R.id.tvLoadingCount);
+        prgLoadingCachedList = getView(R.id.prgLoadingCachedList);
+
+        prgLoadingCachedList.setVisibility(View.GONE);
 
         mCountAdminsGroup = 0;
 
-        getChats();
+
+        new GetChatsCached().execute();
     }
 
     @Override
@@ -191,7 +200,7 @@ public class ActivityGroupsList extends ActivityExtended {
 
         if (TgUtils.isSuperGroup(chat.type.getConstructor())) {
             TdApi.ChannelChatInfo channel = (TdApi.ChannelChatInfo) chat.type;
-            if (!channel.channel.username.isEmpty()) {
+            if (!TextUtils.isEmpty(channel.channel.username)) {
                 menu.add(0, 4, 0, R.string.action_open_group_link);
             }
         }
@@ -285,8 +294,34 @@ public class ActivityGroupsList extends ActivityExtended {
         return super.onContextItemSelected(item);
     }
 
+    /*
+         First we get and show cached chats list, and next load actual chats list
+          */
+    class GetChatsCached extends AsyncTask<Void, Void, ArrayList<TdApi.Chat>> {
+
+        @Override
+        protected ArrayList<TdApi.Chat> doInBackground(Void... params) {
+            ArrayList<TdApi.Chat> chats = DBHelper.getInstance().getCacheChats();
+            return chats;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<TdApi.Chat> chats) {
+            if (!chats.isEmpty()) {
+                mAdapter.addAll(chats);
+                prgLoadingChats.setVisibility(View.GONE);
+                tvLoadingCount.setVisibility(View.GONE);
+                prgLoadingCachedList.setVisibility(View.VISIBLE);
+            }
+            getChats();
+        }
+    }
+
 
     void getChats() {
+        if (chatsCache == null)
+            chatsCache = new ArrayList<>();
+
         TgH.TG().send(new TdApi.GetChats(offsetOrder, 0, 100), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
@@ -298,17 +333,17 @@ public class ActivityGroupsList extends ActivityExtended {
 
                         if (TgUtils.isSuperGroup(chat.type.getConstructor())) {
                             TdApi.ChannelChatInfo channelInfo = (TdApi.ChannelChatInfo) chat.type;
-                            role = channelInfo.channel.role.getConstructor();
+                            role = channelInfo.channel.status.getConstructor();
 
                             if (channelInfo.channel.isSupergroup) {
                                 chatsInfo.supergroups_count++;
-                                if (role == TdApi.ChatParticipantRoleAdmin.CONSTRUCTOR)
+                                if (role == TdApi.ChatMemberStatusCreator.CONSTRUCTOR)
                                     chatsInfo.created_groups_count++;
                                 else if (TgUtils.isUserPrivileged(role))
                                     chatsInfo.admin_groups_count++;
                             } else {
                                 chatsInfo.channels_count++;
-                                if (role == TdApi.ChatParticipantRoleAdmin.CONSTRUCTOR)
+                                if (role == TdApi.ChatMemberStatusCreator.CONSTRUCTOR)
                                     chatsInfo.created_channels_count++;
                                 else if (TgUtils.isUserPrivileged(role))
                                     chatsInfo.admin_channels_count++;
@@ -324,12 +359,12 @@ public class ActivityGroupsList extends ActivityExtended {
                             if (isShowChannels)
                                 continue;
                             TdApi.GroupChatInfo groupInfo = (TdApi.GroupChatInfo) chat.type;
-                            role = groupInfo.group.role.getConstructor();
-                            if (role == TdApi.ChatParticipantRoleEditor.CONSTRUCTOR && groupInfo.group.anyoneCanEdit) {
+                            role = groupInfo.group.status.getConstructor();
+                            if (role == TdApi.ChatMemberStatusEditor.CONSTRUCTOR && groupInfo.group.anyoneCanEdit) {
                                 // простая группа и все могут изменять - мы не админ
                                 continue;
                             }
-                            if (role == TdApi.ChatParticipantRoleAdmin.CONSTRUCTOR)
+                            if (role == TdApi.ChatMemberStatusCreator.CONSTRUCTOR)
                                 chatsInfo.created_groups_count++;
                             else
                                 chatsInfo.admin_groups_count++;
@@ -342,28 +377,55 @@ public class ActivityGroupsList extends ActivityExtended {
                         } else {
                             continue;
                         }
-                        if (isShowOnlyCreated && role != TdApi.ChatParticipantRoleAdmin.CONSTRUCTOR)// только собственые
+                        if (isShowOnlyCreated && role != TdApi.ChatMemberStatusCreator.CONSTRUCTOR)// только собственые
                             continue;
 
                         if (TgUtils.isUserPrivileged(role)) {
                             mListAdminChats.add(chat);
                             mCountAdminsGroup++;
+
+                            try {
+                                JSONObject jChat = new JSONObject()
+                                        .put("id", chat.id)
+                                        .put("title", chat.title)
+                                        .put("type", chat.type.getConstructor())
+                                        .put("order", chat.order);
+                                if (chat.photo != null)
+                                    jChat.put("photo_id", chat.photo.small.id);
+                                jChat.put("role", TgUtils.getRole(chat).getConstructor());
+                                if (TgUtils.isChannel(chat)) {
+                                    jChat.put("isChannel", true);
+                                }
+                                if (TgUtils.isSuperGroup(chat.type.getConstructor())) {
+                                    TdApi.ChannelChatInfo channel = (TdApi.ChannelChatInfo) chat.type;
+                                    if (!TextUtils.isEmpty(channel.channel.username))
+                                        jChat.put("username", channel.channel.username);
+                                    jChat.put("channel_id", channel.channel.id);
+                                }
+
+
+                                chatsCache.add(jChat);
+
+                            } catch (JSONException e) {
+                                MyLog.log(e);
+                            }
                         }
                     }
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            /// if(cs.chats.length<100)
                             tvLoadingCount.setText(getString(R.string.label_loading_chats_count) + " " + totalChats);
                         }
                     });
-                    if (cs.chats.length == 100) {
+                    if (cs.chats.length >= 100) {
                         offsetOrder = cs.chats[cs.chats.length - 1].order;
                         getChats();
                     } else {
                         // чаты кончились
                         runOnUiThread(updateList);
+                        DBHelper.getInstance().cacheChats(chatsCache);
+                        chatsCache = null;
                     }
 
                 } else {
@@ -387,9 +449,11 @@ public class ActivityGroupsList extends ActivityExtended {
 
             UIUtils.setBatchVisibility(View.VISIBLE, tvListCount, tvCountTotalTitle);
             tvListCount.setText(mCountAdminsGroup + "");
+            mAdapter.clear();
             mAdapter.addAll(mListAdminChats);
             prgLoadingChats.setVisibility(View.GONE);
             tvLoadingCount.setVisibility(View.GONE);
+            prgLoadingCachedList.setVisibility(View.GONE);
 
             AdHelper.showBanner(findViewById(R.id.adView));
         }
@@ -428,42 +492,53 @@ public class ActivityGroupsList extends ActivityExtended {
         TextView tvHint = UIUtils.getView(v, R.id.tvHint);
         tvHint.setText(R.string.create_chat_title);
         final EditText editText = UIUtils.getView(v, R.id.editInputText);
+        final EditText edtInviteUsername = UIUtils.getView(v, R.id.edtInviteUsername);
+
         editText.setHint(R.string.hint_enter_chat_title);
         new AlertDialog.Builder(mContext)
                 .setTitle(R.string.dialog_new_chat_title)
                 .setView(v)
-                .setNegativeButton(R.string.cancel, null)
+                .setNegativeButton(R.string.btnCancel, null)
                 .setPositiveButton(R.string.btnSave, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String title = editText.getText().toString().trim();
-                        if (title.isEmpty()) {
-                            MyToast.toast(mContext, R.string.error_empty_chat_title);
-                            return;
-                        }
-                        pDlg.show();
-                        CreateGroup cr = new CreateGroup(title, null);
-                        cr.onSuccessCallback = new Client.ResultHandler() {
                             @Override
-                            public void onResult(final TdApi.TLObject object) {
-                                MyLog.log(object.toString());
-                                onUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        pDlg.dismiss();
+                            public void onClick(DialogInterface dialog, int which) {
+                                String title = editText.getText().toString().trim();
+                                String inviteUsername = edtInviteUsername.getText().toString().trim();
 
-                                        TdApi.Chat chat = (TdApi.Chat) object;
-                                        mAdapter.list.add(0, chat);
-                                        mAdapter.notifyDataSetChanged();
-                                        MyToast.toast(mContext, R.string.group_created);
+                                if (title.isEmpty()) {
+                                    MyToast.toast(mContext, R.string.error_empty_chat_title);
+                                    return;
+                                }
+                                pDlg.show();
+                                CreateGroup cr = new CreateGroup(title, null);
+
+                                cr.onSuccessCallback = new Client.ResultHandler() {
+                                    @Override
+                                    public void onResult(final TdApi.TLObject object) {
+                                        // MyLog.log(object.toString());
+                                        onUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                pDlg.dismiss();
+                                                TdApi.Chat chat = (TdApi.Chat) object;
+                                                mAdapter.list.add(0, chat);
+                                                mAdapter.notifyDataSetChanged();
+                                                MyToast.toast(mContext, R.string.group_created);
+                                            }
+                                        });
                                     }
-                                });
+                                };
+                                if (!inviteUsername.isEmpty()) {
+                                    cr.setInvitingUsername(inviteUsername);
+                                }
+                                cr.start();
                             }
-                        };
-                        cr.start();
-                    }
-                })
-                .show();
+                        }
+
+                )
+                .
+
+                        show();
     }
 
     private static int randomBotId = 0;
@@ -471,6 +546,7 @@ public class ActivityGroupsList extends ActivityExtended {
     private class CreateGroup {
         String title;
         Client.ResultHandler onSuccessCallback, onErrorCallback;
+        private String inviteUsername;
 
         CreateGroup(String title, Client.ResultHandler onSuccessCallback) {
             this.title = title;
@@ -478,15 +554,23 @@ public class ActivityGroupsList extends ActivityExtended {
         }
 
         private void start() {
+            if (TextUtils.isEmpty(inviteUsername))
+                inviteUsername = "ImageBot";//default invited bot coz telegram allow create chat only when users count 2 or more
+
             if (randomBotId != 0)
                 createGroup();
             else
-                TgH.send(new TdApi.SearchUser("ImageBot"), new Client.ResultHandler() {
+                TgH.send(new TdApi.SearchPublicChat(inviteUsername), new Client.ResultHandler() {
                     @Override
                     public void onResult(TdApi.TLObject object) {
-                        MyLog.log(object.toString());
-                        TdApi.User user = (TdApi.User) object;
-                        randomBotId = user.id;
+                        //MyLog.log(object.toString());
+                        if (object.getConstructor() == TdApi.PrivateChatInfo.CONSTRUCTOR) {
+                            TdApi.PrivateChatInfo chat = (TdApi.PrivateChatInfo) object;
+                            TdApi.User user = chat.user;
+                            randomBotId = user.id;
+                        } else {
+                            randomBotId = 122242792;
+                        }
                         createGroup();
                     }
                 });
@@ -497,28 +581,34 @@ public class ActivityGroupsList extends ActivityExtended {
             TgH.send(f, new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
-                    MyLog.log(object.toString());
+                    //MyLog.log(object.toString());
                     if (TgUtils.isError(object)) {
                         onError((TdApi.Error) object);
                     } else {
                         TdApi.Chat newChat = (TdApi.Chat) object;
-                        TgH.send(new TdApi.ChangeChatParticipantRole(newChat.id, randomBotId, new TdApi.ChatParticipantRoleLeft()),
+                        TgH.send(new TdApi.ChangeChatMemberStatus(newChat.id, randomBotId, new TdApi.ChatMemberStatusLeft()),
                                 TgUtils.emptyResultHandler());
                         onSuccess(object);
-                        //MyToast.toastL(mContext, object.toString()); //TODO success dialog
                     }
                 }
             });
         }
 
         void onError(TdApi.Error error) {
-            MyToast.toastL(mContext, "Error " + error.code + "\n" + error.text);
+            MyToast.toastL(mContext, "Error " + error.code + "\n" + error.message);
             if (onErrorCallback != null)
                 onErrorCallback.onResult(error);
         }
 
         void onSuccess(TdApi.TLObject object) {
             onSuccessCallback.onResult(object);
+        }
+
+        public void setInvitingUsername(String inviteUsername) {
+            randomBotId = 0;
+            if (inviteUsername.startsWith("@"))
+                inviteUsername = inviteUsername.substring(1, inviteUsername.length());
+            this.inviteUsername = inviteUsername;
         }
     }
 
@@ -533,15 +623,19 @@ public class ActivityGroupsList extends ActivityExtended {
         TextView tvHint = UIUtils.getView(v, R.id.tvHint);
         tvHint.setText(R.string.chat_title);
         final EditText editText = UIUtils.getView(v, R.id.editInputText);
+        final EditText edtInviteUsername = UIUtils.getView(v, R.id.edtInviteUsername);
+
         editText.setHint(R.string.hint_enter_chat_title);
         new AlertDialog.Builder(mContext)
                 .setTitle(R.string.create_supergroup)
                 .setView(v)
-                .setNegativeButton(R.string.cancel, null)
+                .setNegativeButton(R.string.btnCancel, null)
                 .setPositiveButton(R.string.btnSave, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String title = editText.getText().toString().trim();
+                        String inviteUsername = edtInviteUsername.getText().toString().trim();
+
                         if (title.isEmpty()) {
                             MyToast.toast(mContext, R.string.error_empty_chat_title);
                             return;
@@ -566,6 +660,10 @@ public class ActivityGroupsList extends ActivityExtended {
 
                             }
                         };
+
+                        if (!inviteUsername.isEmpty())
+                            superGroup.setInviteUsername(inviteUsername);
+
                         superGroup.onErrorCallback = new Client.ResultHandler() {
                             @Override
                             public void onResult(TdApi.TLObject object) {
@@ -582,6 +680,7 @@ public class ActivityGroupsList extends ActivityExtended {
 
     class CreateSuperGroup {
         Client.ResultHandler onCreateCallback, onErrorCallback;
+        private String inviteUsername;
 
         void start(String title) {
             CreateGroup createGroup = new CreateGroup(title, onCreateBaseGroup);
@@ -591,6 +690,8 @@ public class ActivityGroupsList extends ActivityExtended {
                     onError(object);
                 }
             };
+            if (!TextUtils.isEmpty(inviteUsername))
+                createGroup.setInvitingUsername(inviteUsername);
             createGroup.start();
         }
 
@@ -600,6 +701,7 @@ public class ActivityGroupsList extends ActivityExtended {
                 Client.ResultHandler callback = new Client.ResultHandler() {
                     @Override
                     public void onResult(TdApi.TLObject object) {
+
                         if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR)
                             onSuccess(object);
                         else
@@ -629,6 +731,10 @@ public class ActivityGroupsList extends ActivityExtended {
                     onCreateCallback.onResult(object);
                 }
             });
+        }
+
+        public void setInviteUsername(String inviteUsername) {
+            this.inviteUsername = inviteUsername;
         }
     }
 

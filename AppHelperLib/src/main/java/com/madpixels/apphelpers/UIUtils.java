@@ -208,4 +208,10 @@ public class UIUtils {
     public static int getPixelsFromDp(int dpValue) {
         return (int) (dpValue * Resources.getSystem().getDisplayMetrics().density);
     }
+
+    public static void setActionBarWithBackArrow(AppCompatActivity activity) {
+        android.support.v7.app.ActionBar actionBar = activity.getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+    }
 }

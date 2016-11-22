@@ -24,30 +24,30 @@ public class TgUtils {
 
     // Базовая группа, до 200человек.
     public static boolean isGroup(final int chatType) {
-        return chatType== TdApi.GroupChatInfo.CONSTRUCTOR;
+        return chatType == TdApi.GroupChatInfo.CONSTRUCTOR;
     }
 
     public static boolean isError(final TdApi.TLObject object) {
-        return object.getConstructor()== TdApi.Error.CONSTRUCTOR;
+        return object.getConstructor() == TdApi.Error.CONSTRUCTOR;
     }
 
     public static boolean isUserPrivileged(final int role) {
-        return role == TdApi.ChatParticipantRoleAdmin.CONSTRUCTOR ||
-                role == TdApi.ChatParticipantRoleEditor.CONSTRUCTOR ||
-                role == TdApi.ChatParticipantRoleModerator.CONSTRUCTOR;
+        return role == TdApi.ChatMemberStatusCreator.CONSTRUCTOR ||
+                role == TdApi.ChatMemberStatusEditor.CONSTRUCTOR ||
+                role == TdApi.ChatMemberStatusModerator.CONSTRUCTOR;
     }
 
     public static boolean isSuperGroup(final int chatType) {
-        return chatType== TdApi.ChannelChatInfo.CONSTRUCTOR;
+        return chatType == TdApi.ChannelChatInfo.CONSTRUCTOR;
     }
 
-    public static TdApi.ChatParticipantRole getRole(TdApi.Chat chat){
-        if(isGroup(chat.type.getConstructor())){
+    public static TdApi.ChatMemberStatus getRole(TdApi.Chat chat) {
+        if (isGroup(chat.type.getConstructor())) {
             TdApi.GroupChatInfo info = (TdApi.GroupChatInfo) chat.type;
-            return  info.group.role;
-        }else if(isSuperGroup(chat.type.getConstructor())){
+            return info.group.status;
+        } else if (isSuperGroup(chat.type.getConstructor())) {
             TdApi.ChannelChatInfo info = (TdApi.ChannelChatInfo) chat.type;
-            return info.channel.role;
+            return info.channel.status;
         }
         return null;
     }
@@ -56,19 +56,19 @@ public class TgUtils {
         return !channel.isSupergroup;
     }
 
-    public static boolean isChannel(TdApi.Chat chat){
-        if(!isSuperGroup(chat.type.getConstructor()))
+    public static boolean isChannel(TdApi.Chat chat) {
+        if (!isSuperGroup(chat.type.getConstructor()))
             return false;
         TdApi.ChannelChatInfo channelChatInfo = (TdApi.ChannelChatInfo) chat.type;
         return isChannel(channelChatInfo.channel);
     }
 
     public static boolean isOk(final TdApi.TLObject object) {
-        return object.getConstructor()== TdApi.Ok.CONSTRUCTOR;
+        return object.getConstructor() == TdApi.Ok.CONSTRUCTOR;
     }
 
-    public static void getChatFullInfo(TdApi.Chat chat, final ResultHandler callbackHandler){
-        if(TgUtils.isSuperGroup(chat.type.getConstructor())){
+    public static void getChatFullInfo(TdApi.Chat chat, final ResultHandler callbackHandler) {
+        if (TgUtils.isSuperGroup(chat.type.getConstructor())) {
             TdApi.ChannelChatInfo ci = (TdApi.ChannelChatInfo) chat.type;
             TgH.send(new TdApi.GetChannelFull(ci.channel.id), new Client.ResultHandler() {
                 @Override
@@ -76,8 +76,8 @@ public class TgUtils {
                     callbackHandler.onResult(object);
                 }
             });
-        }else{
-            TdApi.GroupChatInfo gi= (TdApi.GroupChatInfo) chat.type;
+        } else {
+            TdApi.GroupChatInfo gi = (TdApi.GroupChatInfo) chat.type;
             TgH.send(new TdApi.GetGroupFull(gi.group.id), new ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
@@ -88,12 +88,12 @@ public class TgUtils {
     }
 
     public static void loadChatInviteLink(TdApi.Chat chat, final Callback callback) {
-        if(TgUtils.isSuperGroup(chat.type.getConstructor())){
+        if (TgUtils.isSuperGroup(chat.type.getConstructor())) {
             TdApi.ChannelChatInfo ci = (TdApi.ChannelChatInfo) chat.type;
             TgH.send(new TdApi.GetChannelFull(ci.channel.id), new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
-                    if(isError(object)){
+                    if (isError(object)) {
                         callback.onResult(null);
                         return;
                     }
@@ -102,12 +102,12 @@ public class TgUtils {
 
                 }
             });
-        }else{
-            TdApi.GroupChatInfo gi= (TdApi.GroupChatInfo) chat.type;
+        } else {
+            TdApi.GroupChatInfo gi = (TdApi.GroupChatInfo) chat.type;
             TgH.send(new TdApi.GetGroupFull(gi.group.id), new ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
-                    if(isError(object)){
+                    if (isError(object)) {
                         callback.onResult(null);
                         return;
                     }
@@ -118,15 +118,15 @@ public class TgUtils {
         }
     }
 
-    public static boolean isBot(TdApi.ChatParticipant chatParticipant) {
-        return chatParticipant.botInfo.getConstructor()!= TdApi.BotInfoEmpty.CONSTRUCTOR;
+    public static boolean isBot(TdApi.ChatMember chatParticipant) {
+        return chatParticipant.botInfo != null;//.getConstructor() != TdApi.BotInfoEmpty.CONSTRUCTOR;
     }
 
     public static int getChatRealId(TdApi.Chat chat) {
-        if(isGroup(chat.type.getConstructor())){
+        if (isGroup(chat.type.getConstructor())) {
             TdApi.GroupChatInfo gi = (TdApi.GroupChatInfo) chat.type;
             return gi.group.id;
-        }else{
+        } else {
             TdApi.ChannelChatInfo chi = (TdApi.ChannelChatInfo) chat.type;
             return chi.channel.id;
         }
@@ -135,38 +135,61 @@ public class TgUtils {
 
     public static boolean isUserJoined(final TdApi.Message message) {
         return (message.content.getConstructor() == TdApi.MessageChatJoinByLink.CONSTRUCTOR ||
-                message.content.getConstructor()== TdApi.MessageChatAddParticipants.CONSTRUCTOR);
+                message.content.getConstructor() == TdApi.MessageChatAddMembers.CONSTRUCTOR);
     }
 
     /**
      * @param callback get last 200 participants
      */
-    public static void getGroupLastMembers(TdApi.Chat chat, final Callback callback){
-        if(TgUtils.isSuperGroup(chat.type.getConstructor())){
+    public static void getGroupLastMembers(TdApi.Chat chat, final Callback callback) {
+        if (TgUtils.isSuperGroup(chat.type.getConstructor())) {
             TdApi.ChannelChatInfo ci = (TdApi.ChannelChatInfo) chat.type;
-            TdApi.ChannelParticipantsFilter f = new TdApi.ChannelParticipantsRecent();
-            TgH.send(new TdApi.GetChannelParticipants(ci.channel.id, f, 0, 200), new Client.ResultHandler() { //TODO check more 200 or 100
+            TdApi.ChannelMembersFilter f = new TdApi.ChannelMembersRecent();
+            TgH.send(new TdApi.GetChannelMembers(ci.channel.id, f, 0, 200), new Client.ResultHandler() { //200 is Max
                 @Override
                 public void onResult(TdApi.TLObject object) {
-                    TdApi.ChatParticipants participants = (TdApi.ChatParticipants) object;
-                    callback.onResult(participants.participants);
+                    TdApi.ChatMembers participants = (TdApi.ChatMembers) object;
+                    callback.onResult(participants.members);
                 }
             });
-        }else{
+        } else {
             TdApi.GroupChatInfo gi = (TdApi.GroupChatInfo) chat.type;
             TdApi.TLFunction f = new TdApi.GetGroupFull(gi.group.id);
             TgH.send(f, new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
-                    if(object.getConstructor()!= TdApi.GroupFull.CONSTRUCTOR)
+                    if (object.getConstructor() != TdApi.GroupFull.CONSTRUCTOR)
                         return;
                     TdApi.GroupFull group = (TdApi.GroupFull) object;
-                    callback.onResult(group.participants);
+                    callback.onResult(group.members);
                 }
             });
         }
     }
 
 
+    public static boolean isAuthorized(TdApi.TLObject object) {
+        if (TgUtils.isError(object))
+            return false;
+        TdApi.AuthState as = (TdApi.AuthState) object;
+        if (as.getConstructor() == TdApi.AuthStateOk.CONSTRUCTOR) {
+            return true;
+        }
+        return false;
+    }
 
+    public static TdApi.User getUser(int userId) {
+        TdApi.User user = TgH.users.get(userId);
+        if(user==null){// create empty user for prevent NullPointerExcepion
+            user = new TdApi.User();
+            user.id = userId;
+            user.firstName=user.lastName="";
+            user.username="";
+        }
+        return user;
+    }
+
+    public static TdApi.User getUser(TdApi.ChatMember member) {
+        return getUser(member.userId);
+    }
 }

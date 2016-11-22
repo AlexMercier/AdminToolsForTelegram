@@ -1,6 +1,8 @@
 package com.madpixels.tgadmintools.activity;
 
 import android.app.AlarmManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -19,6 +21,7 @@ import com.madpixels.apphelpers.ui.ActivityExtended;
 import com.madpixels.tgadmintools.Const;
 import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.db.DBHelper;
+import com.madpixels.tgadmintools.services.ServiceChatTask;
 
 /**
  * Created by Snake on 21.03.2016.
@@ -27,8 +30,8 @@ public class ActivitySettings extends ActivityExtended {
 
     boolean whiteLinksChanged = false;
 
-    EditText editWhiteListLinks;
-    CheckBox chkAllowStickersInLinks,chkAllowMentionLinks, chkIgnorePhoneUsers;
+    EditText editWhiteListLinks, edtAntispamAlertTitle;
+    CheckBox chkAllowStickersInLinks,chkAllowMentionLinks, chkIgnorePhoneUsers, chkShowServiceAlways;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,10 +45,14 @@ public class ActivitySettings extends ActivityExtended {
         CheckBox chkAutoRun = getView(R.id.chkAutoRun);
         chkAllowMentionLinks = getView(R.id.chkAllowMentionLinks);
         chkIgnorePhoneUsers = getView(R.id.chkIgnorePhoneUsers);
+        chkShowServiceAlways = getView(R.id.chkShowServiceAlways);
+        edtAntispamAlertTitle = getView(R.id.edtAntispamAlertTitle);
 
         chkAllowStickersInLinks.setChecked(Sets.getBoolean(Const.ANTISPAM_ALLOW_STICKERS_LINKS, true));
         chkAllowMentionLinks.setChecked(Sets.getBoolean(Const.ANTISPAM_ALLOW_MENTION_LINKS, true));
-        chkIgnorePhoneUsers.setChecked(Sets.getBoolean(Const.ANTISPAM_IGNORE_SHARED_CONTACTS, true));
+        chkIgnorePhoneUsers.setChecked(Sets.getBoolean(Const.ANTISPAM_IGNORE_SHARED_CONTACTS, Const.ANTISPAM_IGNORE_SHARED_CONTACTS_DEFAULT));
+        chkShowServiceAlways.setChecked(Sets.getBoolean(Const.START_SERVICE_AS_FOREGROUND, true));
+        edtAntispamAlertTitle.setText(Sets.getString(Const.ANTISPAM_ALERT_TITLE, getString(R.string.text_antispam_alert_title)));
 
         chkAutoRun.setChecked(Sets.getBoolean(Const.AUTORUN, true));
         Spinner spinnerLogLifeTime = getView(R.id.spinnerLogLifeTime);
@@ -101,7 +108,7 @@ public class ActivitySettings extends ActivityExtended {
 
 
         UIUtils.setBatchClickListener(onClickListener, chkAllowStickersInLinks,chkAllowMentionLinks,
-                chkAutoRun, chkIgnorePhoneUsers);
+                chkAutoRun, chkIgnorePhoneUsers, chkShowServiceAlways);
         editWhiteListLinks.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -115,6 +122,39 @@ public class ActivitySettings extends ActivityExtended {
 
             @Override
             public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        edtAntispamAlertTitle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                edtAntispamAlertTitle.setTag(System.currentTimeMillis());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                edtAntispamAlertTitle.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (edtAntispamAlertTitle.getTag() == null)
+                            return;
+
+                        long ts = Long.valueOf(edtAntispamAlertTitle.getTag().toString());
+                        if (System.currentTimeMillis() - ts < 1200)
+                            return;
+
+                        String text = edtAntispamAlertTitle.getText().toString().trim();
+                        Sets.set(Const.ANTISPAM_ALERT_TITLE, text);
+
+                        edtAntispamAlertTitle.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
+                    }
+                }, 1300);
 
             }
         });
@@ -137,6 +177,11 @@ public class ActivitySettings extends ActivityExtended {
                     break;
                 case R.id.chkIgnorePhoneUsers:
                     Sets.set(Const.ANTISPAM_IGNORE_SHARED_CONTACTS, chkIgnorePhoneUsers.isChecked());
+                    break;
+                case R.id.chkShowServiceAlways:
+                    Sets.set(Const.START_SERVICE_AS_FOREGROUND, chkShowServiceAlways.isChecked());
+                    ServiceChatTask.stop(mContext);
+                    ServiceChatTask.start(mContext);
                     break;
             }
         }
@@ -171,7 +216,6 @@ public class ActivitySettings extends ActivityExtended {
         } else {
             String[] lines = text.split("\n");
             DBHelper.getInstance().saveLinksWhiteList(lines);
-
         }
     }
 }

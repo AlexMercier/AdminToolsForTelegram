@@ -42,7 +42,7 @@
     <string name="btn_yes">Si</string>
     <string name="button_delete">Borrar</string>
     <string name="button_rate_us">Si te gusta esta app, haz click para puntuarla en google play</string>
-    <string name="cancel">Cancelar</string>
+    <string name="btnCancel">Cancelar</string>
     <string name="caption_autostart">Auto inicio</string>
     <string name="caption_enter_value">Introduce un nuevo valor:</string>
     <string name="caption_users_whitelist">Lista blanca de usuarios</string>
@@ -100,8 +100,8 @@
     <string name="hint_no_chat_about">Toca para añadir descripcion del chat</string>
     <string name="hint_short_link_not_created">El link corto no ha sido creado</string>
     <string name="hint_upgrade_to_supergroup">"Puedes convertir este grupo en supergrupo"</string>
-    <string name="hint_warntext_links">Texto de noticia para link</string>
-    <string name="hint_warntext_stickers">Texto de noticia para stickers</string>
+
+
     <string name="input_edit_chat_about">Introduce descripcion del chat</string>
     <string name="input_new_chat_title">Introduce nueva descripcion del chat</string>
     <string name="kickedCount">Expulsado:</string>
@@ -144,8 +144,6 @@
     <string name="participiantsCount">Participantes:</string>
     <string name="revoke_user_admin">Quitar privilegios de admin</string>
     <string name="role_action_switch_continue">Cambiar y continuar</string>
-    <string name="role_editor">Admin</string>
-    <string name="role_editor_description_supegroup">El admin puede invitar usuarios baneados, cambiar la foto del grupo, borrar mensajes de todos...</string>
     <string name="role_moderator">Moderador</string>
     <string name="role_moderator_description_supergroup">El moderador solo puede borrar mensajes</string>
     <string name="selectBanForever">Ban permanente</string>
@@ -162,7 +160,7 @@
     <string name="text_ban_time">Fecha del ban:</string>
     <string name="text_confirm_deletion_group">"Seguro que quieres eliminar este grupo?\nEsta accion no se puede deshacer!"</string>
     <string name="text_delete_group">Si, borrar este grupo</string>
-    <string name="text_publish_banreason">Usuario %1$s ha sido baneado por la razon: %2$s</string>
+    <string name="text_publish_banreason" formatted="false">Usuario %username% ha sido baneado por la razon: %reason%</string>
     <string name="text_unban_time">El ban expira en:</string>
     <string name="titleEditChatDescription">Descripcion del chat</string>
     <string name="titleLogLifetime">Limpiar el log despues</string>
@@ -174,7 +172,7 @@
     <string name="title_change_value">Cambiar valor</string>
     <string name="title_delete_group">Borrar grupo</string>
     <string name="title_group_info">Administrar grupo</string>
-    <string name="title_list_of_banned_words">La lista de palabras prohibidad en el chat. Cada palabra en una nueva linea</string>
+    <string name="title_list_of_banned_words">La lista de palabras prohibidad en el chat:</string>
     <string name="title_users">Miembros del chat</string>
     <string name="toast_access_denied_admin">"Acceso denegado.\nSolo el creador puede editar esta opcion"</string>
     <string name="toast_banlist_empty">La lista de ban esta vacia</string>
@@ -197,28 +195,28 @@
     <string name="crash_dialog_sendok">El reporte ha sido enviado, gracias</string>
     <string name="crash_dialog_text">"Disculpe, la app se ha cerrado!\nPor favor, envia el error para arreglarlo"</string>
     <string name="lang_code">es</string>
-
+    <!--
     <string name="about_translator">Ivan Lazcano</string>
-    
+     -->
     <string-array name="ban_times">
         <item>Min.</item>
-        <item>Hour.</item>
-        <item>Day.</item>
-        <item>Month.</item>
+        <item>Horas.</item>
+        <item>Días.</item>
+        <item>Meses.</item>
     </string-array>
 
     <string-array name="auto_ban_times">
-        <item>Forever</item>
+        <item>Eternidad</item>
         <item>Min.</item>
-        <item>Hour.</item>
-        <item>Day.</item>
+        <item>Horas.</item>
+        <item>Días.</item>
     </string-array>
 
     <string-array name="log_lifetime">
-        <item>Month</item>
-        <item>Week</item>
-        <item>3 days</item>
-        <item>1 day</item>
+        <item>Meses</item>
+        <item>Semanas</item>
+        <item>3 días</item>
+        <item>1 día</item>
     </string-array>
 
 

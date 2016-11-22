@@ -129,7 +129,9 @@ public class Client implements Runnable {
      * @param dir            Directory for persistent database.
      * @param filesDir       Directory for files.
      * @param enableFileLog  True, if log should be written to the file.
-     * @throws NullPointerException if dir is null.
+     * @param useTestDc      True, if test Telegram environment should be used.
+     * @return Created Client
+     * @throws NullPointerException if dir or filesDir is null.
      */
     static Client create(ResultHandler updatesHandler, String dir, String filesDir,
                          boolean enableFileLog, boolean useTestDc) {

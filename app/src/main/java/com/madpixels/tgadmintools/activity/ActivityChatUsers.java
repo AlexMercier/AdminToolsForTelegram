@@ -46,9 +46,11 @@ import com.madpixels.tgadmintools.utils.LogUtil;
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import libs.AdHelper;
@@ -69,14 +71,14 @@ public class ActivityChatUsers extends ActivityExtended {
     AdapterChatUsers mAdapter;
     ProgressBar prgLoading;
     boolean isAdmin = false;// main admin
-    private String additionalType=null;
+    private String additionalType = null;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt("type", chatType);
         outState.getLong("chat_id", chat_id);
         outState.putString("title", chatTitle);
-        if(additionalType!=null)
+        if (additionalType != null)
             outState.putString("filter", additionalType);
         outState.putInt("channel_id", channel_id);
         outState.putInt("group_id", group_id);
@@ -97,7 +99,7 @@ public class ActivityChatUsers extends ActivityExtended {
         chatType = b.getInt("type");
         chat_id = b.getLong("chat_id");
         chatTitle = b.getString("title");
-        if(b.containsKey("filter"))
+        if (b.containsKey("filter"))
             additionalType = b.getString("filter");
         if (chatType == TdApi.ChannelChatInfo.CONSTRUCTOR) {
             //chat_id = b.getLong("chat_id");
@@ -124,18 +126,22 @@ public class ActivityChatUsers extends ActivityExtended {
         TgH.send(f, new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
+                if(TgUtils.isError(object)){
+                    MyToast.toast(mContext, object.toString());
+                    return;
+                }
                 TdApi.Chat chat = (TdApi.Chat) object;
                 if (!TgUtils.isGroup(chatType)) {
                     TdApi.ChannelChatInfo superGroup = (TdApi.ChannelChatInfo) chat.type;
-                    if (superGroup.channel.role.getConstructor() == TdApi.ChatParticipantRoleAdmin.CONSTRUCTOR)
+                    if (superGroup.channel.status.getConstructor() == TdApi.ChatMemberStatusCreator.CONSTRUCTOR)
                         isAdmin = true;
                 } else {
                     TdApi.GroupChatInfo groupInfo = (TdApi.GroupChatInfo) chat.type;
-                    if (groupInfo.group.role.getConstructor() == TdApi.ChatParticipantRoleAdmin.CONSTRUCTOR)
+                    if (groupInfo.group.status.getConstructor() == TdApi.ChatMemberStatusCreator.CONSTRUCTOR)
                         isAdmin = true;
                 }
 
-                MyLog.log(object.toString());
+                // MyLog.log(object.toString());
                 loadUsers();
             }
         });
@@ -160,12 +166,12 @@ public class ActivityChatUsers extends ActivityExtended {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        TdApi.ChatParticipant user = mAdapter.getItem(info.position - mListViewUsers.getHeaderViewsCount());
-        boolean isUserPrivileged = TgUtils.isUserPrivileged(user.role.getConstructor());
+        TdApi.ChatMember user = mAdapter.getItem(info.position - mListViewUsers.getHeaderViewsCount());
+        boolean isUserPrivileged = TgUtils.isUserPrivileged(user.status.getConstructor());
         if (isAdmin || !isUserPrivileged) {  // нельзя кикать админов несуперадмину
             menu.add(0, 1, 0, R.string.action_ban_user);
             menu.add(0, 3, 0, R.string.action_remove_user_from_chat);
-            if (TgH.selfProfileId == user.user.id) {
+            if (TgH.selfProfileId == user.userId) {
                 menu.getItem(0).setEnabled(false);
                 menu.getItem(1).setEnabled(false);
             }
@@ -174,8 +180,10 @@ public class ActivityChatUsers extends ActivityExtended {
         if (isAdmin && !isUserPrivileged)
             menu.add(0, 2, 0, R.string.action_set_as_admin);
         if (isAdmin && isUserPrivileged) {
+            if (TgUtils.isSuperGroup(chatType)) // only supergroup can moders and editors, so we can switch users beetween roles
+                menu.add(0, 5, 0, R.string.action_change_user_admin_role);
             menu.add(0, 4, 0, R.string.revoke_user_admin);
-            if (TgH.selfProfileId == user.user.id)
+            if (TgH.selfProfileId == user.userId)
                 menu.findItem(4).setEnabled(false);
         }
 
@@ -190,14 +198,15 @@ public class ActivityChatUsers extends ActivityExtended {
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo cInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int pos = cInfo.position - mListViewUsers.getHeaderViewsCount();
-        TdApi.ChatParticipant user = mAdapter.getItem(pos);
+        TdApi.ChatMember user = mAdapter.getItem(pos);
 
         switch (item.getItemId()) {
             case 1:
                 showDialogBanUser(user);
                 break;
             case 2:
-                if(TgUtils.isSuperGroup(chatType))
+            case 5:
+                if (TgUtils.isSuperGroup(chatType))
                     dialogSetUserRole(user);
                 else
                     checkGroupPermissions(user);
@@ -207,7 +216,7 @@ public class ActivityChatUsers extends ActivityExtended {
                 break;
             case 4:
                 //TODO for base groups not tested
-                setUserRole(user, new TdApi.ChatParticipantRoleGeneral());
+                setUserRole(user, new TdApi.ChatMemberStatusMember());
                 break;
             case 99:
                 DBHelper.getInstance().getExpairedBanList();
@@ -216,18 +225,18 @@ public class ActivityChatUsers extends ActivityExtended {
         return super.onContextItemSelected(item);
     }
 
-    private void checkGroupPermissions(final TdApi.ChatParticipant user) {
+    private void checkGroupPermissions(final TdApi.ChatMember user) {
         TgH.sendOnUi(new TdApi.GetGroup(group_id), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
                 TdApi.Group group = (TdApi.Group) object;
-                if(!group.anyoneCanEdit)
-                    setUserRole(user, new TdApi.ChatParticipantRoleEditor());
-                else{
+                if (!group.anyoneCanEdit)
+                    setUserRole(user, new TdApi.ChatMemberStatusEditor());
+                else {
                     new AlertDialog.Builder(mContext)
                             .setTitle("Set user role")
                             .setMessage(R.string.dialog_group_all_are_admins)
-                            .setNegativeButton(R.string.cancel, null)
+                            .setNegativeButton(R.string.btnCancel, null)
                             .setPositiveButton(R.string.role_action_switch_continue, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -237,7 +246,7 @@ public class ActivityChatUsers extends ActivityExtended {
                                         @Override
                                         public void onResult(TdApi.TLObject object) {
                                             if (object.getConstructor() == TdApi.Group.CONSTRUCTOR)
-                                                setUserRole(user, new TdApi.ChatParticipantRoleEditor());
+                                                setUserRole(user, new TdApi.ChatMemberStatusEditor());
                                             else
                                                 MyToast.toast(mContext, "Error:\n" + object.toString());
                                         }
@@ -250,48 +259,56 @@ public class ActivityChatUsers extends ActivityExtended {
         });
     }
 
-    private void dialogSetUserRole(final TdApi.ChatParticipant user) {
+    private void dialogSetUserRole(final TdApi.ChatMember user) {
         View view = UIUtils.inflate(mContext, R.layout.dialog_set_moder);
         new AlertDialog.Builder(mContext)
                 .setView(view)
-                .setTitle("Set user role")
+                .setTitle(R.string.title_set_user_role_admin)
                 .show();
 
-        RadioButton rbAdmin = UIUtils.getView(view, R.id.rbAdmin); rbAdmin.setVisibility(View.VISIBLE);
+        RadioButton rbAdmin = UIUtils.getView(view, R.id.rbAdmin);
+        rbAdmin.setVisibility(View.GONE);
+
         RadioButton rbModer = UIUtils.getView(view, R.id.rbModer);
         RadioButton rbEditor = UIUtils.getView(view, R.id.rbEditor);
+
+        if (user.status.getConstructor() == TdApi.ChatMemberStatusModerator.CONSTRUCTOR)
+            rbModer.setChecked(true);
+        else if (user.status.getConstructor() == TdApi.ChatMemberStatusEditor.CONSTRUCTOR)
+            rbEditor.setChecked(true);
+
         View.OnClickListener rbClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TdApi.ChatParticipantRole role = null;
-                switch (v.getId()){
-                    case R.id.rbAdmin:
-                        role = new TdApi.ChatParticipantRoleAdmin();
+                TdApi.ChatMemberStatus role = null;
+                switch (v.getId()) {
+                    case R.id.rbAdmin: // not work. onyl 1 admin allowed (creator)
+                        role = new TdApi.ChatMemberStatusCreator();
                         break;
                     case R.id.rbModer:
-                        role = new TdApi.ChatParticipantRoleModerator();
+                        role = new TdApi.ChatMemberStatusModerator();
                         break;
                     case R.id.rbEditor:
-                        role = new TdApi.ChatParticipantRoleEditor();
+                        role = new TdApi.ChatMemberStatusEditor();
                         break;
                 }
                 setUserRole(user, role);
             }
         };
-        UIUtils.setBatchClickListener(rbClick, rbAdmin,rbModer,rbEditor);
+        UIUtils.setBatchClickListener(rbClick, rbAdmin, rbModer, rbEditor);
 
     }
 
-    private void setUserRole(final TdApi.ChatParticipant user, final TdApi.ChatParticipantRole role) {
-        TdApi.TLFunction f = new TdApi.ChangeChatParticipantRole(chat_id, user.user.id, role);
+    private void setUserRole(final TdApi.ChatMember user, final TdApi.ChatMemberStatus role) {
+        TdApi.TLFunction f = new TdApi.ChangeChatMemberStatus(chat_id, user.userId, role);
         TgH.sendOnUi(f, new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                if(TgUtils.isOk(object)) {
-                    user.role = role;
+                if (TgUtils.isOk(object)) {
+                    user.status = role;
                     mAdapter.notifyDataSetChanged();
                     MyToast.toast(mContext, R.string.toast_user_role_changed);
-                }else{
+                } else {
                     MyToast.toast(mContext, object);
                 }
             }
@@ -339,30 +356,30 @@ public class ActivityChatUsers extends ActivityExtended {
 
     private void getSupergroupUsers() {
         final int getCount = mAdapter.isEmpty() ? 25 : 200;
-        TdApi.ChannelParticipantsFilter f;
-        if(additionalType==null)
-            f = new TdApi.ChannelParticipantsRecent();
+        TdApi.ChannelMembersFilter f;
+        if (additionalType == null)
+            f = new TdApi.ChannelMembersRecent();
         else
-            f = new TdApi.ChannelParticipantsAdmins();
+            f = new TdApi.ChannelMembersAdministrators();
 
-        TgH.TG().send(new TdApi.GetChannelParticipants(channel_id, f, offset, getCount), new Client.ResultHandler() {
+        TgH.TG().send(new TdApi.GetChannelMembers(channel_id, f, offset, getCount), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
                 //MyLog.log(object.toString());
-                if (object.getConstructor() == TdApi.ChatParticipants.CONSTRUCTOR) {
-                    TdApi.ChatParticipants users = (TdApi.ChatParticipants) object;
+                if (object.getConstructor() == TdApi.ChatMembers.CONSTRUCTOR) {
+                    TdApi.ChatMembers users = (TdApi.ChatMembers) object;
 
-                    offset += users.participants.length;
-                    if (users.participants.length < getCount)
+                    offset += users.members.length;
+                    if (users.members.length < getCount)
                         isListEnd = true;
                     if (mAdapter.getCount() == 0) {
                         /// setTotal(users.totalCount);
                     }
-                    List<TdApi.ChatParticipant> usersList = Arrays.asList(users.participants);
+                    List<TdApi.ChatMember> usersList = Arrays.asList(users.members);
                     mAdapter.getList().addAll(usersList);
                     onUiThread(updateList);
                 } else {
-                    //TODO error
+                    MyToast.toast(mContext, "Error loading chat members");
                 }
             }
         });
@@ -377,16 +394,15 @@ public class ActivityChatUsers extends ActivityExtended {
                     TdApi.GroupFull group = (TdApi.GroupFull) object;
                     isListEnd = true;
 
-                    List<TdApi.ChatParticipant> users;
+                    List<TdApi.ChatMember> users;
 
-                    if(additionalType==null){
-                        users = Arrays.asList(group.participants);
-                    }else
-                    {
+                    if (additionalType == null) {
+                        users = Arrays.asList(group.members);
+                    } else {
                         users = new ArrayList<>();
-                        for(TdApi.ChatParticipant cp:group.participants){
-                            if(TgUtils.isUserPrivileged(cp.role.getConstructor()))
-                                users.add(cp);
+                        for (TdApi.ChatMember cm : group.members) {
+                            if (TgUtils.isUserPrivileged(cm.status.getConstructor()))
+                                users.add(cm);
                         }
                     }
 
@@ -407,11 +423,11 @@ public class ActivityChatUsers extends ActivityExtended {
         }
     };
 
-    void removeUserFromChat(TdApi.ChatParticipant user){
-        AdminUtils.kickUser(chat_id, user.user.id, new Client.ResultHandler() {
+    void removeUserFromChat(TdApi.ChatMember user) {
+        AdminUtils.kickUser(chat_id, user.userId, new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                MyToast.toastL(mContext, TgUtils.isOk(object)?"User was removed":"Remove user error");
+                MyToast.toastL(mContext, TgUtils.isOk(object) ? "User was removed" : "Remove user error");
             }
         });
     }
@@ -419,7 +435,7 @@ public class ActivityChatUsers extends ActivityExtended {
     /*
     ==== ban section ===========
      */
-    private void showDialogBanUser(final TdApi.ChatParticipant user) {
+    private void showDialogBanUser(final TdApi.ChatMember user) {
         final Calendar mUnbanTargetMillis = Calendar.getInstance();
 
         View view = getLayoutInflater().inflate(R.layout.dialog_ban_time, null);
@@ -440,44 +456,52 @@ public class ActivityChatUsers extends ActivityExtended {
         final Button btnBanSelectDate = UIUtils.getView(view, R.id.btnBanSelectDate);
         final String[] timeValues = getResources().getStringArray(R.array.ban_times);
 
-        btnSetValue.setText("1 "+timeValues[1]); //TODO english
-        if(Sets.getBoolean("ban.default.forever", true)){
+        btnSetValue.setText("1 " + timeValues[1]);
+        if (Sets.getBoolean("ban.default.forever", true)) {
             rbBanForever.setChecked(true);
             layerTimebanOptions.setVisibility(View.GONE);
-        }else{
+        } else {
             rbBanTime.setChecked(true);
         }
 
 
         int defTimeVal = Sets.getInteger(Const.BAN_DEFAULT_TIME_VALUE, 1);
-        switch (Sets.getInteger(Const.BAN_DEFAULT_TIME, Calendar.MINUTE)){
+        switch (Sets.getInteger(Const.BAN_DEFAULT_TIME, Calendar.MINUTE)) {
             case Calendar.MINUTE:
-                btnSetValue.setText(defTimeVal+" "+timeValues[0]);
+                btnSetValue.setText(defTimeVal + " " + timeValues[0]);
                 mUnbanTargetMillis.add(Calendar.MINUTE, defTimeVal);
                 break;
             case Calendar.HOUR_OF_DAY:
-                btnSetValue.setText(defTimeVal+" "+timeValues[1]);
+                btnSetValue.setText(defTimeVal + " " + timeValues[1]);
                 mUnbanTargetMillis.add(Calendar.HOUR_OF_DAY, defTimeVal);
                 break;
             case Calendar.DAY_OF_MONTH:
-                btnSetValue.setText(defTimeVal+" "+timeValues[2]);
+                btnSetValue.setText(defTimeVal + " " + timeValues[2]);
                 mUnbanTargetMillis.add(Calendar.DAY_OF_MONTH, defTimeVal);
                 break;
             case Calendar.MONTH:
-                btnSetValue.setText(defTimeVal+" "+timeValues[3]);
+                btnSetValue.setText(defTimeVal + " " + timeValues[3]);
                 mUnbanTargetMillis.add(Calendar.MONTH, defTimeVal);
                 break;
         }
 
-        String time = Utils.TimestampToDateFormat(mUnbanTargetMillis.getTimeInMillis() / 1000, "HH:mm");
-        String date = Utils.TimestampToDateFormat(mUnbanTargetMillis.getTimeInMillis() / 1000, "d MMMM, yyyy");
-        btnBanSelectTime.setText(time);
-        btnBanSelectDate.setText(date);
+        final DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(mContext);
+        final DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(mContext);
+
+        Date dateD = new Date(mUnbanTargetMillis.getTimeInMillis());
+        String timeS = timeFormat.format(dateD);
+        String dateS = dateFormat.format(dateD);
+        MyLog.log(dateS);
+
+        // String time = Utils.TimestampToDateFormat(mUnbanTargetMillis.getTimeInMillis() / 1000, "HH:mm"); //DONE use local date format?
+        // String date = Utils.TimestampToDateFormat(mUnbanTargetMillis.getTimeInMillis() / 1000, "d MMMM, yyyy");
+        btnBanSelectTime.setText(timeS);
+        btnBanSelectDate.setText(dateS);
 
         AlertDialog d = new AlertDialog.Builder(this)
-                .setTitle("Ban user")
+                .setTitle(R.string.action_ban_user)
                 .setView(view)
-                .setPositiveButton("Ban", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.btnBanUser, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         long ban_age = rbBanForever.isChecked() ? 0 : mUnbanTargetMillis.getTimeInMillis() - System.currentTimeMillis();
@@ -488,7 +512,7 @@ public class ActivityChatUsers extends ActivityExtended {
                         Sets.set("ban.default.forever", rbBanForever.isChecked());
                     }
                 })
-                .setNegativeButton(R.string.cancel, null)
+                .setNegativeButton(R.string.btnCancel, null)
                 .show();
 
 
@@ -497,7 +521,7 @@ public class ActivityChatUsers extends ActivityExtended {
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.btnSetValue:
-                                showDialogSelectTimeValue(new Callback() {
+                        showDialogSelectTimeValue(new Callback() {
                             @Override
                             public void onResult(Object data) {
                                 long millis = (long) data;
@@ -508,12 +532,15 @@ public class ActivityChatUsers extends ActivityExtended {
 
                                 long unbanTS = (System.currentTimeMillis() + millis);
                                 mUnbanTargetMillis.setTimeInMillis(unbanTS);
-                                unbanTS = unbanTS / 1000;
-                                String time = Utils.TimestampToDateFormat(unbanTS, "HH:mm");
-                                String date = Utils.TimestampToDateFormat(unbanTS, "d MMMM, yyyy");
+                                Date dateD = new Date(unbanTS);
+                                // unbanTS = unbanTS / 1000;
+                                String timeS = timeFormat.format(dateD);
+                                String dateS = dateFormat.format(dateD);
+                                //String time = Utils.TimestampToDateFormat(unbanTS, "HH:mm");
+                                //String date = Utils.TimestampToDateFormat(unbanTS, "d MMMM, yyyy");
 
-                                btnBanSelectTime.setText(time);
-                                btnBanSelectDate.setText(date);
+                                btnBanSelectTime.setText(timeS);
+                                btnBanSelectDate.setText(dateS);
                             }
                         });
                         break;
@@ -527,9 +554,11 @@ public class ActivityChatUsers extends ActivityExtended {
                                 btnSetValue.setText(timeText);
 
                                 mUnbanTargetMillis.setTimeInMillis(unbanTS);
-                                unbanTS = unbanTS / 1000;
-                                String date = Utils.TimestampToDateFormat(unbanTS, "d MMMM, yyyy");
-                                btnBanSelectDate.setText(date);
+                                // unbanTS = unbanTS / 1000;
+                                Date dateD = new Date(unbanTS);
+                                String dateS = dateFormat.format(dateD);
+                                // String date = Utils.TimestampToDateFormat(unbanTS, "d MMMM, yyyy");
+                                btnBanSelectDate.setText(dateS);
                             }
                         });
                         break;
@@ -543,9 +572,11 @@ public class ActivityChatUsers extends ActivityExtended {
                                 btnSetValue.setText(timeText);
 
                                 mUnbanTargetMillis.setTimeInMillis(unbanTS);
-                                unbanTS = unbanTS / 1000;
-                                String time = Utils.TimestampToDateFormat(unbanTS, "HH:mm");
-                                btnBanSelectTime.setText(time);
+                                //unbanTS = unbanTS / 1000;
+                                Date dateD = new Date(unbanTS);
+                                String timeS = timeFormat.format(dateD);
+                                //String time = Utils.TimestampToDateFormat(unbanTS, "HH:mm");
+                                btnBanSelectTime.setText(timeS);
                             }
                         });
                         break;
@@ -566,11 +597,11 @@ public class ActivityChatUsers extends ActivityExtended {
                 btnBanSelectTime, chkPublishBanReason);
     }
 
-    private void banUser(final TdApi.ChatParticipant user, final long ban_age, final boolean isPublishBanReason, final boolean isReturnOnUnban, final String banText) {
+    private void banUser(final TdApi.ChatMember user, final long ban_age, final boolean isPublishBanReason, final boolean isReturnOnUnban, final String banText) {
         if (TgUtils.isGroup(chatType)) {
-            DBHelper.getInstance().addUserToAutoKick(chat_id, user.user.id);
+            DBHelper.getInstance().addUserToAutoKick(chat_id, user.userId);
         }
-        AdminUtils.kickUser(chat_id, user.user.id, new Client.ResultHandler() {
+        AdminUtils.kickUser(chat_id, user.userId, new Client.ResultHandler() {
                     @Override
                     public void onResult(TdApi.TLObject object) {
                         // MyLog.log(object.toString());
@@ -584,7 +615,8 @@ public class ActivityChatUsers extends ActivityExtended {
                             });
 
                             saveLocalBanList(user, ban_age, isPublishBanReason, isReturnOnUnban, banText);
-                            LogUtil.logBanUserManually(chat_id, chatType, chatTitle, user, banText, ban_age);
+                            TdApi.User chatUser = TgUtils.getUser(user);
+                            LogUtil.logBanUserManually(chat_id, chatType, chatTitle, chatUser, banText, ban_age);
                             if (TgUtils.isGroup(chatType)) {
                                 ServiceAutoKicker.start(mContext);
                             }
@@ -596,27 +628,40 @@ public class ActivityChatUsers extends ActivityExtended {
         );
     }
 
-    private void saveLocalBanList(TdApi.ChatParticipant chatParticipant, long ban_age, boolean isPublishBanReason, boolean isReturnOnUnban, final String banText) {
+    private void saveLocalBanList(TdApi.ChatMember chatMember, long ban_age, boolean isPublishBanReason, boolean isReturnOnUnban, final String banText) {
         int from_id = chatType == TdApi.ChannelChatInfo.CONSTRUCTOR ? channel_id : group_id; // группа или супергруппа id.
-        DBHelper.getInstance().addToBanList(chatParticipant.user, chat_id, chatType, from_id, ban_age, isReturnOnUnban, banText);
-        if(ban_age>0) //TODO проверить почему если >0 мб всегда надо?
+        TdApi.User user = TgUtils.getUser(chatMember);
+        DBHelper.getInstance().addToBanList(user, chat_id, chatType, from_id, ban_age, isReturnOnUnban, banText);
+        if (ban_age > 0) //TODO проверить почему если >0 мб всегда надо?
             ServiceUnbanTask.registerTask(mContext);
         if (isPublishBanReason && !banText.isEmpty()) {
-            //if (TgUtils.isSuperGroup(chatType)) {
-                TdApi.InputMessageText text = new TdApi.InputMessageText();
-                String username = chatParticipant.user.username.isEmpty()? // @username либо имя пользователя
-                        chatParticipant.user.firstName+" "+chatParticipant.user.lastName :
-                        " @"+chatParticipant.user.username;
-                String strText = getString(R.string.text_publish_banreason, username, banText);
-                text.text = strText;
-                TdApi.TLFunction f = new TdApi.SendMessage(chat_id, 0, false, true, true, new TdApi.ReplyMarkupNone(), text);
-                TgH.TG().send(f, new Client.ResultHandler() {
-                    @Override
-                    public void onResult(TdApi.TLObject object) {
-                        MyLog.log(object.toString());
-                    }
-                });
-           // }
+            TdApi.InputMessageText inputMessage = new TdApi.InputMessageText();
+            //String username = user.username.isEmpty() ? // @username либо имя пользователя
+            //        user.firstName + " " + user.lastName :
+            //        " @" + user.username;
+
+            String strText = getString(R.string.text_publish_banreason);
+
+            String userMention = user.firstName+" "+user.lastName;
+            int start = strText.indexOf("%username%");
+            strText = strText.replace("%username%", userMention);
+            ArrayList<TdApi.MessageEntity> entities = new ArrayList<>(1); // message formatting
+            entities.add(new TdApi.MessageEntityMentionName(start, userMention.length(), user.id));
+
+            start = strText.indexOf("%reason%", start+userMention.length())+1;
+            strText = strText.replace("%reason%", "\n"+banText);
+            entities.add(new TdApi.MessageEntityCode(start, banText.length()));
+
+            inputMessage.text = strText;
+            inputMessage.entities = entities.toArray(new TdApi.MessageEntity[0]);
+
+            TdApi.TLFunction f = new TdApi.SendMessage(chat_id, 0, false, true, null, inputMessage);
+            TgH.TG().send(f, new Client.ResultHandler() {
+                @Override
+                public void onResult(TdApi.TLObject object) {
+                    MyLog.log(object.toString());
+                }
+            });
         }
     }
 
@@ -703,9 +748,9 @@ public class ActivityChatUsers extends ActivityExtended {
     void dialogAcceptRemoveUsers() {
         new AlertDialog.Builder(mContext)
                 .setTitle("Clear deleted accounts")
-                .setMessage( R.string.deleted_accounts_hint)
+                .setMessage(R.string.deleted_accounts_hint)
                 .show();
-        if(true)
+        if (true)
             return;
     /*
         new AlertDialog.Builder(mContext)
@@ -858,7 +903,7 @@ public class ActivityChatUsers extends ActivityExtended {
 
     @Override
     protected void onDestroy() {
-        if(mAdapter!=null)
+        if (mAdapter != null)
             mAdapter.onDestroy();
         super.onDestroy();
     }

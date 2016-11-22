@@ -31,6 +31,8 @@ import com.madpixels.tgadmintools.utils.LogUtil;
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -67,7 +69,7 @@ public class ActivityLogView extends ActivityExtended {
         mListView.setOnScrollListener(onScrollListener);
 
 
-        if(mAdapter.isEmpty())
+        if (mAdapter.isEmpty())
             tvState.setText(R.string.label_empty);
         else
             tvState.setVisibility(View.INVISIBLE);
@@ -81,14 +83,14 @@ public class ActivityLogView extends ActivityExtended {
         i.setCheckable(true);
         i.setChecked(Sets.getBoolean(Const.NOTIFICATION_LOG, true));
 
-        menu.add(0, 2,0, R.string.action_clear_log);
+        menu.add(0, 2, 0, R.string.action_clear_log);
 
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case 1:
                 item.setChecked(!item.isChecked());
                 Sets.set(Const.NOTIFICATION_LOG, item.isChecked());
@@ -97,7 +99,7 @@ public class ActivityLogView extends ActivityExtended {
                 new AlertDialog.Builder(mContext)
                         .setTitle("Confirm")
                         .setMessage(R.string.action_clear_log)
-                        .setNegativeButton(R.string.cancel, null)
+                        .setNegativeButton(R.string.btnCancel, null)
                         .setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -117,16 +119,19 @@ public class ActivityLogView extends ActivityExtended {
         AdapterView.AdapterContextMenuInfo cInfo = (AdapterView.AdapterContextMenuInfo) menuInfo;
         int pos = cInfo.position - mListView.getHeaderViewsCount();
         LogUtil.LogEntity log = mAdapter.getItem(pos);
-        if(log.hasChatId())
+        if (log.hasChatId())
             menu.add(0, 1, 0, R.string.action_open_chat_info);
-        if(log.action== LogUtil.Action.BanForSticker || log.action== LogUtil.Action.BanForLink || log.action== LogUtil.Action.AutoKickFromGroup){
+        if (log.action == LogUtil.Action.BanForSticker || log.action == LogUtil.Action.BanForLink || log.action == LogUtil.Action.AutoKickFromGroup) {
             menu.add(0, 2, 0, R.string.action_return_to_chat);
         }
 
-        if(     log.action== LogUtil.Action.BanForBlackWord || log.action== LogUtil.Action.DeleteMsgBlackWord
-                || log.action== LogUtil.Action.RemoveSticker || log.action== LogUtil.Action.RemoveLink
-                || log.action== LogUtil.Action.LinksFloodAttempt || log.action== LogUtil.Action.StickersFloodWarn){
-            if(log.hasUserName())
+        if (log.action == LogUtil.Action.BanForLink || log.action== LogUtil.Action.LinksFloodAttempt) {
+            menu.add(0, 5, 0, R.string.action_add_link_to_wl);
+        }
+        if (log.action == LogUtil.Action.BanForBlackWord || log.action == LogUtil.Action.DeleteMsgBlackWord
+                || log.action == LogUtil.Action.RemoveSticker || log.action == LogUtil.Action.RemoveLink
+                || log.action == LogUtil.Action.LinksFloodAttempt || log.action == LogUtil.Action.StickersFloodWarn) {
+            if (log.hasUserName())
                 menu.add(0, 4, 0, R.string.action_open_userninfo);
         }
 
@@ -141,43 +146,52 @@ public class ActivityLogView extends ActivityExtended {
         final LogUtil.LogEntity log = mAdapter.getItem(pos);
         log.setChat();
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case 1:
                 TgH.send(new TdApi.GetChat(log.chatId), new Client.ResultHandler() {
                     @Override
                     public void onResult(TdApi.TLObject object) {
-                        if(object.getConstructor()== TdApi.Chat.CONSTRUCTOR) {
+                        if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR) {
                             TdApi.Chat chat = (TdApi.Chat) object;
                             openChat(chat);
-                        }else{
+                        } else {
                             MyToast.toastL(mContext, "Error opening chat");
                         }
                     }
                 });
                 break;
             case 2:
-                TgH.send(new TdApi.AddChatParticipant(log.chatId, log.getUserId(), 5), new Client.ResultHandler() {
+                TgH.send(new TdApi.AddChatMember(log.chatId, log.getUserId(), 5), new Client.ResultHandler() {
                     @Override
                     public void onResult(TdApi.TLObject object) {
-                        if(TgUtils.isOk(object)) {
+                        if (TgUtils.isOk(object)) {
                             MyToast.toast(mContext, "User returned and removed from ban list");
                             DBHelper.getInstance().removeUserFromAutoKick(log.chatId, log.getUserId());
                             DBHelper.getInstance().removeBannedUser(log.chatId, log.getUserId());
-                        }
-                        else
-                            MyToast.toast(mContext, "Add chat participiant error:\n"+object.toString());
+                        } else
+                            MyToast.toast(mContext, "Add chat participiant error:\n" + object.toString());
                     }
                 });
                 break;
             case 3:
                 String text;
-                text = log.getTitle()+"\n"+log.getLogText();
+                text = log.getTitle() + "\n" + log.getLogText();
                 Utils.copyToClipboard(text, mContext);
                 MyToast.toast(mContext, "Text copied");
                 break;
             case 4:
-                String link =  "https://telegram.me/"+log.username;
+                String link = "https://telegram.me/" + log.username;
                 Utils.openUrl(link, mContext);
+                break;
+            case 5:
+                try {
+                    JSONObject payload = new JSONObject(log.jsonData).getJSONObject("payload");
+                    link =  payload.getString("link").replace("http://", "").replace("https://", "").replaceFirst("www.", "");
+                    DBHelper.getInstance().addLinkToWhiteList(link);
+                    MyToast.toast(mContext, "Link added to whitelist");
+                } catch (JSONException e) {
+                    MyToast.toast(mContext, "Error");
+                }
                 break;
         }
 
@@ -218,18 +232,18 @@ public class ActivityLogView extends ActivityExtended {
 
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-            if(!isLoading &&  !isListEnd && totalItemCount> mListView.getHeaderViewsCount() && firstVisibleItem+visibleItemCount==totalItemCount ){
+            if (!isLoading && !isListEnd && totalItemCount > mListView.getHeaderViewsCount() && firstVisibleItem + visibleItemCount == totalItemCount) {
                 isLoading = true;
                 getLog();
             }
         }
     };
 
-    public void onNewLogEvent(){
-        if(!mAdapter.isEmpty()){
+    public void onNewLogEvent() {
+        if (!mAdapter.isEmpty()) {
             int id = mAdapter.getItem(0).item_id;
             final ArrayList<LogUtil.LogEntity> logs = DBHelper.getInstance().getLogUpdate(id);
-            if(logs!=null){
+            if (logs != null) {
                 mAdapter.list.addAll(0, logs);
                 mListView.postDelayed(new Runnable() {
                     @Override
@@ -244,21 +258,21 @@ public class ActivityLogView extends ActivityExtended {
         }
     }
 
-    private void getLog(){
-        new Thread(){
+    private void getLog() {
+        new Thread() {
             @Override
             public void run() {
                 final ArrayList<LogUtil.LogEntity> logs = DBHelper.getInstance().getLog(offset);
                 onUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(logs!=null) {
-                            if(logs.size()<5) isListEnd = true;
+                        if (logs != null) {
+                            if (logs.size() < 5) isListEnd = true;
                             mAdapter.list.addAll(logs);
                             mAdapter.notifyDataSetChanged();
                             tvState.setVisibility(View.GONE);
-                            offset+=logs.size();
-                        }else{
+                            offset += logs.size();
+                        } else {
                             isListEnd = true; // on error stop loading
                         }
                         isLoading = false;
@@ -270,25 +284,25 @@ public class ActivityLogView extends ActivityExtended {
     }
 
     @Override
-    public void close(){
-        Instance=null;
-        if(mAdapter!=null && mAdapter.getCount()>0) {
+    public void close() {
+        Instance = null;
+        if (mAdapter != null && mAdapter.getCount() > 0) {
             AdHelper.onCloseActivity(this);
-        }
-        else
+        } else
             super.close();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Instance= null;
+        Instance = null;
     }
 
     static ActivityLogView Instance;
+
     public static void updateLog() {
-        if(Instance!=null && !Instance.isFinishing()){
-           Instance.onNewLogEvent();
+        if (Instance != null && !Instance.isFinishing()) {
+            Instance.onNewLogEvent();
         }
     }
 }

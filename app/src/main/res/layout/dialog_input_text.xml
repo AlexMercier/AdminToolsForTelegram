@@ -17,4 +17,20 @@
         android:layout_height="wrap_content"
         android:id="@+id/editInputText"
         android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:text="For creating group you must add at least 1 user. Please enter @username of your friend. You can leave this field empty to add default bot:"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+         />
+
+    <EditText
+        android:maxLines="3"
+        android:hint="\@ImageBot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edtInviteUsername"
+        android:layout_gravity="center_horizontal" />
+
+
 </LinearLayout>

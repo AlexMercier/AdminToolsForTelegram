@@ -155,7 +155,12 @@ public class Utils {
     public static String TimestampToDateFormat(long ts, String sFormat){
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(ts*1000);
-        SimpleDateFormat format = new SimpleDateFormat(sFormat);
+        SimpleDateFormat format = null;
+        try {
+            format = new SimpleDateFormat(sFormat);
+        } catch (IllegalArgumentException e) {
+            format = new SimpleDateFormat("d MM yyyy hh:mm:ss aa");
+        }
         return format.format(c.getTime());
     }
 

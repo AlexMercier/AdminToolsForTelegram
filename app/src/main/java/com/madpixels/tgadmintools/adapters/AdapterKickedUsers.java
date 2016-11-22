@@ -17,6 +17,7 @@ import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.db.DBHelper;
 import com.madpixels.tgadmintools.entities.ChatParticipantBan;
 import com.madpixels.tgadmintools.helper.TgH;
+import com.madpixels.tgadmintools.helper.TgUtils;
 import com.madpixels.tgadmintools.utils.TgImageGetter;
 
 import org.drinkless.td.libcore.telegram.Client;
@@ -74,7 +75,7 @@ public class AdapterKickedUsers extends BaseAdapter{
         }
 
         ChatParticipantBan banUser = getItem(position);
-        TdApi.ChatParticipant user = banUser.chatParticipant;
+        //TdApi.ChatMember member = banUser.chatParticipant;
 
         final EmojiconTextView tvUserName = UIUtils.getHolderView(view, R.id.tvUserName);
         final TextView tvUserInfo = UIUtils.getHolderView(view, R.id.tvUserInfo);
@@ -82,8 +83,8 @@ public class AdapterKickedUsers extends BaseAdapter{
         final TextView tvBanText = UIUtils.getHolderView(view, R.id.tvBanText);
         final TextView tvOther = UIUtils.getHolderView(view, R.id.tvOther);
         final TextView tvUserLogin = UIUtils.getHolderView(view, R.id.tvUserLogin);
-
-        if(user.user.type.getConstructor()== TdApi.UserTypeDeleted.CONSTRUCTOR){
+        TdApi.User user = TgUtils.getUser(banUser.user.id);
+        if(user.type.getConstructor()== TdApi.UserTypeDeleted.CONSTRUCTOR){
             tvUserName.setTextColor(Color.parseColor("#BDBDBD"));
             tvUserName.setText(R.string.user_type_deleted);
             tvBanText.setVisibility(View.GONE);
@@ -91,12 +92,12 @@ public class AdapterKickedUsers extends BaseAdapter{
         }else{
             tvUserName.setTextColor(Color.BLACK);
             tvBanText.setVisibility(View.VISIBLE);
-            tvUserName.setText(user.user.firstName+" "+user.user.lastName);
-            if(user.user.username==null || user.user.username.isEmpty())
+            tvUserName.setText(user.firstName+" "+user.lastName);
+            if(user.username==null || user.username.isEmpty())
                 tvUserLogin.setVisibility(View.GONE);
             else {
                 tvUserLogin.setVisibility(View.VISIBLE);
-                tvUserLogin.setText("@"+user.user.username);
+                tvUserLogin.setText("@"+user.username);
             }
         }
 
@@ -107,18 +108,18 @@ public class AdapterKickedUsers extends BaseAdapter{
             getBanText(banUser);
         }
 
-        if(user.user.status==null){
+        if(user.status==null){
             tvUserInfo.setText("");
         }
         else
-        if(user.user.status.getConstructor()== TdApi.UserStatusRecently.CONSTRUCTOR){
+        if(user.status.getConstructor()== TdApi.UserStatusRecently.CONSTRUCTOR){
             tvUserInfo.setText(R.string.online_last_seen);
-        }else if (user.user.status.getConstructor()== TdApi.UserStatusOffline.CONSTRUCTOR){
-            TdApi.UserStatusOffline offline = (TdApi.UserStatusOffline) user.user.status;
+        }else if (user.status.getConstructor()== TdApi.UserStatusOffline.CONSTRUCTOR){
+            TdApi.UserStatusOffline offline = (TdApi.UserStatusOffline) user.status;
             String time = Utils.TimestampToDate(offline.wasOnline);
             tvUserInfo.setText(mCtx.getString(R.string.last_seen_at)+" "+time);
-            MyLog.log(user.user.status.toString());
-        }else if(user.user.status.getConstructor()== TdApi.UserStatusOnline.CONSTRUCTOR){
+            MyLog.log(user.status.toString());
+        }else if(user.status.getConstructor()== TdApi.UserStatusOnline.CONSTRUCTOR){
             tvUserInfo.setText("online");
         }else{
             tvUserInfo.setText("");
@@ -144,8 +145,8 @@ public class AdapterKickedUsers extends BaseAdapter{
             //tvOther.setVisibility(View.VISIBLE);
         }
 
-        int photoId = user.user.profilePhoto.small.id;
-        Bitmap bmp = images.getPhoto(photoId);
+        //int photoId = ;
+        Bitmap bmp = user.profilePhoto==null?null:images.getPhoto(user.profilePhoto.small.id);
 
         if(bmp!=null)
             avatar.setImageBitmap(bmp);
@@ -159,14 +160,14 @@ public class AdapterKickedUsers extends BaseAdapter{
 
     private HashMap<Integer, Boolean> tmp = new HashMap<>(0);
     void getUserProfilePhoto(final ChatParticipantBan b){
-        if(!tmp.containsKey(b.chatParticipant.user.id)){
-            tmp.put(b.chatParticipant.user.id, true);
-            TgH.send(new TdApi.GetUser(b.chatParticipant.user.id), new Client.ResultHandler() {
+        if(!tmp.containsKey(b.user.id)){
+            tmp.put(b.user.id, true);
+            TgH.send(new TdApi.GetUser(b.user.id), new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
                     if(object.getConstructor()== TdApi.User.CONSTRUCTOR){
                         TdApi.User u = (TdApi.User) object;
-                        b.chatParticipant.user.profilePhoto.small.id = u.profilePhoto.small.id;
+                        b.user.profilePhoto.small.id = u.profilePhoto.small.id;
                         notifyDataSetChanged();
                     }
                 }
@@ -175,7 +176,7 @@ public class AdapterKickedUsers extends BaseAdapter{
     }
 
     private void getBanText(ChatParticipantBan banUser) {
-        ChatParticipantBan ban = DBHelper.getInstance().getBanById(banUser.chat_id, banUser.chatParticipant.user.id);
+        ChatParticipantBan ban = DBHelper.getInstance().getBanById(banUser.chat_id, banUser.user.id);
         if(ban==null) return;
         banUser.banText = ban.banText;
         banUser.banAge=ban.banAge;
@@ -188,7 +189,7 @@ public class AdapterKickedUsers extends BaseAdapter{
     }
 
 
-    public void onDestroy(){ //TODO activity add this method
+    public void onDestroy(){
         images.onDestroy();
     }
 

@@ -18,17 +18,56 @@
         android:text="@string/chk_remove_messages_stickers" />
 
     <CheckBox
-        android:id="@+id/chkAutoBanSticks"
+        android:id="@+id/chkBanForSticks"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checked="false"
         android:text="@string/chkTitleBanForSticks" />
 
     <LinearLayout
-        android:id="@+id/layerBanSticksAge"
+        android:id="@+id/layerBanSticksTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="@string/title_ban_age"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <EditText
+                android:id="@+id/edtSticksBanTimeVal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.2"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:inputType="number"
+                android:text="5" />
+
+            <Spinner
+                android:id="@+id/spinnerBanSticksAge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0" />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/chkReturnOnBanSticksExpired"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/check_return_after_bantime_expired" />
 
         <TextView
             android:id="@+id/textView12"
@@ -36,7 +75,9 @@
             android:layout_height="wrap_content"
             android:text="@string/label_allow_count"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:visibility="visible" />
+            android:visibility="visible"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp" />
 
         <TextView
             android:id="@+id/tvBanSticksWarningCount"
@@ -63,6 +104,16 @@
             android:max="10"
             android:progress="1" />
 
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_weight="0"
+            android:text="@string/description_user_within_time"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_marginLeft="8dp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,15 +122,8 @@
             android:orientation="horizontal"
             android:visibility="visible">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:text="@string/title_ban_age"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
             <EditText
-                android:id="@+id/edtSticksBanAgeVal"
+                android:id="@+id/edtStickersFloodTimeVal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.2"
@@ -89,33 +133,38 @@
                 android:text="5" />
 
             <Spinner
-                android:id="@+id/spinnerBanSticksAge"
+                android:id="@+id/spinnerStickersFloodTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0" />
         </LinearLayout>
 
-
-        <CheckBox
-            android:id="@+id/chkReturnOnBanSticksExpired"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="@string/check_return_after_bantime_expired" />
-
-        <CheckBox
-            android:id="@+id/chkWarnBeforeStickersBan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="@string/chkWarnBeforeBanWord" />
-
-        <EditText
-            android:id="@+id/editTextSticksWarning"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:hint="@string/hint_warntext_stickers" />
+            android:layout_marginTop="8dp"
+            android:layout_weight="0"
+            android:text="@string/tex_warn_count_for_user_before_ban"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_marginLeft="8dp" />
+
+        <TextView
+            android:id="@+id/tvBtnWarnStickersFreq"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_weight="0"
+            android:background="?attr/selectableItemBackground"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:text="@string/text_warn_on_first_last_warn"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/md_teal_500"
+            android:layout_marginLeft="8dp" />
+
+
+
 
 
     </LinearLayout>

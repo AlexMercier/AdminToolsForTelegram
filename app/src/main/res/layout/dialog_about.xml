@@ -8,7 +8,10 @@
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -145,6 +148,20 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/thnaksToList"
                 android:text="@string/thanks_to_list"/>
+
+            <TextView android:textStyle="bold" android:layout_marginTop="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sources:"/>
+
+            <TextView android:textColor="@color/text_clickable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="github.com/AlexMercier/AdminToolsForTelegram"
+                android:textColorLink="@color/text_clickable"
+                android:layout_marginLeft="4dp"
+                android:linksClickable="true"
+                android:autoLink="web" />
 
 
         </LinearLayout>

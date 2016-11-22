@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_border"
+    android:padding="1dp"
+    >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/md_white_1000"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <RadioGroup
+            android:id="@+id/rgWarnFrequency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/rbWarnFreqNone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/text_warn_no_warn_user" />
+
+            <RadioButton
+                android:id="@+id/rbWarnFreqLastMsg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/text_warn_on_last_warn" />
+
+            <RadioButton
+                android:id="@+id/rbWarnFreqFirstMsg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/text_warn_on_first_warn" />
+
+            <RadioButton
+                android:id="@+id/rbWarnFreqFirstLast"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/text_warn_on_first_last_warn" />
+
+            <RadioButton
+                android:id="@+id/rbWarnFreqSecondLast"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/text_warn_on_second_and_last_warn" />
+
+            <RadioButton
+                android:id="@+id/rbWarnFreqEvery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_warn_always" />
+        </RadioGroup>
+
+        <TextView
+            android:text="@string/title_warning_text_before_ban"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView27"
+            android:layout_marginTop="6dp" />
+
+        <TextView
+            android:text="@string/title_warn_help"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/text_clickable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvHelpWarnFormat"
+            android:layout_marginTop="3dp" />
+
+        <EditText
+            android:id="@+id/edtWarningFirst"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_first_user_warning"
+            android:maxLines="3" />
+
+
+        <EditText
+            android:id="@+id/edtWarningLast"  android:hint="@string/hint_last_user_warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:maxLines="3" />
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:text="@string/btnSave"
+                android:textColor="@color/colorAccent" />
+
+            <Button
+                android:id="@+id/btnClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:text="@string/close"
+                android:textColor="@color/colorAccent" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+</ScrollView>

@@ -19,7 +19,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity  android:theme="@style/Toolbar"
+        <activity  android:theme="@style/ToolbarTheme"
             android:name="com.madpixels.tgadmintools.activity.MainActivity"
             android:configChanges="orientation|screenSize">
             <intent-filter>
@@ -32,19 +32,20 @@
 
         <activity
             android:name="com.madpixels.tgadmintools.activity.ActivityGroupsList"
-            android:theme="@style/Toolbar" />
+            android:theme="@style/ToolbarTheme" />
         <activity
             android:name="com.madpixels.tgadmintools.activity.ActivityBanList"
-            android:theme="@style/Toolbar" />
+            android:theme="@style/ToolbarTheme" />
 
         <activity android:name="com.madpixels.tgadmintools.activity.ActivityChatUsers"
-            android:theme="@style/Toolbar" />
+            android:theme="@style/ToolbarTheme" />
         <activity android:name="com.madpixels.tgadmintools.activity.ActivityGroupInfo"
-            android:theme="@style/Toolbar" />
+            android:theme="@style/ToolbarTheme" />
         <activity android:name="com.madpixels.tgadmintools.activity.ActivitySettings"
-            android:theme="@style/Toolbar" />
+            android:theme="@style/ToolbarTheme" />
         <activity android:name="com.madpixels.tgadmintools.activity.ActivityLogView"
-            android:theme="@style/Toolbar" />
+            android:theme="@style/ToolbarTheme" />
+        <activity android:name=".activity.ActivityBannedWordsList" />
 
 
         <receiver android:name="com.madpixels.tgadmintools.services.ReceiverStartupSystem">
@@ -53,10 +54,11 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.madpixels.tgadmintools.services.ServiceUnbanTask" />
-        <service android:name="com.madpixels.tgadmintools.services.ServiceAutoKicker"/>
-        <service android:name="com.madpixels.tgadmintools.services.ServiceAntispam" />
+        <service android:name=".services.ServiceUnbanTask" />
+        <service android:name=".services.ServiceAutoKicker"/>
+        <service android:name=".services.ServiceChatTask" />
         <service android:name=".services.ServiceOnStartCheckAuth"/>
+        <service android:name=".services.ServiceBackgroundStarter"/>
 
 
         <activity
@@ -65,29 +67,6 @@
             android:finishOnTaskLaunch="true"
             android:launchMode="singleInstance"
             android:theme="@android:style/Theme.Dialog" />
-
-        <!-- yandex analytics -->
-        <service android:name="com.yandex.metrica.MetricaService" android:enabled="true"
-            android:exported="true" android:process=":Metrica">
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-                <action android:name="com.yandex.metrica.IMetricaService" />
-                <data android:scheme="metrica" />
-            </intent-filter>
-            <meta-data android:name="metrica:api:level" android:value="44" />
-        </service>
-        <receiver android:name="com.yandex.metrica.MetricaEventHandler"
-            android:enabled="true" android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER" />
-            </intent-filter>
-        </receiver>
-        <!-- /.yandex -->
-
-        <!-- ads -->
-
-
-        <!-- /ads -->
 
     </application>
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/edtBanWord"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:hint="@string/hint_enter_ban_word"
+        android:lines="1"
+        android:maxLines="1"
+        android:singleLine="true" />
+
+    <CheckBox
+        android:id="@+id/chkDelBanWord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/chk_remove_banword_messages" />
+
+    <CheckBox
+        android:id="@+id/chkBanUserForBanWord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/chk_ban_user_for_banword" />
+
+
+</LinearLayout>

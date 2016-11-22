@@ -9,7 +9,7 @@
     </style>
 
 
-    <style name="Toolbar" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="ToolbarTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
 

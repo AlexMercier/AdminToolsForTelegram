@@ -21,7 +21,6 @@ import java.util.HashMap;
  * Created by Snake on 23.02.2016.
  */
 public class TgImageGetter {
-    // TODO какойто адаптер не уничтожает хендлер
     HashMap<Integer, Object> avatars = new HashMap<>();
     private Runnable onUpdateHandler;
     private boolean isRounded = false;
@@ -133,7 +132,7 @@ public class TgImageGetter {
         localCanvas.drawCircle(i / 2, j / 2, k, localPaint);
         localPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         localCanvas.drawBitmap(paramBitmap, 0.0F, 0.0F, localPaint);
-        //TODO ? paramBitmap.recycle();
+
         // circle
         localPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         localPaint.setStyle(Paint.Style.STROKE);

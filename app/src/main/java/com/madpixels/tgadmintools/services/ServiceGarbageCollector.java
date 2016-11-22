@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import com.madpixels.apphelpers.FileUtils2;
 import com.madpixels.apphelpers.MyLog;
+import com.madpixels.tgadmintools.BuildConfig;
 import com.madpixels.tgadmintools.db.DBHelper;
 import com.madpixels.tgadmintools.helper.TgH;
 
@@ -42,10 +43,11 @@ public class ServiceGarbageCollector extends Service{
             @Override
             public void onCallback() {
                 MyLog.log("removedCount: "+removedFilesCount);
-
-                MyNotification m = new MyNotification(123, getBaseContext());
-                m.mNotificationBuilder.setContentText("remove files: "+removedFilesCount);
-                m.alert();
+                if(BuildConfig.DEBUG) {
+                    MyNotification m = new MyNotification(123, getBaseContext());
+                    m.mNotificationBuilder.setContentText("remove files: " + removedFilesCount);
+                    m.alert();
+                }
                 stopSelf();
             }
         });
