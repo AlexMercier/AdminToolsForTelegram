@@ -26,4 +26,5 @@ public class Const {
     public static final int ACTION_REQUEST_STORAGE_PERMISSION = 100;
 
     public static final Boolean ANTISPAM_IGNORE_SHARED_CONTACTS_DEFAULT = false;
+    public static final int ACTION_REFRESH_COMMANDS = 102;
 }

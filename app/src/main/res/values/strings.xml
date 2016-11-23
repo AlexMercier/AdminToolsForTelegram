@@ -34,7 +34,7 @@
     <string name="btnContinue">Continue</string>
     <string name="create_group">Create group</string>
     <string name="create_supergroup">Create supergroup</string>
-    <string name="labelAutoBanRules">Antispam rules</string>
+
     <string name="noteAntispamLinks">Note: Rules ignored for admins.</string>
     <string name="toast_chat_link_added">Link changed</string>
     <string name="hint_invite_link_not_created">Click to create invite link</string>
@@ -69,7 +69,6 @@
     <string name="logAction_banForSticker">Ban for sticker flood</string>
     <string name="logAction_removeLink">Removed message with url</string>
     <string name="logAction_removeSticker">Removed message with sticker</string>
-
 
 
     <string name="label_allow_count">Allowed count per user:</string>
@@ -240,14 +239,16 @@
     <string name="hint_first_user_warning">Message text for first warning</string>
     <string name="hint_last_user_warning">Message text for last warning</string>
 
-    <string name="stringName1" formatted="false"><![CDATA[<html> \n
+    <string name="text_help_formatting" formatted="false"><![CDATA[<html> \n
         <b>You can use next short tags to print variables in message</b>: \n
         <b>%username%</b> - print @username if exists \n
         <b>%name%</b> - print user First and Last name \n
         <b>%count%</b> - print current user warnings count \n
         <b>%max%</b> - print max allowed warnings per user \n
         <b>%left%</b> - print number of remaining warnings for user \n
-
+        <b>%u_id%</b> - print user id \n
+        <b>%c_id%</b> - print chat id \n
+        \n
         <b>Example</b>: \n
         <i>%username% warning %count% of %max%! Spam not allowed! \n
         Remains %left% warnings before you will be banned.</i> \n
@@ -282,6 +283,16 @@
     <string name="title_warning_text_before_ban">Warning text for users before ban:</string>
     <string name="title_warn_help">formatting help</string>
     <string name="ban_for_flood">Ban user</string>
+    <string name="labelChatTasks">Chat tasks</string>
+    <string name="labelChatCommands">Commands for chat</string>
+    <string name="text_clear_all_commands_for_chat">Confirm to clear all commands for this chat?</string>
+    <string name="title_dialog_clear_all">Clear all</string>
+    <string name="labelChatCommand">Command:\n(for example \'/command\')</string>
+    <string name="label_chatCommand_action">Action for command:</string>
+    <string name="chk_chatcommand_only_admin_can_execute">Only admin can execute command</string>
+    <string name="title_chat_commands">Chat commands</string>
+    <string name="btn_chat_commands_manage">Edit commands</string>
+
 
     <string-array name="ban_times">
         <item>Min.</item>
@@ -309,6 +320,11 @@
         <item>Min.</item>
         <item>Hour.</item>
         <item>Day.</item>
+    </string-array>
+
+    <string-array name="command_types">
+        <item>Text answer</item>
+        <item>Kick self user</item>
     </string-array>
 
 

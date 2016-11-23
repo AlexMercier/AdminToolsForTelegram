@@ -7,7 +7,7 @@ package com.madpixels.tgadmintools.entities;
 public class ChatTask {
     public boolean isEnabled = false; //now using only for blackwords
 
-    public enum TYPE {STICKERS, IMAGES, LINKS, BANWORDS, VOICE, LeaveMsg, JoinMsg, FLOOD}
+    public enum TYPE {STICKERS, IMAGES, LINKS, BANWORDS, VOICE, LeaveMsg, JoinMsg, FLOOD, COMMAND}
 
     public TYPE mType;
     public int id; // id in database

@@ -17,6 +17,7 @@ import com.madpixels.tgadmintools.activity.MainActivity;
 import com.madpixels.tgadmintools.db.DBHelper;
 import com.madpixels.tgadmintools.entities.BannedWord;
 import com.madpixels.tgadmintools.entities.Callback;
+import com.madpixels.tgadmintools.entities.ChatCommand;
 import com.madpixels.tgadmintools.entities.ChatTask;
 import com.madpixels.tgadmintools.entities.ChatTaskControl;
 import com.madpixels.tgadmintools.helper.TgH;
@@ -101,13 +102,27 @@ public class ServiceChatTask extends Service {
                     String welcomeText = DBHelper.getInstance().getWelcomeText(chatId);
                     if (welcomeText != null)
                         sendWelcomeText(message, welcomeText);
-                    // return;
+                }
+
+                ChatTaskControl antispamTasks = new ChatTaskControl(chatId, true);
+
+                //Check for command execute:
+                if (antispamTasks.hasCommands() && message.message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
+                    TdApi.MessageText msgContent = (TdApi.MessageText) message.message.content;
+                    if (msgContent.text.startsWith("/") && msgContent.text.length() > 1) {
+                        final String command = msgContent.text.substring(1).toLowerCase();
+                        ChatCommand cmd = DBHelper.getInstance().getChatCommand(antispamTasks.chatId, command);
+                        if (cmd != null) {
+                            new ChatCommandExecute(message, antispamTasks, cmd);
+                            return;
+                        }
+                    }
                 }
 
                 if (!message.message.canBeDeleted)
                     return;
 
-                ChatTaskControl antispamTasks = new ChatTaskControl(chatId, true);
+
                 if (antispamTasks.isEmpty())
                     return;
 
@@ -133,7 +148,7 @@ public class ServiceChatTask extends Service {
                 if (TgH.selfProfileId == message.message.senderUserId)
                     return;
 
-                checkMessageForAntiSpam(message, antispamTasks);
+                checkMessageForTask(message, antispamTasks);
             }
         }
     };
@@ -164,7 +179,7 @@ public class ServiceChatTask extends Service {
         TgH.send(f);
     }
 
-    private void checkMessageForAntiSpam(UpdateNewMessage message, ChatTaskControl antiSpamRule) {
+    private void checkMessageForTask(UpdateNewMessage message, ChatTaskControl antiSpamRule) {
 
         if (antiSpamRule.hasFloodControl()) {
             long diffSeconds = (System.currentTimeMillis() / 1000) - message.message.date;
@@ -260,6 +275,7 @@ public class ServiceChatTask extends Service {
             new BanForVoice(message, antiSpamRule);
         }
 
+
         // Check banwords usage:
         if (antiSpamRule.hasBanWords() && message.message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
             int offset = 0;
@@ -287,8 +303,8 @@ public class ServiceChatTask extends Service {
         }
 
 
-        // if(message.message.content.getConstructor() == TdApi.MessagePhoto.CONSTRUCTOR && antiSpamRule.isImagesFloodEnabled){
-        //     new BanForImage(message, antiSpamRule);
+        // if(message.message.content.getConstructor() == TdApi.MessagePhoto.CONSTRUCTOR && taskControl.isImagesFloodEnabled){
+        //     new BanForImage(message, taskControl);
         // }
     }
 
@@ -310,15 +326,15 @@ public class ServiceChatTask extends Service {
     /*
     private class BanForImage extends Ban {
 
-        BanForImage(UpdateNewMessage message, AntiSpamRule antiSpamRule) {
-            super(message, antiSpamRule);
+        BanForImage(UpdateNewMessage message, AntiSpamRule taskControl) {
+            super(message, taskControl);
             getChat();
         }
 
         @Override
-        void banAction() {
+        void doAction() {
             int tryes = DBHelper.getInstance().getAntiSpamWarnCount(LogUtil.Action.ImagesFloodWarn, message.message.chatId, message.message.fromId, 60 * 60 * 1000);
-            int limit = antiSpamRule.mImagesFloodLimit;
+            int limit = taskControl.mImagesFloodLimit;
             if (tryes < limit) {
                 DBHelper.getInstance().setAntiSpamWarnCount(LogUtil.Action.ImagesFloodWarn, message.message.chatId, message.message.fromId, tryes + 1);
             } else { // баним за флуд
@@ -331,7 +347,7 @@ public class ServiceChatTask extends Service {
                         String banReason = getString(R.string.logAction_banForSticker);// TODO banForImages
                         int localChatId = TgUtils.getChatRealId(chat);
                         DBHelper.getInstance().addToBanList(user, message.message.chatId, chat.type.getConstructor(), localChatId,
-                                antiSpamRule.imagesBanAge, antiSpamRule.isImagesReturnOnUnban, banReason);
+                                taskControl.imagesBanAge, taskControl.isImagesReturnOnUnban, banReason);
                         ServiceUnbanTask.registerTask(getBaseContext());
                     }
                 });
@@ -353,14 +369,14 @@ public class ServiceChatTask extends Service {
         }
     } */
 
-    private abstract class Ban {
-        ChatTaskControl antiSpamRule;
+    private abstract class TaskAction {
+        ChatTaskControl taskControl;
         ChatTask task;
         UpdateNewMessage message;
         TdApi.Chat chat;
 
-        Ban(final TdApi.UpdateNewMessage message, ChatTaskControl antiSpamRule) {
-            this.antiSpamRule = antiSpamRule;
+        TaskAction(final TdApi.UpdateNewMessage message, ChatTaskControl chatTasks) {
+            this.taskControl = chatTasks;
             this.message = message;
         }
 
@@ -369,17 +385,31 @@ public class ServiceChatTask extends Service {
                 @Override
                 public void onResult(TdApi.TLObject object) {
                     chat = (TdApi.Chat) object;
-                    checkUserInPhoneBook();
+                    onChatLoad();
                 }
             });
+        }
+
+        void onChatLoad() {
+            checkUserInPhoneBook();
+        }
+
+        void onUserInPhoneBookChecked() {
+            AdminUtils.checkUserIsAdminInChat(chat, message.message.senderUserId, onCheckIsAdmin);
+        }
+
+        void onCheckIsAdmin(boolean isAdmin) {
+            if (isAdmin)
+                return;
+            AdminUtils.checkIsBot(message.message.senderUserId, onCheckIsBot);
         }
 
 
         void checkUserInPhoneBook() { // друзьям разрешаем спамить.
             if (Sets.getBoolean(Const.ANTISPAM_IGNORE_SHARED_CONTACTS, Const.ANTISPAM_IGNORE_SHARED_CONTACTS_DEFAULT))
                 AdminUtils.checkUserIsInContactList(message.message.senderUserId, onCheckIsContact);
-            else
-                AdminUtils.checkUserIsAdminInChat(chat, message.message.senderUserId, onCheckIsAdmin);
+            else //go to next step
+                onUserInPhoneBookChecked();
         }
 
 
@@ -389,7 +419,7 @@ public class ServiceChatTask extends Service {
                 boolean isContact = (boolean) boolData;
                 if (isContact)
                     return;
-                AdminUtils.checkUserIsAdminInChat(chat, message.message.senderUserId, onCheckIsAdmin);
+                onUserInPhoneBookChecked();
             }
         };
 
@@ -397,9 +427,7 @@ public class ServiceChatTask extends Service {
             @Override
             public void onResult(Object data) {
                 boolean isAdmin = (boolean) data;
-                if (isAdmin)
-                    return;
-                AdminUtils.checkIsBot(message.message.senderUserId, onCheckIsBot);
+                onCheckIsAdmin(isAdmin);
             }
         };
 
@@ -409,19 +437,19 @@ public class ServiceChatTask extends Service {
                 boolean isBot = (boolean) data;
                 if (isBot) // TODO check if bot allowed
                     return;
-                onBan();
+                onAction();
             }
         };
 
-        public void onBan() {
-            banAction();
+        public void onAction() {
+            doAction();
         }
 
-        abstract void banAction();
+        abstract void doAction();
     }
 
 
-    private class BanForVoice extends Ban {
+    private class BanForVoice extends TaskAction {
 
         BanForVoice(UpdateNewMessage message, ChatTaskControl chatTasks) {
             super(message, chatTasks);
@@ -430,7 +458,7 @@ public class ServiceChatTask extends Service {
         }
 
         @Override
-        void banAction() {
+        void doAction() {
             if (task.isBanUser) {
                 final int tryes = DBHelper.getInstance().getAntiSpamWarnCount(ChatTask.TYPE.VOICE, message.message.chatId, message.message.senderUserId, task.mWarningsDuringTime);
                 final int limit = task.mAllowCountPerUser;
@@ -550,8 +578,115 @@ public class ServiceChatTask extends Service {
         }
     }
 
+    private class ChatCommandExecute extends TaskAction {
+        ChatCommand pCommand;
 
-    private class BanForBlackWord extends Ban {
+        public ChatCommandExecute(UpdateNewMessage message, ChatTaskControl antiSpamRule, ChatCommand cmd) {
+            super(message, antiSpamRule);
+            task = antiSpamRule.getTask(ChatTask.TYPE.VOICE);
+            pCommand = cmd;
+            getChat();
+        }
+
+        @Override
+        void onChatLoad() {
+            //check if command only for admins
+            if (pCommand.isAdmin) {
+                AdminUtils.checkUserIsAdminInChat(chat, message.message.senderUserId, onCheckIsAdmin);
+            } else {
+                doAction();
+            }
+        }
+
+        @Override
+        void onCheckIsAdmin(boolean isAdmin) {
+            if (isAdmin) {
+                AdminUtils.checkIsCreator(chat, message.message.senderUserId, new Callback() {
+                    @Override
+                    public void onResult(Object data) {
+                        boolean isCreator = (boolean) data;
+                        if (!isCreator)
+                            doAction();
+                        else
+                            sendCreatorDeniedAnswer();
+                    }
+                });
+                doAction();
+            } else {
+                sendDeniedAnswer();
+            }
+        }
+
+
+        @Override
+        void doAction() {
+            if (pCommand.type == 0) {
+                TdApi.SendMessage msgSend = new TdApi.SendMessage();
+                msgSend.chatId = message.message.chatId;
+                msgSend.replyToMessageId = message.message.id;
+                TdApi.InputMessageText msgText = new TdApi.InputMessageText();
+
+                TdApi.User user = TgUtils.getUser(message.message.senderUserId);
+                FormattedTagText formattedTagText = replaceWarningsShortTags(pCommand.answer, task, user, 0);
+                msgText.text = formattedTagText.resultText;
+                if (formattedTagText.mention != null) {
+                    msgText.entities = new TdApi.MessageEntity[1];
+                    msgText.entities[0]=formattedTagText.mention;
+                }
+
+                msgSend.inputMessageContent = msgText;
+                TgH.send(msgSend, new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.TLObject object) {
+                        //MyLog.log(object.toString());
+                    }
+                });
+            } else {
+                AdminUtils.kickUser(message.message.chatId, message.message.senderUserId, new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.TLObject object) {
+                        MyLog.log(object.toString());
+                    }
+                });
+            }
+        }
+
+        void sendDeniedAnswer() {
+            TdApi.SendMessage msgSend = new TdApi.SendMessage();
+            msgSend.chatId = message.message.chatId;
+            msgSend.replyToMessageId = message.message.id;
+            TdApi.InputMessageText msgText = new TdApi.InputMessageText();
+            msgText.text = "Access denied.\nOnly admin can execute this command";
+
+            msgSend.inputMessageContent = msgText;
+            TgH.send(msgSend, new Client.ResultHandler() {
+                @Override
+                public void onResult(TdApi.TLObject object) {
+                    //MyLog.log(object.toString());
+                }
+            });
+        }
+
+        private void sendCreatorDeniedAnswer() {
+            TdApi.SendMessage msgSend = new TdApi.SendMessage();
+            msgSend.chatId = message.message.chatId;
+            msgSend.replyToMessageId = message.message.id;
+            TdApi.InputMessageText msgText = new TdApi.InputMessageText();
+            msgText.text = "Creator can't leave the channel";
+
+            msgSend.inputMessageContent = msgText;
+            TgH.send(msgSend, new Client.ResultHandler() {
+                @Override
+                public void onResult(TdApi.TLObject object) {
+                    //MyLog.log(object.toString());
+                }
+            });
+        }
+
+    }
+
+
+    private class BanForBlackWord extends TaskAction {
         private BannedWord bannedWord;
 
         BanForBlackWord(UpdateNewMessage message, ChatTaskControl antiSpamRule, final BannedWord bannedWord) {
@@ -563,7 +698,7 @@ public class ServiceChatTask extends Service {
 
 
         @Override
-        void banAction() {
+        void doAction() {
             final TdApi.MessageText msgContent = (TdApi.MessageText) message.message.content;
 
             if (bannedWord.isBanUser) {
@@ -691,7 +826,7 @@ public class ServiceChatTask extends Service {
     }
 
 
-    private class BanForSticker extends Ban {
+    private class BanForSticker extends TaskAction {
 
         BanForSticker(final TdApi.UpdateNewMessage message, ChatTaskControl antiSpamRule) {
             super(message, antiSpamRule);
@@ -701,7 +836,7 @@ public class ServiceChatTask extends Service {
 
 
         @Override
-        void banAction() {
+        void doAction() {
             if (task.isBanUser) {
                 long floodTimeLimit = task.mWarningsDuringTime;
                 final int tryes = DBHelper.getInstance().getAntiSpamWarnCount(ChatTask.TYPE.STICKERS, message.message.chatId, message.message.senderUserId, floodTimeLimit);
@@ -850,7 +985,7 @@ public class ServiceChatTask extends Service {
         return message.message.content.toString();
     }
 
-    private class BanForLink extends Ban {
+    private class BanForLink extends TaskAction {
         String mLink;
 
         BanForLink(String link, UpdateNewMessage message, ChatTaskControl antiSpamRule) {
@@ -861,7 +996,7 @@ public class ServiceChatTask extends Service {
 
         //переопределяем чтоб проверить ссылку перед баном
         @Override
-        public void onBan() {
+        public void onAction() {
             loadChatInfo(message.message.chatId, new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
@@ -937,15 +1072,15 @@ public class ServiceChatTask extends Service {
                         if (mLink.equals(mention) || mLink.contains(link))
                             return;
                     }
-                    banAction();
+                    doAction();
                 }
             });
         }
 
         @Override
-        void banAction() {
-            final ChatTask task = antiSpamRule.getTask(ChatTask.TYPE.LINKS);
-            if (antiSpamRule.isBanForLinks()) {
+        void doAction() {
+            final ChatTask task = taskControl.getTask(ChatTask.TYPE.LINKS);
+            if (taskControl.isBanForLinks()) {
                 final int tryes = DBHelper.getInstance().getAntiSpamWarnCount(ChatTask.TYPE.LINKS, message.message.chatId, message.message.senderUserId, task.mWarningsDuringTime);
                 final int limit = task.mAllowCountPerUser;
                 if (tryes < limit) {
@@ -1078,7 +1213,7 @@ public class ServiceChatTask extends Service {
         }
     }
 
-    class FloodControl extends Ban {
+    class FloodControl extends TaskAction {
 
         FloodControl(UpdateNewMessage message, ChatTaskControl antiSpamRule) {
             super(message, antiSpamRule);
@@ -1087,7 +1222,7 @@ public class ServiceChatTask extends Service {
         }
 
         @Override
-        void banAction() {
+        void doAction() {
             if (task.isEnabled) {
                 long floodTimeLimit = task.mWarningsDuringTime;
                 final int tryes = DBHelper.getInstance().getAntiSpamWarnCount(task.mType, message.message.chatId, message.message.senderUserId, floodTimeLimit);
@@ -1243,10 +1378,14 @@ public class ServiceChatTask extends Service {
         TdApi.MessageEntityMentionName mention;
     }
 
-    private static FormattedTagText replaceWarningsShortTags(String customText, ChatTask task, TdApi.User user, int tryes) {
+    private static FormattedTagText replaceWarningsShortTags(String customText, @Nullable ChatTask task, TdApi.User user, int tryes) {
         FormattedTagText formattedText = new FormattedTagText();
 
         customText = customText.replace("%name%", user.firstName + " " + user.lastName);
+        customText = customText.replace("%u_id%", user.id + "");
+        if (task != null)
+            customText = customText.replace("%c_id%", task.chat_id + "");
+
         customText = customText.replace("%count%", (tryes + 1) + "");
         if (task != null) {
             customText = customText.replace("%max%", task.mAllowCountPerUser + "");

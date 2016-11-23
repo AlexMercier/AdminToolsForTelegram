@@ -105,7 +105,7 @@
     <string name="input_edit_chat_about">Introduce descripcion del chat</string>
     <string name="input_new_chat_title">Introduce nueva descripcion del chat</string>
     <string name="kickedCount">Expulsado:</string>
-    <string name="labelAutoBanRules">Reglas de Antispam</string>
+
     <string name="labelOther">Otro</string>
     <string name="labelWelcomeTextForJoinedUsers">Texto de bienvenida para nuevos usuarios</string>
     <string name="label_allow_count">Contador activado para cada usuario</string>

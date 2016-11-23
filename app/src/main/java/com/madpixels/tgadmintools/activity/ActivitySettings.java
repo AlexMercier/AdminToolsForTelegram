@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -190,16 +189,6 @@ public class ActivitySettings extends ActivityExtended {
     @Override
     public void onBackPressed() {
         close();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                close();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public void close() {

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class ChatTaskControl {
 
-    long chatId;
+    public long chatId;
     ArrayList<ChatTask> tasks;
     //// public AntispamTask taskLinks, taskStickers, taskRemoveNotificationUserLeave,
     //         taskRemoveNotificationUserJoined, taskBanWords, taskVoice;
@@ -84,6 +84,11 @@ public class ChatTaskControl {
 
     public boolean hasBanWords() {
         ChatTask task = getTask(ChatTask.TYPE.BANWORDS, false);
+        return task != null && (task.isEnabled);
+    }
+
+    public boolean hasCommands() {
+        ChatTask task = getTask(ChatTask.TYPE.COMMAND, false);
         return task != null && (task.isEnabled);
     }
 

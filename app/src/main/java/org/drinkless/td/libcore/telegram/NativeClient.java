@@ -35,17 +35,13 @@ final class NativeClient {
         }
     }
 
-    public static native long createClient();
+    public static native long createClient(String safeDir, String filesDir, boolean enableFileLog, boolean useTestDc);
 
     public static native void destroyClient(long clientId);
-
-    public static native void clientInit(long clientId, String safeDir, String filesDir, boolean enableFileLog, boolean useTestDc);
 
     public static native int clientRun(long clientId, long[] eventIds, TdApi.TLObject[] events, int changesCount, double timeout);
 
     public static native void clientWakeUp(long clientId);
-
-    public static native void clientClear(long clientId);
 
     public static native void setLogVerbosity(int newLogVerbosity);
 

@@ -15,6 +15,7 @@ import com.madpixels.tgadmintools.App;
 import com.madpixels.tgadmintools.Const;
 import com.madpixels.tgadmintools.entities.BanTask;
 import com.madpixels.tgadmintools.entities.BannedWord;
+import com.madpixels.tgadmintools.entities.ChatCommand;
 import com.madpixels.tgadmintools.entities.ChatParticipantBan;
 import com.madpixels.tgadmintools.entities.ChatTask;
 import com.madpixels.tgadmintools.helper.TgH;
@@ -494,7 +495,6 @@ public class DBHelper extends DB {
         return list.get(0);
     }
     */
-
     public ArrayList<ChatTask> getAntispamTasks(long chat_id, boolean onlyActiveTasks) {
         String filterActiveTasks = " AND (is_ban=1 OR is_remove_msg=1 OR isEnabled=1) ";
         String sql = "SELECT * FROM " + TABLE_CHAT_TASKS + " WHERE chat_id=? ";
@@ -685,7 +685,7 @@ public class DBHelper extends DB {
         return null;
     }
 
-    public void addLinkToWhiteList(String link){
+    public void addLinkToWhiteList(String link) {
         ContentValues c = new ContentValues(1);
         c.put("link", link);
         try {
@@ -1081,13 +1081,13 @@ public class DBHelper extends DB {
     }
 
     public ArrayList<TdApi.Chat> getCacheChats() {
-        String sql = "SELECT * FROM "+TABLE_CHATS_LIST+" ORDER BY chat_order DESC";
+        String sql = "SELECT * FROM " + TABLE_CHATS_LIST + " ORDER BY chat_order DESC";
         ArrayList<TdApi.Chat> list = new ArrayList<>();
         try {
             Cursor c = db.rawQuery(sql, null);
 
-            if(c.moveToFirst()){
-                do{
+            if (c.moveToFirst()) {
+                do {
                     String json = c.getString(c.getColumnIndex("json_chat_info"));
                     JSONObject jChat = new JSONObject(json);
 
@@ -1116,24 +1116,24 @@ public class DBHelper extends DB {
                     if (TgUtils.isGroup(jChat.getInt("type"))) {
                         TdApi.GroupChatInfo info = new TdApi.GroupChatInfo();
                         info.group = new TdApi.Group();
-                        info.group.status =roleStatus;
+                        info.group.status = roleStatus;
                         chat1.type = info;
-                    }else if(TgUtils.isSuperGroup(jChat.getInt("type"))){
+                    } else if (TgUtils.isSuperGroup(jChat.getInt("type"))) {
                         TdApi.ChannelChatInfo info = new TdApi.ChannelChatInfo();
                         info.channel = new TdApi.Channel();
                         info.channel.status = roleStatus;
                         info.channel.id = jChat.getInt("channel_id");
-                        if(!jChat.optBoolean("isChannel", false))
+                        if (!jChat.optBoolean("isChannel", false))
                             info.channel.isSupergroup = true;
                         chat1.type = info;
-                        if(jChat.has("username")){
+                        if (jChat.has("username")) {
                             info.channel.username = jChat.getString("username");
                         }
 
                     }
                     list.add(chat1);
 
-                }while (c.moveToNext());
+                } while (c.moveToNext());
             }
             c.close();
         } catch (JSONException e) {
@@ -1141,5 +1141,118 @@ public class DBHelper extends DB {
         }
 
         return list;
+    }
+
+    public void addChatCommand(ChatCommand cmd) {
+        ContentValues cv = new ContentValues(6);
+        cv.put("chat_id", cmd.chatId);
+        cv.put("type", cmd.type);
+        cv.put("command", cmd.cmd);
+        cv.put("answer", cmd.answer);
+        cv.put("is_admin", cmd.isAdmin);
+        cv.put("is_enabled", cmd.isEnabled);
+        try {
+            long id = db.insertWithOnConflict(TABLE_CHAT_COMMAND, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+            cmd.id = id;
+        } catch (Exception e) {
+            MyLog.log(e);
+        }
+    }
+
+    public int getChatCommandsCount(long chatId) {
+        String sql = "SELECT COUNT(1) as count FROM " + TABLE_CHAT_COMMAND + " WHERE chat_id=?";
+
+        try {
+            Cursor c = getTable(sql, new String[]{chatId + ""});
+            if (c != null) {
+                int count = c.getInt(c.getColumnIndex("count"));
+
+                c.close();
+                return count;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+
+    public ArrayList<ChatCommand> getChatCommands(long chatId) {
+        String sql = "SELECT * FROM " + TABLE_CHAT_COMMAND + " WHERE chat_id=?";
+        ArrayList<ChatCommand> list = new ArrayList<>();
+        try {
+            Cursor c = getTable(sql, new String[]{chatId + ""});
+            if (c != null) {
+                do {
+                    ChatCommand cmd = new ChatCommand();
+                    cmd.id = c.getInt(c.getColumnIndex("_id"));
+                    cmd.chatId = c.getInt(c.getColumnIndex("chat_id"));
+                    cmd.type = c.getInt(c.getColumnIndex("type"));
+                    cmd.cmd = c.getString(c.getColumnIndex("command"));
+                    cmd.answer = c.getString(c.getColumnIndex("answer"));
+                    cmd.isAdmin = c.getInt(c.getColumnIndex("is_admin")) == 1;
+                    cmd.isEnabled = c.getInt(c.getColumnIndex("is_enabled")) == 1;
+                    list.add(cmd);
+                } while (c.moveToNext());
+                c.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public void updateCommand(ChatCommand cmd) {
+        ContentValues cv = new ContentValues(6);
+        // cv.put("chat_id", cmd.chatId);
+        cv.put("type", cmd.type);
+        cv.put("command", cmd.cmd);
+        cv.put("answer", cmd.answer);
+        cv.put("is_admin", cmd.isAdmin);
+        cv.put("is_enabled", cmd.isEnabled);
+        try {
+            db.update(TABLE_CHAT_COMMAND, cv, "_id=?", new String[]{cmd.id + ""});
+        } catch (Exception e) {
+            MyLog.log(e);
+        }
+    }
+
+    public void clearChatCommands(long chatId) {
+        try {
+            db.delete(TABLE_CHAT_COMMAND, "chat_id=?", new String[]{chatId + ""});
+        } catch (Exception e) {
+            MyLog.log(e);
+        }
+    }
+
+    public ChatCommand getChatCommand(long chatId, String command) {
+        try {
+            Cursor c = getTable("SELECT * FROM " + TABLE_CHAT_COMMAND + " WHERE chat_id=? AND command=? LIMIT 1", new String[]{chatId + "", command});
+            if (c != null) {
+                ChatCommand cmd = new ChatCommand();
+                cmd.id = c.getInt(c.getColumnIndex("_id"));
+                cmd.chatId = c.getInt(c.getColumnIndex("chat_id"));
+                cmd.type = c.getInt(c.getColumnIndex("type"));
+                cmd.cmd = c.getString(c.getColumnIndex("command"));
+                cmd.answer = c.getString(c.getColumnIndex("answer"));
+                cmd.isAdmin = c.getInt(c.getColumnIndex("is_admin")) == 1;
+                cmd.isEnabled = c.getInt(c.getColumnIndex("is_enabled")) == 1;
+
+                c.close();
+                return cmd;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public void deleteChatCommand(long id) {
+        try {
+            db.delete(TABLE_CHAT_COMMAND, "_id=?", new String[]{id + ""});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

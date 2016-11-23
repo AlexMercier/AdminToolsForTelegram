@@ -31,7 +31,7 @@
     <string name="btnContinue">Продолжить</string>
     <string name="create_group">Создать группу</string>
     <string name="create_supergroup">Создать супергруппу</string>
-    <string name="labelAutoBanRules">Анти-спам</string>
+
     <string name="noteAntispamLinks">Примечание: Правила не применяются для админов</string>
     <string name="toast_chat_link_added">Ссылка изменена</string>
     <string name="hint_invite_link_not_created">Ссылка на чат не создана</string>
@@ -260,6 +260,15 @@
     <string name="title_warning_text_before_ban">Текст предупрежения перед банов:</string>
     <string name="title_warn_help">справка по форматированию</string>
     <string name="ban_for_flood">Банить юзера</string>
+    <string name="labelChatTasks">Правила для чата</string>
+    <string name="labelChatCommands">Команды для чата</string>
+    <string name="text_clear_all_commands_for_chat">Удалить все команды для этого чата?</string>
+    <string name="title_dialog_clear_all">Удалить все</string>
+    <string name="labelChatCommand">Команда:\n(например \'/test\')</string>
+    <string name="label_chatCommand_action">Действие для команды:</string>
+    <string name="chk_chatcommand_only_admin_can_execute">Только для админов</string>
+    <string name="title_chat_commands">Команды для автоответов</string>
+    <string name="btn_chat_commands_manage">Редактирование ответов</string>
 
 
     <string-array name="ban_times">
@@ -289,6 +298,11 @@
         <item>Минут</item>
         <item>Часов</item>
         <item>Дней</item>
+    </string-array>
+
+    <string-array name="command_types">
+        <item>Простой ответ</item>
+        <item>Команда KickMe</item>
     </string-array>
 
 </resources>

@@ -162,8 +162,7 @@ public class ActivityBannedWordsList extends ActivityExtended {
 
     private void dialogClearList() {
         new AlertDialog.Builder(mContext)
-                .setCancelable(false)
-                .setTitle(R.string.title_dialog_confirm)
+                .setTitle(R.string.title_dialog_clear_all)
                 .setMessage(R.string.text_clear_all_banwords_for_chat)
                 .setNeutralButton(R.string.btnCancel, null)
                 .setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener() {

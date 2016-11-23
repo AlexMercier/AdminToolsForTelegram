@@ -231,7 +231,7 @@
 
                 </LinearLayout>
 
-                <LinearLayout
+                <LinearLayout android:id="@+id/viewWelcomeText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
@@ -264,7 +264,7 @@
 
                 </LinearLayout>
 
-                <LinearLayout
+                <LinearLayout android:id="@+id/viewOther"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
@@ -309,7 +309,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="@string/labelAutoBanRules"
+                        android:text="@string/labelChatTasks"
                         android:textColor="@color/md_blue_600" />
 
                     <TextView
@@ -372,6 +372,40 @@
 
 
                     </LinearLayout>
+
+
+
+                </LinearLayout>
+
+
+                <LinearLayout android:id="@+id/viewCommands"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:background="@color/md_white_1000"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_chat_commands"
+                        android:textColor="@color/md_blue_600"
+                        android:textStyle="bold" />
+
+
+                    <LinearLayout
+                        android:id="@+id/layer_commands"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" >
+
+                </LinearLayout>
+
+
+
+
+
 
                 </LinearLayout>
 

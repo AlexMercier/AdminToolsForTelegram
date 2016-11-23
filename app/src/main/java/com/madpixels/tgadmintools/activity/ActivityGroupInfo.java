@@ -67,16 +67,16 @@ public class ActivityGroupInfo extends ActivityExtended {
     TextView tvChatUsername, tvUsersCount, tvAdminsCount, tvKickedCount, tvBanLinksWarningCount, tvBanSticksWarningCount,
             tvInviteLink, tvChatType, tvBanWordsAllowCount, tvBtnWarnLinksFreq, tvBtnWarnStickersFreq,
             tvBtnWarnBanWordsFreq, tvBanVoiceWarningCount, tvBtnWarnVoiceFreq, tvFloodMsgAllowCount,
-            tvBtnWarnBanFloodFreq;
+            tvBtnWarnBanFloodFreq, tvChatCommandsCount;
     EmojiconTextView tvTitle, tvChatDescription, tvChatAdmin;
     View viewContent, viewLoading, layerBanLinksAge, layerBanSticksTime, layerBanForBlackWord,
             layerBanVoiceTime, layerFloodControl;
-    Button btnConvertToSuper;
+    Button btnConvertToSuper, btnEditCommands;
     CheckBox chkAnyoneInviteFriendsSuper, chkAnyoneManageGroup, chkRemoveLinks, chkBanForLinks, chkRemoveStickers,
             chkBanForSticks, chkReturnOnBanLinksExpired, chkReturnOnBanSticksExpired,
             chkWelcomeText, chkReturnOnBannedWordsExpired, chkBlackListedWordsEnabled,
             chkRemoveJoinedMsg, chkRemoveLeaveMsg, chkRemoveVoices, chkBanForVoice, chkReturnOnBanVoiceExpired,
-            chkFloodControlEnabled, chkBanFloodUser, chkReturnOnBanFloodExpired;
+            chkFloodControlEnabled, chkBanFloodUser, chkReturnOnBanFloodExpired, chkCommandsEnable;
     EditText edtLinksBanTimeVal, edtSticksBanTimeVal, edtWelcomeText,
             edtBannedWordBanTimesVal, edtLinksFloodTimeVal, edtStickersFloodTimeVal,
             edtBanWordsFloodTimeVal, edtVoiceBanTimeVal, edtVoiceFloodTimeVal, edtFloodControlTimeVal,
@@ -140,6 +140,7 @@ public class ActivityGroupInfo extends ActivityExtended {
         UIUtils.include(this, R.id.layer_links_antispam, R.layout.layout_links_antispam);
         UIUtils.include(this, R.id.layer_voice_antispam, R.layout.layout_voices_antispam);
         UIUtils.include(this, R.id.layer_flood_control, R.layout.layout_flood_control);
+        UIUtils.include(this, R.id.layer_commands, R.layout.layout_commands);
 
         btnAva = getView(R.id.imgBtnChatAva);
         btnConvertToSuper = getView(R.id.btnConvertToSuper);
@@ -155,7 +156,9 @@ public class ActivityGroupInfo extends ActivityExtended {
         tvBanSticksWarningCount = getView(R.id.tvBanSticksWarningCount);
         tvBanLinksWarningCount = getView(R.id.tvBanLinksAllowCount);
         tvInviteLink = getView(R.id.tvInviteLink);
-
+        btnEditCommands = getView(R.id.btnEditCommands);
+        chkCommandsEnable = getView(R.id.chkCommandsEnable);
+        tvChatCommandsCount = getView(R.id.tvChatCommandsCount);
 
         layerBanLinksAge = getView(R.id.layerBanLinksAge);
         layerBanSticksTime = getView(R.id.layerBanSticksTime);
@@ -220,7 +223,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                 tvBtnWarnLinksFreq, tvBtnWarnStickersFreq, tvBtnWarnBanWordsFreq, chkBlackListedWordsEnabled,
                 chkRemoveVoices, chkBanForVoice, tvBtnWarnVoiceFreq, chkReturnOnBanVoiceExpired, tvBanVoiceWarningCount,
                 chkFloodControlEnabled, tvFloodMsgAllowCount, chkBanFloodUser, chkReturnOnBanFloodExpired,
-                tvBtnWarnBanFloodFreq, tvNoticePhoneBookEnabled);
+                tvBtnWarnBanFloodFreq, tvNoticePhoneBookEnabled, btnEditCommands, chkCommandsEnable);
 
         if (Sets.getBoolean(Const.ANTISPAM_IGNORE_SHARED_CONTACTS, Const.ANTISPAM_IGNORE_SHARED_CONTACTS_DEFAULT)) {
             tvNoticePhoneBookEnabled.setText(getString(R.string.label_notice_ignore_antispam_for_shared));
@@ -291,7 +294,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                 chkBanFloodUser.setChecked(taskFlood.isBanUser);
                 tvFloodMsgAllowCount.setText(taskFlood.mAllowCountPerUser + "");
                 chkReturnOnBanFloodExpired.setChecked(taskFlood.isReturnOnBanExpired);
-                if(!taskFlood.isBanUser){
+                if (!taskFlood.isBanUser) {
                     edtFloodBanTimeVal.setEnabled(false);
                     spinnerBanFloodTime.setEnabled(false);
                     chkReturnOnBanFloodExpired.setEnabled(false);
@@ -365,10 +368,24 @@ public class ActivityGroupInfo extends ActivityExtended {
                 setDefaultBannedWordsValues();
             }
 
+            ChatTask taskCommands = chatTasks.getTask(ChatTask.TYPE.COMMAND, false);
+            if (taskCommands != null) {
+                chkCommandsEnable.setChecked(taskCommands.isEnabled);
+                if (!taskCommands.isEnabled) {
+                    btnEditCommands.setEnabled(false);
+                }
+
+                int chatCommandsCount = DBHelper.getInstance().getChatCommandsCount(chatId);
+                tvChatCommandsCount.setText(chatCommandsCount+" commands for this chat");
+
+            } else {
+                btnEditCommands.setEnabled(false);
+            }
 
         } else {
             setDefaultBannedWordsValues();
             setDefaultFloodValues();
+            btnEditCommands.setEnabled(false);
         }
 
         int blackWordsCount = DBHelper.getInstance().getWordsBlackListCount(chatId);
@@ -1131,6 +1148,18 @@ public class ActivityGroupInfo extends ActivityExtended {
                     startActivity(new Intent(mContext, ActivitySettings.class));
                     break;
 
+                case R.id.btnEditCommands:
+                    Intent intent = new Intent(mContext, ActivityChatCommands.class).putExtra("chat_id", chatId);
+                    startActivityForResult(intent, Const.ACTION_REFRESH_COMMANDS);
+                    break;
+
+                case R.id.chkCommandsEnable:
+                    task = chatTasks.getTask(ChatTask.TYPE.COMMAND);
+                    task.isEnabled = chkCommandsEnable.isChecked();
+                    btnEditCommands.setEnabled(task.isEnabled);
+                    chatTasks.saveTask(task);
+                    break;
+
             }
         }
     };
@@ -1292,7 +1321,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                         View view = UIUtils.inflate(mContext, R.layout.layout_dialog_help_warning_formattin);
                         TextView tvHelpText = UIUtils.getView(view, R.id.tvHelpText);
 
-                        String text = getString(R.string.stringName1);
+                        String text = getString(R.string.text_help_formatting);
 
                         tvHelpText.setText(Html.fromHtml(text.replaceAll("(\r\n|\n)", "<br />")));
 
@@ -1685,7 +1714,7 @@ public class ActivityGroupInfo extends ActivityExtended {
     void switchAnyoneCanInviteSuperGroup() {
         if (!isAdmin) {
             MyToast.toast(mContext, R.string.toast_access_denied_admin);
-            chkAnyoneInviteFriendsSuper.setChecked(false);
+            chkAnyoneInviteFriendsSuper.setChecked(superAanyoneCanInvite);
             return;
         }
         final ProgressBar prgChangeState = getView(R.id.prgChangeState);
@@ -1790,6 +1819,10 @@ public class ActivityGroupInfo extends ActivityExtended {
                         if (!channelFull.channel.isSupergroup) {// channel
                             isChannel = true;
                             findViewById(R.id.layerAutoban).setVisibility(View.GONE);
+                            findViewById(R.id.viewOther).setVisibility(View.GONE);
+                            findViewById(R.id.viewWelcomeText).setVisibility(View.GONE);
+                            findViewById(R.id.viewCommands).setVisibility(View.GONE);
+
                             tvKickedCount.setVisibility(View.GONE);
                             chkAnyoneInviteFriendsSuper.setVisibility(View.GONE);
                             setTitle(R.string.action_manage_channel);
@@ -1814,13 +1847,18 @@ public class ActivityGroupInfo extends ActivityExtended {
                     for (final TdApi.ChatMember chatMember : users.members) {
                         if (chatMember.status.getConstructor() == TdApi.ChatMemberStatusCreator.CONSTRUCTOR) {
                             adminId = chatMember.userId;
-                            TgH.sendOnUi(new TdApi.GetChatMember(channelId, chatMember.userId), new Client.ResultHandler() {
+
+                            TgH.send(new TdApi.GetChatMember(channelId, chatMember.userId), new Client.ResultHandler() {
                                 @Override
                                 public void onResult(TdApi.TLObject object) {
                                     TdApi.User admin = TgUtils.getUser(chatMember);
                                     adminName = admin.firstName + " " + admin.lastName;
-
-                                    onSuperGroupInfoLoaded();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            onSuperGroupInfoLoaded();
+                                        }
+                                    });
                                 }
                             });
                             return;

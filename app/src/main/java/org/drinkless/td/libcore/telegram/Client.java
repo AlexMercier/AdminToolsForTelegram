@@ -172,8 +172,7 @@ public class Client implements Runnable {
     }
 
     private Client(ResultHandler updatesHandler, String dir, String filesDir, boolean enableFileLog, boolean useTestDc) {
-        long nativeClientId = NativeClient.createClient();
-        NativeClient.clientInit(nativeClientId, dir, filesDir, enableFileLog, useTestDc);
+        long nativeClientId = NativeClient.createClient(dir, filesDir, enableFileLog, useTestDc);
 
         stopFlag = false;
         this.nativeClientId = nativeClientId;
@@ -192,7 +191,6 @@ public class Client implements Runnable {
     }
 
     private void doStop() {
-        NativeClient.clientClear(nativeClientId);
         NativeClient.destroyClient(nativeClientId);
     }
 

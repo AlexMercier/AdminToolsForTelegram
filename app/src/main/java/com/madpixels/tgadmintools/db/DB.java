@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.madpixels.apphelpers.MyLog;
 import com.madpixels.apphelpers.Sets;
-import com.madpixels.tgadmintools.BuildConfig;
 import com.madpixels.tgadmintools.Const;
 
 import java.util.ArrayList;
@@ -18,14 +17,15 @@ import java.util.ArrayList;
  * Created by Snake on 12.01.2016.
  */
 public class DB extends SQLiteOpenHelper {
-    final static int DATABASE_VERSION = BuildConfig.DEBUG?2:2;
+    final static int DATABASE_VERSION = 3;
     SQLiteDatabase db;
 
     public final static String BAN_INFO_TABLE = "bans_info", TABLE_AUTO_KICK = "auto_kick_users",
-            /* TABLE_ANTISPAM = "antispam_rules",*/ TABLE_WHITE_LINKS = "whitelist_links",
+    /* TABLE_ANTISPAM = "antispam_rules",*/ TABLE_WHITE_LINKS = "whitelist_links",
             TABLE_LOG_ACTIONS = "log", TABLE_ANTISPAM_WARNS = "antispam_warns",
             TABLE_CHAT_WELCOME = "chat_welcome_text", TABLE_BLACKLIST_WORDS = "blacklist_words",
-            TABLE_CHAT_TASKS = "chat_tasks", TABLE_CHATS_LIST = "chats_list";
+            TABLE_CHAT_TASKS = "chat_tasks", TABLE_CHATS_LIST = "chats_list",
+            TABLE_CHAT_COMMAND = "chat_commands";
 
     private final static String
             CREATE_TABLE_TEMPORARY_BANS = "CREATE TABLE " + BAN_INFO_TABLE + " (" +
@@ -43,18 +43,18 @@ public class DB extends SQLiteOpenHelper {
             "unban_errors INTEGER DEFAULT 0, " +
             "UNIQUE(chat_id, user_id)" +
             ");",
-            CREATE_TABLE_CHATS_LIST = "CREATE TABLE "+ TABLE_CHATS_LIST +" (" +
+            CREATE_TABLE_CHATS_LIST = "CREATE TABLE " + TABLE_CHATS_LIST + " (" +
                     "chat_id INTEGER, " +
                     "json_chat_info TEXT, " +
                     "chat_order INTEGER" +
                     ");",
 
-            CREATE_TABLE_AUTO_KICK_USERS = "CREATE TABLE " + TABLE_AUTO_KICK + " (" +
-                    "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "chat_id INTEGER, " +
-                    "user_id INTEGER, " +
-                    "UNIQUE(chat_id, user_id)" +
-                    ");",
+    CREATE_TABLE_AUTO_KICK_USERS = "CREATE TABLE " + TABLE_AUTO_KICK + " (" +
+            "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "chat_id INTEGER, " +
+            "user_id INTEGER, " +
+            "UNIQUE(chat_id, user_id)" +
+            ");",
     /*
             CREATE_TABLE_ANTISPAM = "CREATE TABLE " + TABLE_ANTISPAM + " (" +
                     "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -105,10 +105,10 @@ public class DB extends SQLiteOpenHelper {
                     //  "option_images_banage_multiplier INTEGER," +
                     //  "is_images_return_on_unban INTEGER" +
                     ");", */
-            CREATE_TABLE_WHITE_LINKS = "CREATE TABLE " + TABLE_WHITE_LINKS + " (" +
-                    "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "link TEXT UNIQUE" +
-                    " );'",
+    CREATE_TABLE_WHITE_LINKS = "CREATE TABLE " + TABLE_WHITE_LINKS + " (" +
+            "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "link TEXT UNIQUE" +
+            " );'",
             CREATE_TABLE_LOG = "CREATE TABLE " + TABLE_LOG_ACTIONS + " (" +
                     "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "action TEXT, " +
@@ -155,7 +155,17 @@ public class DB extends SQLiteOpenHelper {
                     "is_ban INTEGER, " +
                     "is_remove_msg INTEGER," +
                     "UNIQUE(chat_id, type) " +
-                    ");";
+                    ");",
+        CREATE_TABLE_CHAT_COMMANDS = "CREATE TABLE "+TABLE_CHAT_COMMAND+" (" +
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "chat_id INTEGER, " +
+                "command TEXT, " +
+                "type INTEGER, " +
+                "is_enabled INTEGER, " +
+                "is_admin INTEGER, " +
+                "answer TEXT, " +
+                "UNIQUE(chat_id, command) " +
+                ");";
 
 
     public DB(Context context) {
@@ -181,6 +191,7 @@ public class DB extends SQLiteOpenHelper {
 
         db.execSQL(CREATE_TABLE_CHAT_TASKS);
         db.execSQL(CREATE_TABLE_CHATS_LIST);
+        db.execSQL(CREATE_TABLE_CHAT_COMMANDS);
     }
 
     @Override
@@ -195,7 +206,11 @@ public class DB extends SQLiteOpenHelper {
                 db.execSQL(CREATE_TABLE_BLACKLIST_WORDS.replace(TABLE_BLACKLIST_WORDS, "table_tmp"));
                 db.execSQL(" INSERT INTO table_tmp (chatID, word) SELECT chatID, word FROM " + TABLE_BLACKLIST_WORDS);
                 db.execSQL("DROP TABLE " + TABLE_BLACKLIST_WORDS);
-                db.execSQL("ALTER TABLE table_tmp RENAME TO "+TABLE_BLACKLIST_WORDS);
+                db.execSQL("ALTER TABLE table_tmp RENAME TO " + TABLE_BLACKLIST_WORDS);
+            }
+
+            if(oldVersion<3){
+                db.execSQL(CREATE_TABLE_CHAT_COMMANDS);
             }
         } catch (SQLException e) {
             MyLog.log(e);

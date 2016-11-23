@@ -29,6 +29,56 @@ public class AdminUtils {
         }
     }
 
+    public static void checkIsCreator(TdApi.Chat chat, int userId, Callback pCallback) {
+        if(TgUtils.isSuperGroup(chat.type.getConstructor())){
+            TdApi.ChannelChatInfo ci = (TdApi.ChannelChatInfo) chat.type;
+            AdminUtils.checkIsCreatorInSuperGroup(ci.channel.id, userId, pCallback);
+        }else{
+            TdApi.GroupChatInfo gi = (TdApi.GroupChatInfo) chat.type;
+            AdminUtils.checkIsCreatorInGroup(gi.group.id, userId, pCallback);
+        }
+    }
+
+    public static void checkIsCreatorInSuperGroup(int channelId, final int userid, final Callback pCallback) {
+        TdApi.ChannelMembersFilter f = new TdApi.ChannelMembersAdministrators();
+        TgH.send(new TdApi.GetChannelMembers(channelId, f, 0, 25), new Client.ResultHandler() {
+            @Override
+            public void onResult(TdApi.TLObject object) {
+                TdApi.ChatMembers users = (TdApi.ChatMembers) object;
+                for (TdApi.ChatMember cp : users.members) {
+                    if (cp.userId == userid) {
+                        boolean isCreator = cp.status.getConstructor()== TdApi.ChatMemberStatusCreator.CONSTRUCTOR;
+                        pCallback.onResult(isCreator);
+                        return;
+                    }
+                }
+                pCallback.onResult(false);
+            }
+        });
+    }
+
+    public static void checkIsCreatorInGroup(int groupId, final int userid, final Callback pCallback) {
+        TdApi.TLFunction f = new TdApi.GetGroupFull(groupId);
+        TgH.send(f, new Client.ResultHandler() {
+            @Override
+            public void onResult(TdApi.TLObject object) {
+                if(object.getConstructor()!= TdApi.GroupFull.CONSTRUCTOR)
+                    return;
+                TdApi.GroupFull group = (TdApi.GroupFull) object;
+
+                for (TdApi.ChatMember cp : group.members) {
+                    if ( cp.userId == userid) {
+                        boolean isCreator = cp.status.getConstructor()== TdApi.ChatMemberStatusCreator.CONSTRUCTOR;
+                        pCallback.onResult(isCreator);
+                        return;
+                    }
+                }
+                pCallback.onResult(false);
+            }
+        });
+    }
+
+
     public static void getChatAdmins(TdApi.Chat chat, Client.ResultHandler onResult){
         if(TgUtils.isSuperGroup(chat.type.getConstructor())){
             TdApi.ChannelChatInfo ci = (TdApi.ChannelChatInfo) chat.type;
@@ -103,8 +153,9 @@ public class AdminUtils {
                 TdApi.GroupFull group = (TdApi.GroupFull) object;
 
                 for (TdApi.ChatMember cp : group.members) {
-                    if ( cp.userId == userid && TgUtils.isUserPrivileged(cp.status.getConstructor()) ) {
-                        pCallback.onResult(true);
+                    if ( cp.userId == userid) {
+                        boolean isAdmin =  TgUtils.isUserPrivileged(cp.status.getConstructor());
+                        pCallback.onResult(isAdmin);
                         return;
                     }
                 }
@@ -151,4 +202,6 @@ public class AdminUtils {
             }
         });
     }
+
+
 }

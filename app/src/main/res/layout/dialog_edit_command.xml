@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/labelChatCommand"
+        />
+
+    <EditText
+        android:id="@+id/edtCommand"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:hint="enter command here"
+        android:lines="1"
+        android:maxLines="1"
+        android:singleLine="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_chatCommand_action"
+        />
+
+
+    <Spinner
+        android:id="@+id/spinnerCommandType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+    </Spinner>
+
+
+
+
+    <EditText
+        android:id="@+id/edtCommandAnswer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:hint="Enter answer here"
+
+        android:maxLines="4"
+
+        android:gravity="top|center_vertical" />
+
+    <TextView
+        android:text="@string/title_warn_help"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/text_clickable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvHelpFormat"
+        android:layout_marginTop="3dp" />
+
+
+
+
+    <CheckBox
+        android:id="@+id/chkIsAdmin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/chk_chatcommand_only_admin_can_execute" />
+
+    <CheckBox
+        android:id="@+id/chkEnable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/check_enabled" />
+
+
+</LinearLayout>
