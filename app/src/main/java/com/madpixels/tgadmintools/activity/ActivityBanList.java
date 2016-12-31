@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -70,7 +69,7 @@ public class ActivityBanList extends ActivityExtended {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_banlist);
         setTitle(R.string.title_ban_list);
-        Toolbar tb = UIUtils.setToolbarWithBackArrow(this, R.id.toolbar);
+        UIUtils.setToolbarWithBackArrow(this, R.id.toolbar);
         AdHelper.showBanner(findViewById(R.id.adView));
 
         Bundle b = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();

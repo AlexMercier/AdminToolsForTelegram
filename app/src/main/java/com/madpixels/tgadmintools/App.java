@@ -36,8 +36,8 @@ public class App extends Application{
         setupAcra();
 
         if(BuildConfig.DEBUG){
-//            String s = getFilesDir().getParent()+"/databases/database_773790.db";
-//            new File(s).delete();
+            String s = getFilesDir().getParent()+"/databases/database_773790.db";
+           // new java.io.File(s).delete();
         }
 
         Sets.getInstance().init(this);

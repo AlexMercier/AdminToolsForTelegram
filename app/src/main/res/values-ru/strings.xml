@@ -48,7 +48,7 @@
     <string name="online_last_seen">в сети: недавно</string>
     <string name="last_seen_at">был в сети</string>
     <string name="founded_deleted_users">Найдено %s удалённых аккаунтов. Удалить их из чата?</string>
-    <string name="close">Закрыть</string>
+    <string name="btnClose">Закрыть</string>
     <string name="revoke_user_admin">Снять права админа</string>
     <string name="ban_reason">Причина бана</string>
     <string name="action_group_was_converted">Группа переведена в супергруппу</string>
@@ -64,10 +64,9 @@
     <string name="logAction_autoUnban">Пользователь удалён из бана после истечения срока бана</string>
     <string name="logAction_banForLink">Бан за спам</string>
     <string name="logAction_banForSticker">Бан за флуд стикерами</string>
-    <string name="logAction_removeLink">Удалено сообщение со ссылкой</string>
-    <string name="logAction_removeSticker">Удалено сообщение со стикером</string>
+    <string name="logAction_removedLink">Удалено сообщение со ссылкой</string>
+    <string name="logAction_removedSticker">Удалено сообщение со стикером</string>
     <string name="logAction_banForBlackWord">Баз за запрещённое слово</string>
-
 
 
     <string name="label_allow_count">Сколько раз можно нарушать правило:</string>
@@ -95,7 +94,7 @@
     <string name="logAction_unbanByAdminInvite">Разбан по приглашению админа</string>
     <string name="action_show_log_notification">Показывать уведомления событий</string>
     <string name="action_clear_log">Очистить журнал</string>
-    <string name="btn_yes">Да</string>
+    <string name="btnYes">Да</string>
     <string name="chk_remove_messages_links">Удалять сообщения со ссылками</string>
     <string name="chk_remove_messages_stickers">Удалять сообщения со стикерами</string>
     <string name="titleLogLifetime">Срок хранения журнала</string>
@@ -122,14 +121,14 @@
     <string name="create_chat_title">Название чата</string>
     <string name="dialog_new_chat_title">Создание группы</string>
     <string name="group_created">Группа создана</string>
-    <string name="label_empty">Список пуст</string>
+    <string name="text_list_empty">Список пуст</string>
     <string name="text_ban_time">Время бана:</string>
     <string name="text_ban_permanently">Бан навсегда</string>
     <string name="text_ban_temporary">Временный бан. Дата разбана:</string>
     <string name="action_unban_all">Разбанить всех</string>
     <string name="textRoleAdmin">Администратор</string>
     <string name="textRoleModerator">Модератор</string>
-    <string name="textChatRole"></string>
+
     <string name="check_enabled">Включено</string>
     <string name="hint_enter_welcome_text">Задайте текст для приветствия новых участников</string>
     <string name="hint_chat_description">Описание чата</string>
@@ -140,7 +139,7 @@
     <string name="hint_each_whitelink_at_new_line">Каждая ссылка с новой строки</string>
     <string name="hint_blackwords">Введите каждое слово с новой строки</string>
     <string name="check_delMsgBlackWords">Удалять сообщения с запрещенными словами</string>
-    <string name="logAction_delMsgWithBlackWord">Удалено сообщение с запрещенным словом</string>
+    <string name="logAction_removedBlackWordMessage">Удалено сообщение с запрещенным словом</string>
     <string name="dialog_title_logout">Выход</string>
     <string name="dialog_text_logout">Сменить учётную запись?</string>
     <string name="dialog_title_auth">Авторизация</string>
@@ -174,6 +173,8 @@
     <string name="warntext_links_default_firts">Первое предупреждение. Прекрати спамить</string>
     <string name="warntext_stickers_default_last">Последнее предупреждение. Флуд стикерами</string>
     <string name="warntext_banword_first">Первое предупреждение. Использование запрещённого слова</string>
+    <string name="warntext_bangame_first">Предупреждение. Игры запрещены в чате</string>
+    <string name="warntext_banphoto_first">Первое предупреждение. Флуд изображениями запрещён</string>
     <string name="action_copy">Копировать</string>
     <string name="text_about_app">Приложение для мессенджера Telegram для помощи в администрировании групп.</string>
     <string name="button_rate_us">Пожалуйста оцените приложение в GooglePlay</string>
@@ -208,7 +209,7 @@
     <string name="tex_warn_count_for_user_before_ban">Сколько раз предупреждать юзера:</string>
 
     <string name="log_title_group">Группа</string>
-    <string name="log_title_username" >Пользователь</string>
+    <string name="log_title_username">Пользователь</string>
     <string name="log_title_time">Время</string>
     <string name="log_title_bantime">Забанен на</string>
     <string name="log_title_banuntil">Бан до</string>
@@ -222,7 +223,7 @@
     <string name="action_change_user_admin_role">Изменить права админа</string>
     <string name="chk_remove_banword_messages">Удалять сообщения с этим словом</string>
     <string name="chk_ban_user_for_banword">Банить юзера</string>
-    <string name="hint_enter_ban_word" >Введите слово</string>
+    <string name="hint_enter_ban_word">Введите слово</string>
     <string name="btnAdd">Добавить</string>
     <string name="title_add_banned_word">Добавить новое слово</string>
     <string name="toast_word_is_empty">Текст пуст</string>
@@ -246,14 +247,14 @@
     <string name="action_banwords_import_from_chat">Импортировать слова из другого чата</string>
     <string name="title_import_words">Выберите слова для импорта</string>
     <string name="text_flood_messages_count_per_user">Разрешённое кол-во сообщений</string>
-    <string name="text_flood_control_watch_within_time">Контролировать в течении времени:</string>
+    <string name="text_flood_control_watch_within_time">Отслеживать в течении времени:</string>
     <string name="logAction_banForFlood">Бан за флуд</string>
     <string name="warntext_flood_default_last">Последнее предупреждение. Чрезмерный флуд запрещён</string>
     <string name="btnBanUser">Забанить</string>
-    <string name="btn_banned_words_list_empty">Список слов пуст.\nНажмите чтобы добавить</string>
+    <string name="btn_banned_words_list_empty">Список слов пуст</string>
     <string name="banned_words_count">%d запрещенных слов</string>
-    <string name="logAction_delMsgForFlood">Удалено флуд сообщение</string>
-    <string name="logAction_removeVoice">Удалено войс-сообщение</string>
+    <string name="logAction_removedFloodMessage">Удалено флуд сообщение</string>
+    <string name="logAction_removedVoice">Удалено войс-сообщение</string>
     <string name="text_antispam_alert_title">Antispam alert!</string>
     <string name="caption_alerts_title">Заголовок уведомлений антиспама</string>
     <string name="action_add_link_to_wl">Добавить ссылку в список исключений</string>
@@ -269,6 +270,91 @@
     <string name="chk_chatcommand_only_admin_can_execute">Только для админов</string>
     <string name="title_chat_commands">Команды для автоответов</string>
     <string name="btn_chat_commands_manage">Редактирование ответов</string>
+    <string name="text_label_inviter">Пригласил:</string>
+    <string name="error_auth_pin_incorrect">Ошибка\nНеверный пароль для входа (PIN)</string>
+    <string name="error_phone_not_registered">Введённый номер телефона не зарегистрирован.\nПопробовать ещё раз?</string>
+    <string name="label_commands_count_in_chat">для этого чата</string>
+    <string name="label_no_commands_in_chat">Вы ещё не добавили команды</string>
+    <string name="title_select_task_for_chat">Выберите правило, чтобы применить его к чату</string>
+    <string name="toast_task_already_applied">Это правило уже добавлено.\nДолгое нажатие - удалить правило</string>
+    <string name="title_add_new_task_for_chat">Добавить правило</string>
+    <string name="hint_press_to_add_command">Нажмите + для добавления команды</string>
+    <string name="title_task_stickers">Стикеры</string>
+    <string name="title_task_voices">Войсы</string>
+    <string name="title_task_links">Ссылки (антиспам)</string>
+    <string name="warntext_bangame_last">Последнее предупреждение! Игры в чате запрещены</string>
+    <string name="logAction_banForGame">Бан за игры в чате</string>
+    <string name="title_task_game">Игры через @gamebot</string>
+    <string name="title_task_photos">Изображения</string>
+    <string name="chk_remove_messages_game">Удалять сообщения с Играми</string>
+    <string name="chkTitleBanForGames">Банить за Игры</string>
+    <string name="title_task_add_stickers">Стикеры</string>
+    <string name="title_task_add_voices">Войсы</string>
+    <string name="title_task_add_link">Ссылки (антиспам)</string>
+    <string name="title_task_add_games">Игры via @gamebot</string>
+    <string name="logAction_execCommandError">Ошибка при ответе на команду</string>
+    <string name="title_banwords">Запрещённые слова</string>
+    <string name="title_flood_control">Флуд-лимит</string>
+    <string name="warntext_banphoto_last">Последнее предупреждение. Прекрати флудить фотками</string>
+    <string name="logAction_banForPhotos">Баз за изображения</string>
+    <string name="title_task_add_photos">Изображения</string>
+    <string name="logAction_removedGameMessage">Удалено сообщение с Игрой</string>
+    <string name="logAction_removedPhoto">Удалено сообщение с изображением</string>
+    <string name="chk_remove_messages_photos">Удалять сообщения с изображениями</string>
+    <string name="chkTitleBanForPhotos">Банить за изображения</string>
+    <string name="title_task_docs">Документы</string>
+    <string name="chk_remove_messages_docs">Удалять сообщения с файлами</string>
+    <string name="chkTitleBanForDocs">Банить за файлы</string>
+    <string name="logAction_removedDocs">Удалено сообщение с документом</string>
+    <string name="logAction_DocsFloodWarn">Предупреждение пользователя о флуде документами!</string>
+    <string name="logAction_PhotosFloodWarn">Предупреждение пользователя о флуде изображениями!</string>
+    <string name="title_task_add_documents">Документы</string>
+    <string name="logAction_banForDocs">Ban for attachments flood</string>
+    <string name="warntext_bandocs_first">Первое предупреждение. Флуд файлами запрещён!</string>
+    <string name="warntext_bandocs_last">Последнее предупреждение. Флуд файлами запрещён!</string>
+    <string name="title_remove_taskfrom_added">Удалить правило</string>
+    <string name="text_confirm_remove_task">Подтвердите удаление правила?</string>
+    <string name="chk_remove_messages_gif">Удалять сообщения с гифками</string>
+    <string name="chkTitleBanForGif">Банить за гифки</string>
+    <string name="logAction_banForGifs">Бан за флуд гифками</string>
+    <string name="logAction_removedGif">Удалено сообщение GIF</string>
+    <string name="logAction_gifsFloodWarn">Предупреждение о флуде гифками</string>
+    <string name="warntext_bangifs_first">Предупреждение. Флуд гифками запрещён!</string>
+    <string name="warntext_bangifs_last">Последнее предупреждение. Флуд гифками запрещён!</string>
+    <string name="title_task_audio">Аудио файлы</string>
+    <string name="chk_remove_messages_audio">Удалять сообщения с аудио</string>
+    <string name="chkTitleBanForAudio">Банить за аудио</string>
+    <string name="logAction_banForAudio">Бан за Аудио</string>
+    <string name="logAction_removedAudio">Удалено сообщение с Аудио</string>
+    <string name="logAction_audioFloodWarn">Предупреждение о флуде музыкой</string>
+    <string name="warntext_banAudio_first">Предупреждение. Флуд аудиозаписями запрещён!</string>
+    <string name="warntext_banAudio_last">Последнее предупреждение. Флуд аудиозаписями запрещён!</string>
+    <string name="title_task_video">Видео</string>
+    <string name="chk_remove_messages_video">Удалять сообщения с видео</string>
+    <string name="chkTitleBanForVideo">Банить за видео</string>
+    <string name="warntext_banVideo_first">Предупреждение. Флуд видеозаписями запрещён!</string>
+    <string name="warntext_banVideo_last">Последнее предупреждение. Флуд видеозаписями запрещён!</string>
+    <string name="logAction_banForVideo">Бан за видео</string>
+    <string name="logAction_removedVideo">Удалено сообщение с видео</string>
+    <string name="logAction_videoFloodWarn">Предупреждение о флуде видеозаписями</string>
+    <string name="logAction_removedMutedMessage">Удалено сообщение от рид-онли юзера</string>
+    <string name="text_select_users_to_mute">Выберите пользователей которым запрещено писать.\nСообщения от этих пользователей будут удаляться</string>
+    <string name="title_task_mute_users">Read-Only режим</string>
+    <string name="text_no_muted_users">Пользователи не выбраны</string>
+    <string name="label_select_user_to_mute">Выберите кого добавить в рид-онли</string>
+    <string name="label_select_user_to_remove_mute">Выберите кого убрать из рид-онли</string>
+    <string name="toast_user_added_to_muted">Пользователь добавлен в рид-онли</string>
+    <string name="toast_user_removed_from_muted">Пользователь удалён из рид-онли</string>
+
+    <string name="dialog_recent_changes">
+        Новое в v.%s
+        \nПереработано меню добавления правил к чату
+        \nОбработка фильтром всех типов вложений: Gif, Audio, Video, Game, Doc etc..
+        \nДобавлено меню Read-only - все сообщения выбранного юзера будут удаляться
+        \nДобавлен экспорта журнала событий правил в Телеграм
+        \nМелкие исправления в авторизации по смс/звонку
+        \nФиксы хештегов в фильтре чёрного списка слов
+    </string>
 
 
     <string-array name="ban_times">
@@ -303,6 +389,18 @@
     <string-array name="command_types">
         <item>Простой ответ</item>
         <item>Команда KickMe</item>
+    </string-array>
+
+    <string-array name="commands_plural">
+        <item>команда</item><!-- 1 command -->
+        <item>команды</item><!-- 2 commands -->
+        <item>команд</item><!-- 5 commands -->
+    </string-array>
+
+    <string-array name="muted_users_plural">
+        <item>рид-онли юзер</item><!-- 1 command -->
+        <item>рид-онли юзера</item><!-- 2 commands -->
+        <item>рид-онли юзеров</item><!-- 5 commands -->
     </string-array>
 
 </resources>

@@ -1,33 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp">
 
     <EditText
+        android:id="@+id/ePhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/ePhone"
         android:hint="@string/auth_phone_hint"
-        android:singleLine="true"
- />
+        android:singleLine="true" />
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <Button
+            android:id="@+id/bLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/btn_submit"
-            android:id="@+id/bLogin" />
+            android:text="@string/btn_submit" />
 
         <Button
+            android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/btnCancel"
-            android:id="@+id/btnCancel" />
+            android:text="@string/btnCancel" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvResendSMS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_marginTop="8dp" android:layout_marginBottom="8dp"
+        android:padding="8dp"
+        android:text="Resend SMS Code"
+        android:textColor="@color/md_teal_500" />
 
 </LinearLayout>

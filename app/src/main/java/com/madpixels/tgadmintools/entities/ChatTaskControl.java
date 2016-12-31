@@ -16,8 +16,6 @@ public class ChatTaskControl {
 
     public long chatId;
     ArrayList<ChatTask> tasks;
-    //// public AntispamTask taskLinks, taskStickers, taskRemoveNotificationUserLeave,
-    //         taskRemoveNotificationUserJoined, taskBanWords, taskVoice;
 
     public ChatTaskControl(long chatId) {
         this(chatId, false);
@@ -25,26 +23,10 @@ public class ChatTaskControl {
 
     public ChatTaskControl(long chatId, boolean onlyActiveTasks) {
         this.chatId = chatId;
-        tasks = DBHelper.getInstance().getAntispamTasks(chatId, onlyActiveTasks);
+        tasks = DBHelper.getInstance().getChatTasks(chatId, onlyActiveTasks);
         if (tasks == null) {
             return;
         }
-//        for (ChatTask task : tasks) {
-//            switch (task.mType) {
-//                case LINKS:
-//                  //  taskLinks = task;
-//                    break;
-//                case STICKERS:
-//                 //   taskStickers = task;
-//                    break;
-//                case BANWORDS:
-//                  //  taskBanWords = task;
-//                    break;
-//                case VOICE:
-//                   // taskVoice = task;
-//                    break;
-//            }
-//        }
     }
 
 
@@ -65,22 +47,29 @@ public class ChatTaskControl {
         return false;
     }
 
+    /*
     public boolean hasLinksTask() {
         ChatTask task = getTask(ChatTask.TYPE.LINKS, false);
         if (task != null && (task.isRemoveMessage || task.isBanUser))
             return true;
         return false;
     }
+    */
 
     public boolean isBanForLinks() {
         ChatTask task = getTask(ChatTask.TYPE.LINKS, false);
         return task.isBanUser;
     }
 
+    public boolean hasAttachmentTask(ChatTask.TYPE type) {
+        ChatTask task = getTask(type, false);
+        return task != null && (task.isRemoveMessage || task.isBanUser);
+    }
+    /*
     public boolean hasStickerTask() {
         ChatTask task = getTask(ChatTask.TYPE.STICKERS, false);
         return task != null && (task.isRemoveMessage || task.isBanUser);
-    }
+    }*/
 
     public boolean hasBanWords() {
         ChatTask task = getTask(ChatTask.TYPE.BANWORDS, false);
@@ -92,10 +81,21 @@ public class ChatTaskControl {
         return task != null && (task.isEnabled);
     }
 
+    public boolean hasWelcomeText() {
+        ChatTask task = getTask(ChatTask.TYPE.WELCOME_USER, false);
+        return task != null && (task.isEnabled);
+    }
     public boolean hasFloodControl() {
         ChatTask task = getTask(ChatTask.TYPE.FLOOD, false);
         return task != null && task.isEnabled;
     }
+
+    /*
+    public boolean hasGameTask() {
+        ChatTask task = getTask(ChatTask.TYPE.GAME, false);
+        return task != null && (task.isRemoveMessage || task.isBanUser);
+    }
+    */
 
     public boolean isEmpty() {
         return tasks == null || tasks.isEmpty();
@@ -114,7 +114,8 @@ public class ChatTaskControl {
                 return task;
         if (!createNew)
             return null;
-        // if task not exists, create new
+
+        // If task not exists, create new:
         ChatTask task = new ChatTask(type.toString(), chatId);
 
         if(type== ChatTask.TYPE.FLOOD) {
@@ -132,11 +133,14 @@ public class ChatTaskControl {
     }
 
     public void saveTask(ChatTask task) {
-        DBHelper.getInstance().saveAntispamTask(task);
+        DBHelper.getInstance().saveChatTask(task);
         if (task.isBanUser || task.isRemoveMessage || task.isEnabled)
             ServiceChatTask.start(App.getContext());
     }
 
 
+    public void remove(ChatTask task) {
+        tasks.remove(task);
+    }
 }
 

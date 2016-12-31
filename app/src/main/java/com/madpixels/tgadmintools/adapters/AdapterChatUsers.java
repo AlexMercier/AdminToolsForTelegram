@@ -123,7 +123,7 @@ public class AdapterChatUsers extends BaseAdapter {
         String inviter = getInviter(member.inviterUserId);
 
 
-        tvInviter.setText(inviter != null ? "Пригласил: "+inviter : "");
+        tvInviter.setText(inviter != null ? mContext.getString(R.string.text_label_inviter) +" " + inviter : "");
 
         return view;
     }

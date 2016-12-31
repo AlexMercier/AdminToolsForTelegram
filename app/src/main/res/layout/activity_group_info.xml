@@ -3,10 +3,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/md_grey_200">
 
 
     <include layout="@layout/toolbar" />
+
 
     <View
         android:id="@+id/dummyFocus"
@@ -42,10 +44,11 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
+                    android:background="@color/md_white_1000"
                     android:orientation="horizontal"
                     android:padding="8dp">
 
@@ -54,8 +57,8 @@
                         android:layout_width="50px"
                         android:layout_height="50px"
                         android:background="@null"
-                        android:src="@drawable/no_avatar"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/no_avatar" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -64,10 +67,11 @@
                         android:orientation="vertical">
 
                         <io.github.rockerhieu.emojicon.EmojiconTextView
-                            android:id="@+id/tvTitle" android:textStyle="bold"
+                            android:id="@+id/tvTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Chat title" />
+                            android:text="Chat title"
+                            android:textStyle="bold" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -75,7 +79,6 @@
                             android:orientation="horizontal">
 
                             <TextView
-                                android:id="@+id/textView9"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginRight="4dp"
@@ -114,7 +117,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="16dp"
+                    android:background="@color/md_white_1000"
                     android:orientation="vertical"
                     android:padding="8dp">
 
@@ -162,7 +165,6 @@
                     android:id="@+id/viewChatDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
                     android:background="@color/md_white_1000"
                     android:orientation="vertical"
                     android:padding="8dp">
@@ -188,17 +190,18 @@
                 <Button
                     android:id="@+id/btnConvertToSuper"
                     style="@style/MyButton"
-
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp"
                     android:text="Upgrade to supergroup" />
 
                 <LinearLayout
                     android:id="@+id/counters"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/md_white_1000"
                     android:orientation="vertical"
                     android:padding="8dp">
 
@@ -231,10 +234,12 @@
 
                 </LinearLayout>
 
-                <LinearLayout android:id="@+id/viewWelcomeText"
+
+                <LinearLayout
+                    android:id="@+id/viewWelcomeText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
+                    android:layout_marginTop="8dp"
                     android:background="@color/md_white_1000"
                     android:orientation="vertical"
                     android:padding="8dp">
@@ -254,20 +259,31 @@
                         android:checked="false"
                         android:text="@string/check_enabled" />
 
-                    <EditText
-                        android:id="@+id/edtWelcomeText"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tvWelcomeTextShort"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="@string/hint_enter_welcome_text"
-                        android:lines="1"
-                        android:maxLines="4" />
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="16dp"
+                        android:layout_weight="0"
+                        android:background="?attr/selectableItemBackground"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:paddingBottom="8dp"
+                        android:paddingTop="8dp"
+                        android:text="@string/hint_enter_welcome_text"
+                        android:textAlignment="center"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/md_teal_500" />
+
 
                 </LinearLayout>
 
-                <LinearLayout android:id="@+id/viewOther"
+                <LinearLayout
+                    android:id="@+id/viewOther"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
+                    android:layout_marginTop="8dp"
                     android:background="@color/md_white_1000"
                     android:orientation="vertical"
                     android:padding="8dp">
@@ -297,117 +313,138 @@
 
 
                 <LinearLayout
-                    android:id="@+id/layerAutoban"
+                    android:id="@+id/layerTasksParent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:background="@color/md_white_1000"
+
+                    android:layout_marginTop="8dp"
                     android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:text="@string/labelChatTasks"
-                        android:textColor="@color/md_blue_600" />
-
-                    <TextView
-                        android:id="@+id/textView14"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:text="@string/noteAntispamLinks" />
-
-                    <TextView
-                        android:id="@+id/tvNoticePhoneBookEnabled"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp" android:textColor="@color/md_green_500"
-                        android:text="@string/label_notice_ignore_antispam_for_shared" />
+                    android:paddingBottom="8dp"
+                    android:paddingTop="8dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@color/md_white_1000"
                         android:orientation="vertical"
-                        android:paddingLeft="8dp"
-                        android:paddingRight="8dp">
+                        android:padding="8dp">
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:text="@string/labelChatTasks"
+                            android:textAllCaps="true"
+                            android:textColor="@color/md_blue_600"
+                            android:textStyle="bold" />
 
+                        <TextView
+                            android:id="@+id/textView14"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:text="@string/noteAntispamLinks" />
 
-
-                        <LinearLayout
-                            android:id="@+id/layer_links_antispam"
+                        <TextView
+                            android:id="@+id/tvNoticePhoneBookEnabled"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical" android:layout_marginBottom="16dp"></LinearLayout>
+                            android:layout_marginBottom="4dp"
+                            android:text="@string/label_notice_ignore_antispam_for_shared"
+                            android:textColor="@color/md_green_500" />
 
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layerTasks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+
+                        android:orientation="vertical">
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/viewStaticTasks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="vertical">
 
                         <LinearLayout
-                            android:id="@+id/layer_stickers_antispam"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical" android:layout_marginBottom="16dp"></LinearLayout>
-
-
-                        <LinearLayout  android:layout_marginBottom="16dp"
                             android:id="@+id/layer_words_antispam"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical">
+                            android:layout_marginBottom="8dp"
+                            android:background="@color/md_white_1000"
+                            android:orientation="vertical"
+                            android:padding="8dp">
 
-                            <LinearLayout
-                                android:id="@+id/layer_voice_antispam"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical" android:layout_marginBottom="16dp" />
 
                         </LinearLayout>
+
 
                         <LinearLayout
                             android:id="@+id/layer_flood_control"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical" android:layout_marginBottom="16dp"></LinearLayout>
+                            android:layout_marginBottom="8dp"
+                            android:background="@color/md_white_1000"
+                            android:orientation="vertical"></LinearLayout>
 
 
                     </LinearLayout>
 
-
-
-                </LinearLayout>
-
-
-                <LinearLayout android:id="@+id/viewCommands"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:background="@color/md_white_1000"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/title_chat_commands"
-                        android:textColor="@color/md_blue_600"
-                        android:textStyle="bold" />
-
-
                     <LinearLayout
-                        android:id="@+id/layer_commands"
+                        android:id="@+id/viewMuted"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical" >
+                        android:layout_marginBottom="8dp"
+                        android:background="@color/md_white_1000"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <include layout="@layout/layout_mute_users" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/viewCommands"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@color/md_white_1000"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <LinearLayout
+                            android:id="@+id/layer_commands"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layerLog"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@color/md_white_1000"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <include layout="@layout/layer_log_forward" />
+
+                    </LinearLayout>
+
 
                 </LinearLayout>
 
-
-
-
-
-
-                </LinearLayout>
 
             </LinearLayout>
         </ScrollView>

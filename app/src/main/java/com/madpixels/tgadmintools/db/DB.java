@@ -17,15 +17,16 @@ import java.util.ArrayList;
  * Created by Snake on 12.01.2016.
  */
 public class DB extends SQLiteOpenHelper {
-    final static int DATABASE_VERSION = 3;
+    final static int DATABASE_VERSION = 4;
     SQLiteDatabase db;
 
     public final static String BAN_INFO_TABLE = "bans_info", TABLE_AUTO_KICK = "auto_kick_users",
     /* TABLE_ANTISPAM = "antispam_rules",*/ TABLE_WHITE_LINKS = "whitelist_links",
             TABLE_LOG_ACTIONS = "log", TABLE_ANTISPAM_WARNS = "antispam_warns",
-            TABLE_CHAT_WELCOME = "chat_welcome_text", TABLE_BLACKLIST_WORDS = "blacklist_words",
+            /* TABLE_CHAT_WELCOME = "chat_welcome_text",*/ TABLE_BLACKLIST_WORDS = "blacklist_words",
             TABLE_CHAT_TASKS = "chat_tasks", TABLE_CHATS_LIST = "chats_list",
-            TABLE_CHAT_COMMAND = "chat_commands";
+            TABLE_CHAT_COMMAND = "chat_commands", TABLE_CHAT_LOG="chat_log",
+            TABLE_MUTED_USERS="muted_users";
 
     private final static String
             CREATE_TABLE_TEMPORARY_BANS = "CREATE TABLE " + BAN_INFO_TABLE + " (" +
@@ -124,12 +125,12 @@ public class DB extends SQLiteOpenHelper {
                     "ts INTEGER," +
                     "UNIQUE(chatId, userId, action)" +
                     ");",
-            CREATE_TABLE_CHAT_WELCOMES = "CREATE TABLE " + TABLE_CHAT_WELCOME + " (" +
+            /*CREATE_TABLE_CHAT_WELCOMES = "CREATE TABLE " + TABLE_CHAT_WELCOME + " (" +
                     "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "chatId INTEGER UNIQUE, " +
                     "text TEXT, " +
                     "isEnabled INTEGER" +
-                    ");",
+                    ");", */
             CREATE_TABLE_BLACKLIST_WORDS = "CREATE TABLE " + TABLE_BLACKLIST_WORDS + " (" +
                     "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "chatId INTEGER, " +
@@ -150,6 +151,7 @@ public class DB extends SQLiteOpenHelper {
                     // "is_warn_before_ban INTEGER, " +
                     "warn_text_first TEXT, " +
                     "warn_text_last TEXT," +
+                    "text TEXT," + //some payload
                     "warn_freq INTEGER, " +
                     "within_time_sec INTEGER, " +
                     "is_ban INTEGER, " +
@@ -165,6 +167,20 @@ public class DB extends SQLiteOpenHelper {
                 "is_admin INTEGER, " +
                 "answer TEXT, " +
                 "UNIQUE(chat_id, command) " +
+                ");",
+        CREATE_TABLE_CHAT_LOG = "CREATE TABLE "+TABLE_CHAT_LOG+" (" +
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "chat_id INTEGER, " +
+                "chat_id_log INTEGER," +
+                "isEnabled INTEGER" +
+                "" +
+                ");",
+        CREATE_TABLE_MUTED_USERS="CREATE TABLE "+TABLE_MUTED_USERS+" (" +
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "chat_id INTEGER, " +
+                "user_id INTEGER, " +
+                "user_name TEXT, " +
+                "UNIQUE(chat_id, user_id)" +
                 ");";
 
 
@@ -186,12 +202,14 @@ public class DB extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_WHITE_LINKS);
         db.execSQL(CREATE_TABLE_LOG);
         db.execSQL(CREATE_TABLE_ANTISPAM_WARNS);
-        db.execSQL(CREATE_TABLE_CHAT_WELCOMES);
+        // db.execSQL(CREATE_TABLE_CHAT_WELCOMES);
         db.execSQL(CREATE_TABLE_BLACKLIST_WORDS);
 
         db.execSQL(CREATE_TABLE_CHAT_TASKS);
         db.execSQL(CREATE_TABLE_CHATS_LIST);
         db.execSQL(CREATE_TABLE_CHAT_COMMANDS);
+        db.execSQL(CREATE_TABLE_CHAT_LOG);
+        db.execSQL(CREATE_TABLE_MUTED_USERS);
     }
 
     @Override
@@ -211,6 +229,11 @@ public class DB extends SQLiteOpenHelper {
 
             if(oldVersion<3){
                 db.execSQL(CREATE_TABLE_CHAT_COMMANDS);
+            }
+            if(oldVersion<4){
+                db.execSQL(CREATE_TABLE_CHAT_LOG);
+                db.execSQL(CREATE_TABLE_MUTED_USERS);
+                db.execSQL("ALTER TABLE "+TABLE_CHAT_TASKS+" ADD COLUMN text TEXT;");
             }
         } catch (SQLException e) {
             MyLog.log(e);

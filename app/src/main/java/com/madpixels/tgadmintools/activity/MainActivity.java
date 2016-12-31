@@ -52,8 +52,8 @@ import libs.AdHelper;
 public class MainActivity extends ActivityExtended {
 
 
-
     TextView tvAdditionalStatus;
+    private boolean skipShowActivity = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +63,14 @@ public class MainActivity extends ActivityExtended {
         UIUtils.setToolbar(this, R.id.toolbar);
         AdHelper.setup(this);
 
-        if(savedInstanceState==null){
+        if (savedInstanceState == null) {
             onAppUpgrade();
         }
+
+
+//        if (BuildConfig.DEBUG) {
+//            dialogRecentChanges();
+//        }
 
         tvAdditionalStatus = (TextView) findViewById(R.id.tvAdditionalStatus);
 
@@ -73,7 +78,7 @@ public class MainActivity extends ActivityExtended {
         final Button btnStop = (Button) findViewById(R.id.btnStop);
         final CheckBox checkBoxWriteLog = (CheckBox) findViewById(R.id.checkBoxWriteLog);
 
-        if(!BuildConfig.DEBUG) {
+        if (!BuildConfig.DEBUG) {
             btnClearCache.setVisibility(View.GONE);
             checkBoxWriteLog.setVisibility(View.GONE);
         }
@@ -93,7 +98,8 @@ public class MainActivity extends ActivityExtended {
         checkBoxWriteLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MyLog.WRITE_TO_FILE=checkBoxWriteLog.isChecked();;
+                MyLog.WRITE_TO_FILE = checkBoxWriteLog.isChecked();
+                ;
                 MyToast.toast(getApplication(), "write is " + (MyLog.WRITE_TO_FILE ? "enabled" : "disabled"));
             }
         });
@@ -129,7 +135,7 @@ public class MainActivity extends ActivityExtended {
             }
         }, 1300);
 
-        if(BuildConfig.DEBUG) {// for debug write log only
+        if (BuildConfig.DEBUG) {// for debug write log only
             checkStoragePermissions();
         }
     }
@@ -149,7 +155,7 @@ public class MainActivity extends ActivityExtended {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == Const.ACTION_REQUEST_STORAGE_PERMISSION && grantResults.length > 0) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 MyToast.toast(mContext, "Storage permission granted");
             }
 
@@ -158,10 +164,12 @@ public class MainActivity extends ActivityExtended {
 
     private void onAppUpgrade() {
         int oldVersion = Sets.getInteger("TgAppVersion", 0);
-        if(BuildConfig.VERSION_CODE>oldVersion){
+        if (BuildConfig.VERSION_CODE > oldVersion) {
             Sets.set("TgAppVersion", BuildConfig.VERSION_CODE);
+            if (oldVersion > 0) {
+                dialogRecentChanges();
+            }
         }
-
     }
 
     public static void initializeLanguage(Context c) {
@@ -225,7 +233,7 @@ public class MainActivity extends ActivityExtended {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title_logout)
                 .setMessage(R.string.dialog_text_logout)
-               .setNegativeButton(R.string.btnCancel, null)
+                .setNegativeButton(R.string.btnCancel, null)
                 .setPositiveButton(R.string.btnContinue, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -249,22 +257,23 @@ public class MainActivity extends ActivityExtended {
     }
 
 
-
     void checkAuthState(TdApi.TLObject object) {
         if (TgUtils.isError(object)) {
             TdApi.Error e = (TdApi.Error) object;
             switch (e.code) {
                 case 400:
-                    MyToast.toast(MainActivity.this, e.message);
-                    switch (e.message){
+                    switch (e.message) {
                         case "PHONE_CODE_INVALID":
                             showLoginDialog(TdApi.AuthStateWaitCode.CONSTRUCTOR);
+                            MyToast.toast(MainActivity.this, e.message);
                             break;
                         case "PHONE_NUMBER_INVALID":
                             showLoginDialog(TdApi.AuthStateWaitPhoneNumber.CONSTRUCTOR);
+                            MyToast.toast(MainActivity.this, e.message);
                             break;
                         case "PASSWORD_HASH_INVALID":
                             showLoginDialog(TdApi.AuthStateWaitPassword.CONSTRUCTOR);
+                            MyToast.toast(MainActivity.this, R.string.error_auth_pin_incorrect);
                             break;
                         default:
                             Analytics.sendReport("AuthError", e.message, e.toString());
@@ -281,10 +290,18 @@ public class MainActivity extends ActivityExtended {
         }
 
         TdApi.AuthState authState = (TdApi.AuthState) object;
+
         switch (authState.getConstructor()) {
             case TdApi.AuthStateWaitCode.CONSTRUCTOR:
+                TdApi.AuthStateWaitCode stateWaitCode = (TdApi.AuthStateWaitCode) authState;
+                boolean isRegistered = stateWaitCode.isRegistered;
+                if (!isRegistered) {
+                    showInstantErrorDialog(null);
+                    return;
+                }
+
                 tvAdditionalStatus.setText("Requared sms code...");
-                showLoginDialog(authState.getConstructor());
+                showLoginDialog(authState.getConstructor(), stateWaitCode.nextCodeType);
                 break;
             case TdApi.AuthStateWaitPhoneNumber.CONSTRUCTOR:
                 showLoginDialog(authState.getConstructor());
@@ -305,11 +322,13 @@ public class MainActivity extends ActivityExtended {
         TgH.getProfile(new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                startActivity(new Intent(mContext, ActivityGroupsList.class));
+                if (!skipShowActivity) /* if skipShowActivity then no show activity */
+                    startActivity(new Intent(mContext, ActivityGroupsList.class));
                 ServiceUnbanTask.registerTask(mContext);
                 ServiceAutoKicker.registerTask(mContext);
                 ServiceChatTask.start(mContext);
                 ServiceGarbageCollector.start(mContext);
+                // test();
 
 
 //                int rulesCount = DBHelper.getInstance().getChatRulesCount(); // кол-во правил чата
@@ -321,6 +340,30 @@ public class MainActivity extends ActivityExtended {
 //                        tvAdditionalStatus.setText(tvAdditionalStatus.getText().toString()+"\n"+text);
 //                    }
 //                });
+            }
+        });
+    }
+
+    private void test() {
+        String username = "etozhechat";
+        TdApi.SearchPublicChat searchPublicChat = new TdApi.SearchPublicChat(username);
+        TG.getClientInstance().send(searchPublicChat, new Client.ResultHandler() {
+            @Override
+            public void onResult(TdApi.TLObject object) {
+                MyLog.log(object.toString());
+                TdApi.Chat chat = (TdApi.Chat) object;
+                TdApi.Message topMessage = chat.topMessage;
+
+                long chatId = chat.id;
+
+                TdApi.GetChatHistory getChatHistory = new TdApi.GetChatHistory(chatId, topMessage.id, 0, 15);
+                TG.getClientInstance().send(getChatHistory, new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.TLObject object) {
+                        MyLog.log(object.toString());
+                        TdApi.Messages messages = (TdApi.Messages) object;
+                    }
+                });
             }
         });
     }
@@ -347,16 +390,24 @@ public class MainActivity extends ActivityExtended {
     }
 
     private void showLoginDialog(final int action) {
+        showLoginDialog(action, null);
+    }
+
+    private void showLoginDialog(final int action, TdApi.AuthCodeType nextAuthCodeType) {
         final View view = getLayoutInflater().inflate(R.layout.dialog_login, null);
         final AlertDialog d = new AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setTitle(R.string.dialog_title_auth)
                 .setView(view)
                 .show();
+
+
         final Button login = (Button) view.findViewById(R.id.bLogin);
         final Button btnCancel = (Button) view.findViewById(R.id.btnCancel);
         final EditText eEditText = (EditText) view.findViewById(R.id.ePhone);
-
+        final TextView tvResendSMS = UIUtils.getView(view, R.id.tvResendSMS);
+        if (nextAuthCodeType == null)
+            tvResendSMS.setVisibility(View.GONE);
 
         switch (action) {
             case TdApi.AuthStateWaitPhoneNumber.CONSTRUCTOR:
@@ -383,6 +434,30 @@ public class MainActivity extends ActivityExtended {
             }
         });
 
+        if (nextAuthCodeType != null) {
+            if (nextAuthCodeType.getConstructor() == TdApi.AuthCodeTypeSms.CONSTRUCTOR)
+                tvResendSMS.setText("Resend SMS Code");
+            else if (nextAuthCodeType.getConstructor() == TdApi.AuthCodeTypeCall.CONSTRUCTOR)
+                tvResendSMS.setText("Call auth code");
+
+            tvResendSMS.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    login.setEnabled(false);
+                    eEditText.setEnabled(false);
+                    v.setEnabled(false);
+                    login.setText(R.string.label_loading);
+                    TgH.sendOnUi(new TdApi.ResendAuthCode(), new Client.ResultHandler() {
+                        @Override
+                        public void onResult(TdApi.TLObject object) {
+                            d.dismiss();
+                            checkAuthState(object);
+                        }
+                    });
+                }
+            });
+        }
+
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -391,7 +466,7 @@ public class MainActivity extends ActivityExtended {
                 TdApi.TLFunction func = null;
                 switch (action) {
                     case TdApi.AuthStateWaitPhoneNumber.CONSTRUCTOR:
-                        func = new TdApi.SetAuthPhoneNumber(text, false, true);
+                        func = new TdApi.SetAuthPhoneNumber(text, true, true);
                         break;
                     case TdApi.AuthStateWaitCode.CONSTRUCTOR:
                         func = new TdApi.CheckAuthCode(text, null, null);
@@ -408,6 +483,7 @@ public class MainActivity extends ActivityExtended {
                 TgH.send(func, new Client.ResultHandler() {
                     @Override
                     public void onResult(final TdApi.TLObject object) {
+                        MyLog.log(object.toString());
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -431,11 +507,19 @@ public class MainActivity extends ActivityExtended {
 
 
     private void showInstantErrorDialog(TdApi.Error e) {
+        TgH.send(new TdApi.ResetAuth());// cancel current auth
+        String error_msg;
+        if (e != null)
+            error_msg = "Error code: " + e.code + "\nError message: " + e.message + "\n" +
+                    "Try again?";
+        else
+            error_msg = getString(R.string.error_phone_not_registered);
+
+
         new AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setTitle("Auth error")
-                .setMessage("Error code: " + e.code + "\nError message: " + e.message + "\n" +
-                        "Try again?")
+                .setMessage(error_msg)
                 .setPositiveButton("Login", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -452,20 +536,20 @@ public class MainActivity extends ActivityExtended {
     }
 
 
-    void dialogAbout(){
+    void dialogAbout() {
         View v = UIUtils.inflate(mContext, R.layout.dialog_about);
         TextView version = UIUtils.getView(v, R.id.tvVersion);
         TextView tvReleaseDate = UIUtils.getView(v, R.id.tvReleaseDate);
         TextView tvRateUs = UIUtils.getView(v, R.id.tvRateUs);
         TextView tvContact = UIUtils.getView(v, R.id.tvContact);
 
-        version.setText("v"+BuildConfig.VERSION_NAME);
+        version.setText("v" + BuildConfig.VERSION_NAME);
         tvReleaseDate.setText(R.string.buildDate);
 
-        View.OnClickListener onClickListener=new View.OnClickListener() {
+        View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (v.getId()){
+                switch (v.getId()) {
                     case R.id.tvContact:
                         Utils.openUrl("https://telegram.me/TgAndroAdminToolsBot", mContext);
                         break;
@@ -476,7 +560,7 @@ public class MainActivity extends ActivityExtended {
             }
         };
 
-       UIUtils.setBatchClickListener(onClickListener, tvRateUs, tvContact);
+        UIUtils.setBatchClickListener(onClickListener, tvRateUs, tvContact);
 
         new AlertDialog.Builder(mContext)
                 .setTitle("About")
@@ -484,5 +568,14 @@ public class MainActivity extends ActivityExtended {
                 .setNegativeButton("Close", null)
                 .show();
 
+    }
+
+    void dialogRecentChanges() {
+        skipShowActivity = true;
+        new AlertDialog.Builder(mContext)
+                .setTitle("Changelog")
+                .setMessage(getString(R.string.dialog_recent_changes, BuildConfig.VERSION_NAME))
+                .setNegativeButton(R.string.btnClose, null)
+                .show();
     }
 }

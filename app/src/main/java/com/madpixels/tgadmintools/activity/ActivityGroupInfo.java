@@ -1,5 +1,8 @@
 package com.madpixels.tgadmintools.activity;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,16 +10,22 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
 import android.text.Html;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -24,14 +33,17 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.madpixels.apphelpers.MyLog;
 import com.madpixels.apphelpers.MyToast;
 import com.madpixels.apphelpers.Sets;
 import com.madpixels.apphelpers.UIUtils;
@@ -40,10 +52,16 @@ import com.madpixels.apphelpers.ui.ActivityExtended;
 import com.madpixels.apphelpers.ui.ProgressDialogBuilder;
 import com.madpixels.tgadmintools.Const;
 import com.madpixels.tgadmintools.R;
+import com.madpixels.tgadmintools.adapters.AdapterChatUsersLocal;
 import com.madpixels.tgadmintools.db.DBHelper;
+import com.madpixels.tgadmintools.entities.Callback;
+import com.madpixels.tgadmintools.entities.ChatLogInfo;
 import com.madpixels.tgadmintools.entities.ChatTask;
 import com.madpixels.tgadmintools.entities.ChatTaskControl;
+import com.madpixels.tgadmintools.fragments.FragmentSelectGroup;
+import com.madpixels.tgadmintools.fragments.FragmentSelectUsers;
 import com.madpixels.tgadmintools.helper.DialogInputValue;
+import com.madpixels.tgadmintools.helper.TaskValues;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
 import com.madpixels.tgadmintools.services.ServiceChatTask;
@@ -52,11 +70,14 @@ import com.madpixels.tgadmintools.utils.TgImageGetter;
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.github.rockerhieu.emojicon.EmojiconEditText;
 import io.github.rockerhieu.emojicon.EmojiconTextView;
 import libs.AdHelper;
+import view.FloatingActionButton;
 
 /**
  * Created by Snake on 29.02.2016.
@@ -64,28 +85,28 @@ import libs.AdHelper;
 public class ActivityGroupInfo extends ActivityExtended {
 
     ImageButton btnAva;
-    TextView tvChatUsername, tvUsersCount, tvAdminsCount, tvKickedCount, tvBanLinksWarningCount, tvBanSticksWarningCount,
-            tvInviteLink, tvChatType, tvBanWordsAllowCount, tvBtnWarnLinksFreq, tvBtnWarnStickersFreq,
-            tvBtnWarnBanWordsFreq, tvBanVoiceWarningCount, tvBtnWarnVoiceFreq, tvFloodMsgAllowCount,
+    TextView tvChatUsername, tvUsersCount, tvAdminsCount, tvKickedCount, tvMutedUsersCount,
+            tvInviteLink, tvChatType, tvBanWordsAllowCount, tvSelectLogChat, tvWelcomeTextShort,
+            tvBtnWarnBanWordsFreq, tvFloodMsgAllowCount,
             tvBtnWarnBanFloodFreq, tvChatCommandsCount;
     EmojiconTextView tvTitle, tvChatDescription, tvChatAdmin;
-    View viewContent, viewLoading, layerBanLinksAge, layerBanSticksTime, layerBanForBlackWord,
-            layerBanVoiceTime, layerFloodControl;
-    Button btnConvertToSuper, btnEditCommands;
-    CheckBox chkAnyoneInviteFriendsSuper, chkAnyoneManageGroup, chkRemoveLinks, chkBanForLinks, chkRemoveStickers,
-            chkBanForSticks, chkReturnOnBanLinksExpired, chkReturnOnBanSticksExpired,
+    View viewContent, viewLoading, layerBanForBlackWord,
+            layerFloodControl, layerClickOpenCommand;
+    Button btnConvertToSuper;
+    CheckBox chkAnyoneInviteFriendsSuper, chkAnyoneManageGroup, chkEnableMuteUsers,
             chkWelcomeText, chkReturnOnBannedWordsExpired, chkBlackListedWordsEnabled,
-            chkRemoveJoinedMsg, chkRemoveLeaveMsg, chkRemoveVoices, chkBanForVoice, chkReturnOnBanVoiceExpired,
+            chkRemoveJoinedMsg, chkRemoveLeaveMsg, chkEnableLogToChat,
             chkFloodControlEnabled, chkBanFloodUser, chkReturnOnBanFloodExpired, chkCommandsEnable;
-    EditText edtLinksBanTimeVal, edtSticksBanTimeVal, edtWelcomeText,
-            edtBannedWordBanTimesVal, edtLinksFloodTimeVal, edtStickersFloodTimeVal,
-            edtBanWordsFloodTimeVal, edtVoiceBanTimeVal, edtVoiceFloodTimeVal, edtFloodControlTimeVal,
+    EditText //edtWelcomeText,
+            edtBannedWordBanTimesVal,
+            edtBanWordsFloodTimeVal, edtFloodControlTimeVal,
             edtFloodBanTimeVal;
-    Spinner spinnerLinksBanFloodTime, spinnerStickersFloodTime, spinnerBanTimesSticks, spinnerBanTimesLink,
-            spinnerBanWordsFloodTime, spinnerBannedWordBanTimes, spinnerBanVoiceTime, spinnerVoiceFloodTime,
+    Spinner
+            spinnerBanWordsFloodTime, spinnerBannedWordBanTimes,
             spinnerFloodControlTime, spinnerBanFloodTime;
-    SeekBar seekBarBanVoiceAllowCount;
+
     private PopupWindow mCurrentPopupWindow;
+    FloatingActionButton fabButton;
 
 
     int chatType;
@@ -95,15 +116,12 @@ public class ActivityGroupInfo extends ActivityExtended {
     int chatUsersCount, adminsCount, kickedCount;
     boolean isAdmin = false; // creator
     boolean superAanyoneCanInvite, groupAnyoneCanEdit;
-    SeekBar seekBarBanLinksCount, seekBarBanSticksCount;
 
     String adminName;
     int adminId = 0;
     boolean isChannel = false;
 
-    private TdApi.GroupFull groupFull;
-
-    ChatTaskControl chatTasks;
+    private ChatTaskControl chatTasks;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -134,11 +152,50 @@ public class ActivityGroupInfo extends ActivityExtended {
         viewLoading = getView(R.id.prgLoading);
         viewContent.setVisibility(View.GONE);
 
+        fabButton = new FloatingActionButton.Builder(this)
+                .withDrawable(R.drawable.plus_2_32)
+                .withButtonColor(Color.WHITE)
+                .withGravity(Gravity.BOTTOM | Gravity.RIGHT)
+                .withMargins(0, 0, 16, 16)
+                .create();
+        fabButton.setId(R.id.btnFab);
+        fabButton.setVisibility(View.INVISIBLE);
+
+        final ScrollView scrollViewMainContent = getView(R.id.scrollViewMainContent);
+        scrollViewMainContent.setOnTouchListener(new View.OnTouchListener() {
+            int startTouchY = 0, lastScrollY = 0;
+            boolean SCROLL_DIRECTION_TO_DOWN = false;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (isChannel) // fabButton not for channels
+                    return false;
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    startTouchY = scrollViewMainContent.getScrollY();
+                    lastScrollY = startTouchY;
+                } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    int scrollY = scrollViewMainContent.getScrollY();
+                    if (scrollY > lastScrollY) {// scroll to Down
+                        if (!SCROLL_DIRECTION_TO_DOWN)
+                            startTouchY = scrollY;
+                        SCROLL_DIRECTION_TO_DOWN = true;
+                        if (scrollY - startTouchY > 10)
+                            fabButton.hideFloatingActionButton();
+                    } else if (scrollY < lastScrollY) {
+                        if (SCROLL_DIRECTION_TO_DOWN)
+                            startTouchY = scrollY;
+                        SCROLL_DIRECTION_TO_DOWN = false;
+                        if (startTouchY - scrollY > 2)
+                            fabButton.showFloatingActionButton();
+                    }
+                    lastScrollY = scrollY;
+                }
+                return false;
+            }
+        });
+
 
         UIUtils.include(this, R.id.layer_words_antispam, R.layout.layout_words_antispam);
-        UIUtils.include(this, R.id.layer_stickers_antispam, R.layout.layout_stickers_antispam);
-        UIUtils.include(this, R.id.layer_links_antispam, R.layout.layout_links_antispam);
-        UIUtils.include(this, R.id.layer_voice_antispam, R.layout.layout_voices_antispam);
         UIUtils.include(this, R.id.layer_flood_control, R.layout.layout_flood_control);
         UIUtils.include(this, R.id.layer_commands, R.layout.layout_commands);
 
@@ -151,58 +208,31 @@ public class ActivityGroupInfo extends ActivityExtended {
         tvChatAdmin = getView(R.id.tvMainAdmin);
         tvAdminsCount = getView(R.id.tvAdminsCount);
         tvKickedCount = getView(R.id.tvKickedCount);
-        seekBarBanLinksCount = getView(R.id.seekBarBanLinksCount);
-        seekBarBanSticksCount = getView(R.id.seekBarBanSticksCount);
-        tvBanSticksWarningCount = getView(R.id.tvBanSticksWarningCount);
-        tvBanLinksWarningCount = getView(R.id.tvBanLinksAllowCount);
         tvInviteLink = getView(R.id.tvInviteLink);
-        btnEditCommands = getView(R.id.btnEditCommands);
+        //btnEditCommands = getView(R.id.btnEditCommands);
+        layerClickOpenCommand = getView(R.id.layerClickOpenCommand);
         chkCommandsEnable = getView(R.id.chkCommandsEnable);
         tvChatCommandsCount = getView(R.id.tvChatCommandsCount);
-
-        layerBanLinksAge = getView(R.id.layerBanLinksAge);
-        layerBanSticksTime = getView(R.id.layerBanSticksTime);
-        chkReturnOnBanSticksExpired = getView(R.id.chkReturnOnBanSticksExpired);
-        chkReturnOnBanLinksExpired = getView(R.id.chkReturnOnBanLinksExpired);
         tvChatType = getView(R.id.tvChatType);
-        edtWelcomeText = getView(R.id.edtWelcomeText);
+        // edtWelcomeText = getView(R.id.edtWelcomeText);
+        tvWelcomeTextShort = getView(R.id.tvWelcomeTextShort);
         chkWelcomeText = getView(R.id.chkWelcomeText);
         chkReturnOnBannedWordsExpired = getView(R.id.chkReturnOnBannedWordsExpired);
         layerBanForBlackWord = getView(R.id.layerBanForBlackWord);
         chkRemoveJoinedMsg = getView(R.id.chkRemoveJoinedMsg);
         chkRemoveLeaveMsg = getView(R.id.chkRemoveLeaveMsg);
-        //edtBanWordWarnText = getView(R.id.edtBanWordWarnText);
         tvBanWordsAllowCount = getView(R.id.tvBanWordsAllowCount);
         TextView tvNoticePhoneBookEnabled = getView(R.id.tvNoticePhoneBookEnabled);
-        tvBtnWarnLinksFreq = getView(R.id.tvBtnWarnLinksFreq);
-        edtStickersFloodTimeVal = getView(R.id.edtStickersFloodTimeVal);
-        spinnerStickersFloodTime = getView(R.id.spinnerStickersFloodTime);
-        tvBtnWarnStickersFreq = getView(R.id.tvBtnWarnStickersFreq);
         tvBtnWarnBanWordsFreq = getView(R.id.tvBtnWarnBanWordsFreq);
         chkBlackListedWordsEnabled = getView(R.id.chkBlackListedWordsEnabled);
         edtBanWordsFloodTimeVal = getView(R.id.edtBanWordsFloodTimeVal);
         spinnerBanWordsFloodTime = getView(R.id.spinnerBanWordsFloodTime);
-        spinnerLinksBanFloodTime = getView(R.id.spinnerLinksBanFloodTime);
-        edtLinksFloodTimeVal = getView(R.id.edtLinksBanFloodTimeVal);
         spinnerBannedWordBanTimes = getView(R.id.spinnerBannedWordBanTimes);
         edtBannedWordBanTimesVal = getView(R.id.edtBannedWordBanTimesVal);
-        spinnerBanTimesSticks = getView(R.id.spinnerBanSticksAge);
-        edtSticksBanTimeVal = getView(R.id.edtSticksBanTimeVal);
-        layerBanVoiceTime = getView(R.id.layerBanVoiceTime);
-        edtVoiceFloodTimeVal = getView(R.id.edtVoiceFloodTimeVal);
         chkFloodControlEnabled = getView(R.id.chkFloodControlEnabled);
         tvFloodMsgAllowCount = getView(R.id.tvFloodMsgAllowCount);
 
-        chkRemoveVoices = getView(R.id.chkRemoveVoices);
-        chkBanForVoice = getView(R.id.chkBanForVoice);
-        chkReturnOnBanVoiceExpired = getView(R.id.chkReturnOnBanVoiceExpired);
 
-        edtVoiceBanTimeVal = getView(R.id.edtVoiceBanTimeVal);
-        seekBarBanVoiceAllowCount = getView(R.id.seekBarBanVoiceAllowCount);
-        tvBanVoiceWarningCount = getView(R.id.tvBanVoiceWarningCount);
-        tvBtnWarnVoiceFreq = getView(R.id.tvBtnWarnVoiceFreq);
-        spinnerBanVoiceTime = getView(R.id.spinnerBanVoiceTime);
-        spinnerVoiceFloodTime = getView(R.id.spinnerVoiceFloodTime);
         edtFloodControlTimeVal = getView(R.id.edtFloodControlTimeVal);
         spinnerFloodControlTime = getView(R.id.spinnerFloodControlTime);
         chkBanFloodUser = getView(R.id.chkBanFloodUser);
@@ -211,19 +241,23 @@ public class ActivityGroupInfo extends ActivityExtended {
         spinnerBanFloodTime = getView(R.id.spinnerBanFloodTime);
         layerFloodControl = getView(R.id.layerFloodControl);
         tvBtnWarnBanFloodFreq = getView(R.id.tvBtnWarnBanFloodFreq);
-
+        tvSelectLogChat = getView(R.id.tvSelectLogChat);
+        chkEnableLogToChat = getView(R.id.chkEnableLogToChat);
+        chkEnableMuteUsers = getView(R.id.chkEnableMuteUsers);
+        View layerClickOpenMuted = getView(R.id.layerClickOpenMuted);
+        tvMutedUsersCount = getView(R.id.tvMutedUsersCount);
         TextView tvBannedWordsCount = getView(R.id.tvBannedWordsCount);
 
         setTitle(R.string.title_group_info);
         tvTitle.setText(chatTitle);
 
-        UIUtils.setBatchClickListener(onClickListener, tvChatUsername, btnConvertToSuper, tvTitle, tvChatAdmin, tvChatDescription,
+        UIUtils.setBatchClickListener(onClickListener, tvChatUsername, btnConvertToSuper, tvTitle, tvChatAdmin,
                 tvInviteLink, tvAdminsCount, tvUsersCount, tvKickedCount, chkReturnOnBannedWordsExpired,
-                tvBanLinksWarningCount, tvBanSticksWarningCount, tvBanWordsAllowCount, tvBannedWordsCount,
-                tvBtnWarnLinksFreq, tvBtnWarnStickersFreq, tvBtnWarnBanWordsFreq, chkBlackListedWordsEnabled,
-                chkRemoveVoices, chkBanForVoice, tvBtnWarnVoiceFreq, chkReturnOnBanVoiceExpired, tvBanVoiceWarningCount,
+                tvBanWordsAllowCount, tvBannedWordsCount, fabButton, tvSelectLogChat, chkEnableLogToChat,
+                tvBtnWarnBanWordsFreq, chkBlackListedWordsEnabled, chkEnableMuteUsers, tvChatDescription,
                 chkFloodControlEnabled, tvFloodMsgAllowCount, chkBanFloodUser, chkReturnOnBanFloodExpired,
-                tvBtnWarnBanFloodFreq, tvNoticePhoneBookEnabled, btnEditCommands, chkCommandsEnable);
+                tvBtnWarnBanFloodFreq, tvNoticePhoneBookEnabled, layerClickOpenCommand, chkCommandsEnable,
+                layerClickOpenMuted, tvWelcomeTextShort, chkWelcomeText);
 
         if (Sets.getBoolean(Const.ANTISPAM_IGNORE_SHARED_CONTACTS, Const.ANTISPAM_IGNORE_SHARED_CONTACTS_DEFAULT)) {
             tvNoticePhoneBookEnabled.setText(getString(R.string.label_notice_ignore_antispam_for_shared));
@@ -241,23 +275,22 @@ public class ActivityGroupInfo extends ActivityExtended {
         }
         UIUtils.setBatchClickListener(onClickListener, chkAnyoneInviteFriendsSuper, chkAnyoneManageGroup);
 
-        chkRemoveLinks = getView(R.id.chkRemoveLinks);
-        chkBanForLinks = getView(R.id.chkBanForLinks);
-        chkRemoveStickers = getView(R.id.chkRemoveStickers);
-        chkBanForSticks = getView(R.id.chkBanForSticks);
 
-        UIUtils.setBatchClickListener(onClickListener, chkRemoveLinks, chkRemoveStickers, chkBanForSticks, chkBanForLinks,
-                chkReturnOnBanLinksExpired, chkReturnOnBanSticksExpired,
-                chkRemoveLeaveMsg, chkRemoveJoinedMsg);
+        UIUtils.setBatchClickListener(onClickListener, chkRemoveLeaveMsg, chkRemoveJoinedMsg);
 
-        spinnerBanTimesLink = getView(R.id.spinnerBanLinksAge);
-        edtLinksBanTimeVal = getView(R.id.edtLinksBanTimeVal);
 
         chatTasks = new ChatTaskControl(chatId);
 
-        setTask(ChatTask.TYPE.VOICE);
-        setTask(ChatTask.TYPE.STICKERS);
-        setTask(ChatTask.TYPE.LINKS);
+
+        addTask(ChatTask.TYPE.LINKS, false);
+        addTask(ChatTask.TYPE.STICKERS, false);
+        addTask(ChatTask.TYPE.VOICE, false);
+        addTask(ChatTask.TYPE.IMAGES, false);
+        addTask(ChatTask.TYPE.GIF, false);
+        addTask(ChatTask.TYPE.AUDIO, false);
+        addTask(ChatTask.TYPE.VIDEO, false);
+        addTask(ChatTask.TYPE.GAME, false);
+        addTask(ChatTask.TYPE.DOCS, false);
 
 
         setSpinnerBanTimesListener(ChatTask.TYPE.BANWORDS, spinnerBannedWordBanTimes, edtBannedWordBanTimesVal, chkReturnOnBannedWordsExpired);
@@ -271,10 +304,10 @@ public class ActivityGroupInfo extends ActivityExtended {
             btnConvertToSuper.setVisibility(View.GONE);
         } else {
             tvChatType.setText(R.string.chatTypeGroup);
-            UIUtils.setTextColotRes(chkRemoveLinks, R.color.md_grey_500);
-            UIUtils.setTextColotRes(chkRemoveStickers, R.color.md_grey_500);
             UIUtils.setTextColotRes(chkRemoveJoinedMsg, R.color.md_grey_500);
             UIUtils.setTextColotRes(chkRemoveLeaveMsg, R.color.md_grey_500);
+            UIUtils.setTextColotRes(chkEnableMuteUsers, R.color.md_grey_500);
+            UIUtils.setTextColotRes(tvMutedUsersCount, R.color.md_grey_500);
         }
 
 
@@ -282,6 +315,11 @@ public class ActivityGroupInfo extends ActivityExtended {
             ChatTask taskJoinMsg = chatTasks.getTask(ChatTask.TYPE.JoinMsg, false);
             if (taskJoinMsg != null) {
                 chkRemoveJoinedMsg.setChecked(taskJoinMsg.isEnabled);
+            }
+
+            ChatTask taskMutedUsers = chatTasks.getTask(ChatTask.TYPE.MutedUsers, false);
+            if (taskMutedUsers != null) {
+                chkEnableMuteUsers.setChecked(taskMutedUsers.isEnabled);
             }
 
             ChatTask taskFlood = chatTasks.getTask(ChatTask.TYPE.FLOOD, false);
@@ -307,11 +345,11 @@ public class ActivityGroupInfo extends ActivityExtended {
                     spinnerFloodControlTime.setTag(1);// flag for skip save changes
                     spinnerFloodControlTime.setSelection(0);
                 } else {
-                    setSecondsToFormat(taskFlood.mWarningsDuringTime, edtFloodControlTimeVal, spinnerFloodControlTime);
+                    setSecondsFormatToSpinner(taskFlood.mWarningsDuringTime, edtFloodControlTimeVal, spinnerFloodControlTime);
                 }
 
                 if (taskFlood.mBanTimeSec > 0) {
-                    setSecondsToFormat(taskFlood.mBanTimeSec, edtFloodBanTimeVal, spinnerBanFloodTime);
+                    setSecondsFormatToSpinner(taskFlood.mBanTimeSec, edtFloodBanTimeVal, spinnerBanFloodTime);
                 } else {// 0 - permanent ban.
 
                     edtFloodBanTimeVal.setTag("1");
@@ -339,7 +377,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                 chkBlackListedWordsEnabled.setChecked(taskBanWords.isEnabled);
 
                 if (taskBanWords.mBanTimeSec > 0) {
-                    setSecondsToFormat(taskBanWords.mBanTimeSec, edtBannedWordBanTimesVal, spinnerBannedWordBanTimes);
+                    setSecondsFormatToSpinner(taskBanWords.mBanTimeSec, edtBannedWordBanTimesVal, spinnerBannedWordBanTimes);
                 } else {// 0 - permanent ban.
                     edtBannedWordBanTimesVal.setTag("1");
                     edtBannedWordBanTimesVal.setText("5");
@@ -358,7 +396,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                     spinnerBanWordsFloodTime.setTag(1);// flag for skip save changes
                     spinnerBanWordsFloodTime.setSelection(0);
                 } else {
-                    setSecondsToFormat(taskBanWords.mWarningsDuringTime, edtBanWordsFloodTimeVal, spinnerBanWordsFloodTime);
+                    setSecondsFormatToSpinner(taskBanWords.mWarningsDuringTime, edtBanWordsFloodTimeVal, spinnerBanWordsFloodTime);
                 }
 
                 if (!taskBanWords.isEnabled)
@@ -372,20 +410,24 @@ public class ActivityGroupInfo extends ActivityExtended {
             if (taskCommands != null) {
                 chkCommandsEnable.setChecked(taskCommands.isEnabled);
                 if (!taskCommands.isEnabled) {
-                    btnEditCommands.setEnabled(false);
+                    // layerClickOpenCommand.setEnabled(false);
                 }
 
-                int chatCommandsCount = DBHelper.getInstance().getChatCommandsCount(chatId);
-                tvChatCommandsCount.setText(chatCommandsCount+" commands for this chat");
-
+                updateCommandsCount();
             } else {
-                btnEditCommands.setEnabled(false);
+                // layerClickOpenCommand.setEnabled(false);
+            }
+
+            ChatTask welcomeText = chatTasks.getTask(ChatTask.TYPE.WELCOME_USER, false);
+            if (welcomeText != null) {
+                chkWelcomeText.setChecked(welcomeText.isEnabled);
+                if (!TextUtils.isEmpty(welcomeText.mText))
+                    tvWelcomeTextShort.setText(welcomeText.mText);
             }
 
         } else {
             setDefaultBannedWordsValues();
             setDefaultFloodValues();
-            btnEditCommands.setEnabled(false);
         }
 
         int blackWordsCount = DBHelper.getInstance().getWordsBlackListCount(chatId);
@@ -395,15 +437,12 @@ public class ActivityGroupInfo extends ActivityExtended {
             tvBannedWordsCount.setText(getString(R.string.banned_words_count, blackWordsCount));
             //tvBannedWordsCount.setText(String.format("%d banned words for this chat", blackWordsCount));
         }
-        /**
-         * DONE срок бана слов по умолчанию 5 минут сделать
-         * сколько раз можно: по умолчанию показывать 3.         *
-         */
 
-        setEditTextChangeListenerToSaveBanTimeValue(ChatTask.TYPE.BANWORDS);
-        setEditTextChangeListenerToSaveBanTimeValue(ChatTask.TYPE.FLOOD);
+        setEditTextListenerToBanTimeValueNew(ChatTask.TYPE.BANWORDS, edtBannedWordBanTimesVal, chkReturnOnBannedWordsExpired, spinnerBannedWordBanTimes);
+        setEditTextListenerToBanTimeValueNew(ChatTask.TYPE.FLOOD, edtFloodBanTimeVal, chkReturnOnBanFloodExpired, spinnerBannedWordBanTimes);
 
-        setWelcomeText();
+        // setWelcomeText();
+        updateMutedUsersCount();
         getChatInfo();
     }
 
@@ -435,137 +474,55 @@ public class ActivityGroupInfo extends ActivityExtended {
         chkReturnOnBanFloodExpired.setEnabled(false);
     }
 
-    void setTask(ChatTask.TYPE pType) {
-        Spinner spinnerBanTime = null, spinnerFloodTimeLimit = null;
-        EditText edtBanTimeValue = null, edtFloodTimeValue = null;
-        CheckBox chkReturnOnBanExpired = null, chkRemoveMessage = null, chkBanUser = null;
-        TextView tvWarningsCount = null, tvBtnWarnFreq = null;
-        SeekBar seekBarAllowCount = null;
-        View layerBanTimes = null;
-        ChatTask task = null;
-        task = chatTasks.getTask(pType, false);
-        switch (pType) {
-            case VOICE:
-                spinnerBanTime = spinnerBanVoiceTime;
-                edtBanTimeValue = edtVoiceBanTimeVal;
-                spinnerFloodTimeLimit = spinnerVoiceFloodTime;
-                edtFloodTimeValue = edtVoiceFloodTimeVal;
-                chkReturnOnBanExpired = chkReturnOnBanVoiceExpired;
-                chkRemoveMessage = chkRemoveVoices;
-                chkBanUser = chkBanForVoice;
-                seekBarAllowCount = seekBarBanVoiceAllowCount;
 
-                tvWarningsCount = tvBanVoiceWarningCount;
-                tvBtnWarnFreq = tvBtnWarnVoiceFreq;
-                layerBanTimes = layerBanVoiceTime;
-                break;
-            case STICKERS:
-                spinnerBanTime = spinnerBanTimesSticks;
-                edtBanTimeValue = edtSticksBanTimeVal;
-                spinnerFloodTimeLimit = spinnerStickersFloodTime;
-                edtFloodTimeValue = edtStickersFloodTimeVal;
-                chkReturnOnBanExpired = chkReturnOnBanSticksExpired;
-                chkRemoveMessage = chkRemoveStickers;
-                chkBanUser = chkBanForSticks;
-                seekBarAllowCount = seekBarBanSticksCount;
-
-                tvWarningsCount = tvBanSticksWarningCount;
-                tvBtnWarnFreq = tvBtnWarnStickersFreq;
-                layerBanTimes = layerBanSticksTime;
-                break;
-            case LINKS:
-                spinnerBanTime = spinnerBanTimesLink;
-                edtBanTimeValue = edtLinksBanTimeVal;
-                spinnerFloodTimeLimit = spinnerLinksBanFloodTime;
-                edtFloodTimeValue = edtLinksFloodTimeVal;
-                chkReturnOnBanExpired = chkReturnOnBanLinksExpired;
-                chkRemoveMessage = chkRemoveLinks;
-                chkBanUser = chkBanForLinks;
-                seekBarAllowCount = seekBarBanLinksCount;
-
-                tvWarningsCount = tvBanLinksWarningCount;
-                tvBtnWarnFreq = tvBtnWarnLinksFreq;
-                layerBanTimes = layerBanLinksAge;
-                break;
-        }
-
-        setSpinnerFloodSelectorListener(pType, spinnerFloodTimeLimit, edtFloodTimeValue);
-        setSpinnerBanTimesListener(pType, spinnerBanTime, edtBanTimeValue, chkReturnOnBanExpired);
-        setEditTextChangeListenerToSaveBanTimeValue(pType);
-
-        seekBarAllowCount.setTag(pType);
-        seekBarAllowCount.setOnSeekBarChangeListener(onSeekBarBanCountListener);
-
-        if (task != null) {
-            chkRemoveMessage.setChecked(task.isRemoveMessage);
-            chkBanUser.setChecked(task.isBanUser);
-            if (task.isBanUser)
-                chkBanUser.setVisibility(View.VISIBLE);
-
-            seekBarAllowCount.setProgress(task.mAllowCountPerUser);
-
-            if (!task.isBanUser)
-                layerBanTimes.setVisibility(View.GONE);
-            if (task.mBanTimeSec > 0) {
-                setSecondsToFormat(task.mBanTimeSec, edtBanTimeValue, spinnerBanTime);
-            } else {// 0 - permanent ban.
-                edtBanTimeValue.setEnabled(false);
-                spinnerBanTime.setTag(1);
-                spinnerBanTime.setSelection(0);
+    void setEditTextListenerToBanTimeValueNew(final ChatTask.TYPE pType, final EditText editBanTimeVal, final CheckBox chkReturnOnBanExired, final Spinner spinnerBanTime) {
+        editBanTimeVal.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
-            chkReturnOnBanExpired.setChecked(task.isReturnOnBanExpired);
-            chkReturnOnBanExpired.setEnabled(task.mBanTimeSec > 0);
-            tvWarningsCount.setText(task.mAllowCountPerUser + "");
-
-            if (task.mWarningsDuringTime == 0) {
-                edtFloodTimeValue.setTag("1");// flag for ignore save on change
-                edtFloodTimeValue.setText("5");
-                spinnerFloodTimeLimit.setTag(1);// flag for skip save changes
-                spinnerFloodTimeLimit.setSelection(0);
-                edtFloodTimeValue.setEnabled(false);
-            } else {
-                setSecondsToFormat(task.mWarningsDuringTime, edtFloodTimeValue, spinnerFloodTimeLimit);
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (editBanTimeVal.getTag() != null && editBanTimeVal.getTag().toString().equals("1"))// ignore when set default value
+                    editBanTimeVal.setTag(null);
+                else
+                    editBanTimeVal.setTag(System.currentTimeMillis());
             }
-            setWarnFrequencyText(tvBtnWarnFreq, task.mWarnFrequency);
-        } else {
-            edtBanTimeValue.setEnabled(true);
-            layerBanTimes.setVisibility(View.GONE);
-            spinnerBanTime.setTag(1);
-            spinnerBanTime.setSelection(1);
-            spinnerFloodTimeLimit.setTag(1);
-            spinnerFloodTimeLimit.setSelection(1);
-            chkReturnOnBanExpired.setChecked(true);
-            tvWarningsCount.setText("3");
-        }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                editBanTimeVal.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (editBanTimeVal.getTag() == null)
+                            return;
+
+                        long ts = Long.valueOf(editBanTimeVal.getTag().toString());
+                        if (System.currentTimeMillis() - ts < 900)
+                            return;
+
+                        long val = setBanAgeForTask(pType, spinnerBanTime.getSelectedItemPosition(), editBanTimeVal.getText().toString());
+                        if (val > -1)
+                            chkReturnOnBanExired.setEnabled(val > 0);
+                    }
+                }, 1000);
+            }
+        });
+
     }
-
-    void setEditTextChangeListenerToSaveBanTimeValue(final ChatTask.TYPE pType) {
+    /*
+    void setEditTextChangeListenerToSaveBanTimeValueOld(final ChatTask.TYPE pType) {
         final Spinner spinnerTimeMultiplier;
         final EditText edit;
         final CheckBox chkReturnOnBanExired;
 
         switch (pType) {
-            case STICKERS:
-                edit = edtSticksBanTimeVal;
-                chkReturnOnBanExired = chkReturnOnBanSticksExpired;
-                spinnerTimeMultiplier = spinnerBanTimesSticks;
-                break;
-            case LINKS:
-                edit = edtLinksBanTimeVal;
-                chkReturnOnBanExired = chkReturnOnBanLinksExpired;
-                spinnerTimeMultiplier = spinnerBanTimesLink;
-                break;
             case BANWORDS:
                 edit = edtBannedWordBanTimesVal;
                 chkReturnOnBanExired = chkReturnOnBannedWordsExpired;
                 spinnerTimeMultiplier = spinnerBannedWordBanTimes;
                 break;
-            case VOICE:
-                edit = edtVoiceBanTimeVal;
-                chkReturnOnBanExired = chkReturnOnBanVoiceExpired;
-                spinnerTimeMultiplier = spinnerBanVoiceTime;
-                break;
+
             case FLOOD:
                 edit = edtFloodBanTimeVal;
                 chkReturnOnBanExired = chkReturnOnBanFloodExpired;
@@ -612,6 +569,7 @@ public class ActivityGroupInfo extends ActivityExtended {
         });
 
     }
+    */
 
     private void setWarnFrequencyText(TextView textView, int warnFrequency) {
         int resIDWarnText = 0;
@@ -750,7 +708,7 @@ public class ActivityGroupInfo extends ActivityExtended {
     /**
      * Spinner must have values: 0-Forever, 1-minutes, 2-hours, 3 - days.
      */
-    void setSecondsToFormat(long seconds, EditText editText, Spinner spinnerForSelection) {
+    void setSecondsFormatToSpinner(long seconds, EditText editText, Spinner spinnerForSelection) {
         String text;
         int spinnerPos;
         if (seconds >= TimeUnit.DAYS.toSeconds(1)) {
@@ -770,51 +728,33 @@ public class ActivityGroupInfo extends ActivityExtended {
         spinnerForSelection.setSelection(spinnerPos);
     }
 
+    /*
     private void setWelcomeText() {
-        edtWelcomeText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                edtWelcomeText.setTag(System.currentTimeMillis());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                edtWelcomeText.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        long ts = Long.valueOf(edtWelcomeText.getTag().toString());
-                        if (System.currentTimeMillis() - ts < 900) return;
-                        String text = edtWelcomeText.getText().toString().trim();
-                        DBHelper.getInstance().setWelcomeText(chatId, text, chkWelcomeText.isChecked());
-                        if (chkWelcomeText.isChecked())
-                            ServiceChatTask.start(mContext);
-                    }
-                }, 1000);
-            }
-        });
-
         chkWelcomeText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DBHelper.getInstance().setWelcomeText(chatId, edtWelcomeText.getText().toString().trim(), chkWelcomeText.isChecked());
+                DBHelper.getInstance().setWelcomeTextEnabled(chatId, chkWelcomeText.isChecked());
                 if (chkWelcomeText.isChecked())
                     ServiceChatTask.start(mContext);
             }
         });
 
         Object[] welcomeTexts = DBHelper.getInstance().getWelcomeTextObject(chatId);
-        if (welcomeTexts == null) return;
+        if (welcomeTexts == null) {
+            return;
+        }
         boolean isEnabled = (boolean) welcomeTexts[0];
-        String text = welcomeTexts[1].toString();
         chkWelcomeText.setChecked(isEnabled);
-        edtWelcomeText.setText(text);
-
+        if (welcomeTexts[1] != null) {
+            String text = welcomeTexts[1].toString();
+            tvWelcomeTextShort.setText(text);
+        } else {
+            tvWelcomeTextShort.setText(R.string.hint_enter_welcome_text);
+        }
+        //edtWelcomeText.setText(text);
 
     }
+    */
 
     long setBanAgeForTask(ChatTask.TYPE pType, int selection, String textValue) {
         long banAge = 0;
@@ -854,19 +794,10 @@ public class ActivityGroupInfo extends ActivityExtended {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             if (fromUser) {
-                ChatTask.TYPE type = ChatTask.TYPE.valueOf(seekBar.getTag().toString());
+                // ChatTask.TYPE type = ChatTask.TYPE.valueOf(seekBar.getTag(R.id.tag_id_type).toString());
+                TextView tvCounter = (TextView) seekBar.getTag(R.id.tag_id_view);
                 String text = progress + "";
-                switch (type) {
-                    case STICKERS:
-                        tvBanSticksWarningCount.setText(text);
-                        break;
-                    case LINKS:
-                        tvBanLinksWarningCount.setText(text);
-                        break;
-                    case VOICE:
-                        tvBanVoiceWarningCount.setText(text);
-                        break;
-                }
+                tvCounter.setText(text);
             }
         }
 
@@ -876,7 +807,7 @@ public class ActivityGroupInfo extends ActivityExtended {
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-            ChatTask.TYPE type = ChatTask.TYPE.valueOf(seekBar.getTag().toString());
+            ChatTask.TYPE type = ChatTask.TYPE.valueOf(seekBar.getTag(R.id.tag_id_type).toString());
             int val = seekBar.getProgress();
             ChatTask task = chatTasks.getTask(type);
             task.mAllowCountPerUser = val;
@@ -885,11 +816,97 @@ public class ActivityGroupInfo extends ActivityExtended {
         }
     };
 
+    public static void collapse(final View v) {
+        v.setAnimation(null);
+
+        ScaleAnimation scale = new ScaleAnimation(1f, 1f, 1f, 0f);
+        scale.setFillAfter(true);
+        scale.setDuration(300);
+        scale.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                v.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        v.startAnimation(scale);
+    }
+
+    public static void expand(final View v) {
+        v.setAnimation(null);
+        v.setVisibility(View.VISIBLE);
+        ScaleAnimation scale = new ScaleAnimation(1f, 1f, 0f, 1f);
+        scale.setFillAfter(true);
+        scale.setDuration(250);
+        v.startAnimation(scale);
+    }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
+                case R.id.btnFab:
+                    new DialogAddTask().show();
+                    break;
+
+                case R.id.chkRemoveMessage:
+                    CheckBox cbox = (CheckBox) v;
+                    if (TgUtils.isGroup(chatType)) {
+                        MyToast.toast(mContext, R.string.toast_deletion_not_avail);
+                        cbox.setChecked(false);
+                        return;
+                    }
+
+                    ChatTask.TYPE pType = (ChatTask.TYPE) v.getTag(R.id.tag_id_type);
+                    ChatTask task = chatTasks.getTask(pType);
+                    task.isRemoveMessage = cbox.isChecked();
+                    chatTasks.saveTask(task);
+                    break;
+                case R.id.chkBanForMessage: //TODO chkReturnOnBanLinksExpired.setEnabled(isBan && chatTasks.getTask(ChatTask.TYPE.LINKS).mBanTimeSec > 0);
+                    pType = (ChatTask.TYPE) v.getTag(R.id.tag_id_type);
+                    View layerBanParams = (View) v.getTag(R.id.tag_id_view);
+                    cbox = (CheckBox) v;
+
+                    task = chatTasks.getTask(pType);
+                    task.isBanUser = cbox.isChecked();
+                    chatTasks.saveTask(task);
+
+                    if (cbox.isChecked()) {
+                        expand(layerBanParams);
+                    } else {
+                        collapse(layerBanParams);
+                    }
+                    break;
+
+                case R.id.tvBtnWarnFreq:
+                    pType = (ChatTask.TYPE) v.getTag(R.id.tag_id_type);
+                    showPopupForFrequencyTask(pType, (TextView) v);
+                    break;
+
+                case R.id.chkReturnOnBanExpired:
+                    pType = (ChatTask.TYPE) v.getTag(R.id.tag_id_type);
+                    cbox = (CheckBox) v;
+
+                    task = chatTasks.getTask(pType);
+                    task.isReturnOnBanExpired = cbox.isChecked();
+                    chatTasks.saveTask(task);
+                    break;
+
+                case R.id.tvBanAllowCount:
+                    pType = (ChatTask.TYPE) v.getTag(R.id.tag_id_type);
+                    SeekBar seekBarAllowCount = (SeekBar) v.getTag(R.id.tag_id_view);
+                    setTaskWarnCountDialog(pType, seekBarAllowCount, (TextView) v);
+                    break;
+
                 case R.id.tvBannedWordsCount:
                     startActivity(new Intent(mContext, ActivityBannedWordsList.class).putExtra("chat_id", chatId));
 
@@ -921,65 +938,12 @@ public class ActivityGroupInfo extends ActivityExtended {
                     break;
 
                 case R.id.chkBlackListedWordsEnabled:
-                    ChatTask task = chatTasks.getTask(ChatTask.TYPE.BANWORDS);
+                    task = chatTasks.getTask(ChatTask.TYPE.BANWORDS);
                     task.isEnabled = chkBlackListedWordsEnabled.isChecked();
                     layerBanForBlackWord.setVisibility(task.isEnabled ? View.VISIBLE : View.GONE);
                     chatTasks.saveTask(task);
                     break;
 
-
-                // Link tasks:
-                case R.id.chkBanForLinks:
-                    boolean isBan = chkBanForLinks.isChecked();
-                    setBanEnabledForTask(ChatTask.TYPE.LINKS, isBan);
-                    chkReturnOnBanLinksExpired.setEnabled(isBan && chatTasks.getTask(ChatTask.TYPE.LINKS).mBanTimeSec > 0);
-                    layerBanLinksAge.setVisibility(isBan ? View.VISIBLE : View.GONE);
-                    chkReturnOnBanLinksExpired.setVisibility(isBan ? View.VISIBLE : View.GONE);
-
-                    break;
-                case R.id.chkRemoveLinks:
-                    if (TgUtils.isGroup(chatType)) {
-                        MyToast.toast(mContext, R.string.toast_deletion_not_avail);
-                        chkRemoveLinks.setChecked(false);
-                        return;
-                    }
-
-                    task = chatTasks.getTask(ChatTask.TYPE.LINKS);
-                    task.isRemoveMessage = chkRemoveLinks.isChecked();
-                    chatTasks.saveTask(task);
-                    break;
-                case R.id.chkReturnOnBanLinksExpired:
-                    task = chatTasks.getTask(ChatTask.TYPE.LINKS);
-                    task.isReturnOnBanExpired = chkReturnOnBanLinksExpired.isChecked();
-                    chatTasks.saveTask(task);
-                    break;
-
-                //Stickers tasks:
-                case R.id.chkRemoveStickers:
-                    if (TgUtils.isGroup(chatType)) {
-                        MyToast.toast(mContext, R.string.toast_deletion_not_avail);
-                        chkRemoveStickers.setChecked(false);
-                        return;
-                    }
-
-                    task = chatTasks.getTask(ChatTask.TYPE.STICKERS);
-                    task.isRemoveMessage = chkRemoveStickers.isChecked();
-                    chatTasks.saveTask(task);
-                    break;
-
-                case R.id.chkBanForSticks:
-                    isBan = chkBanForSticks.isChecked();
-                    setBanEnabledForTask(ChatTask.TYPE.STICKERS, isBan);
-
-                    layerBanSticksTime.setVisibility(isBan ? View.VISIBLE : View.GONE);
-                    chkReturnOnBanSticksExpired.setVisibility(layerBanSticksTime.getVisibility());
-                    chkReturnOnBanSticksExpired.setEnabled(isBan && chatTasks.getTask(ChatTask.TYPE.STICKERS).mBanTimeSec > 0);
-                    break;
-                case R.id.chkReturnOnBanSticksExpired:
-                    task = chatTasks.getTask(ChatTask.TYPE.STICKERS);
-                    task.isReturnOnBanExpired = chkReturnOnBanSticksExpired.isChecked();
-                    chatTasks.saveTask(task);
-                    break;
 
                 case R.id.tvInviteLink:
                     if (isAdmin)
@@ -1038,7 +1002,7 @@ public class ActivityGroupInfo extends ActivityExtended {
 //                    saveAntispamRule(antiSpamRule);
 
                     task = chatTasks.getTask(ChatTask.TYPE.LeaveMsg);
-                    task.isEnabled = chkRemoveJoinedMsg.isChecked();
+                    task.isEnabled = chkRemoveLeaveMsg.isChecked();
                     chatTasks.saveTask(task);
                     if (task.isEnabled)
                         ServiceChatTask.start(mContext);
@@ -1061,59 +1025,15 @@ public class ActivityGroupInfo extends ActivityExtended {
                     if (task.isEnabled)
                         ServiceChatTask.start(mContext);
                     break;
-                case R.id.tvBanLinksAllowCount:
-                    setTaskWarnCountDialog(ChatTask.TYPE.LINKS, seekBarBanLinksCount, tvBanLinksWarningCount);
-                    break;
-                case R.id.tvBanSticksWarningCount:
-                    setTaskWarnCountDialog(ChatTask.TYPE.STICKERS, seekBarBanSticksCount, tvBanSticksWarningCount);
-                    break;
+
 
                 case R.id.tvBanWordsAllowCount:
                     setTaskWarnCountDialog(ChatTask.TYPE.BANWORDS, null, tvBanWordsAllowCount);
                     break;
-                case R.id.tvBtnWarnLinksFreq:
-                    showPopupForFrequencyTask(ChatTask.TYPE.LINKS, tvBtnWarnLinksFreq);
-                    break;
 
-                case R.id.tvBtnWarnStickersFreq:
-                    showPopupForFrequencyTask(ChatTask.TYPE.STICKERS, tvBtnWarnStickersFreq);
-                    break;
                 case R.id.tvBtnWarnBanWordsFreq:
                     showPopupForFrequencyTask(ChatTask.TYPE.BANWORDS, tvBtnWarnBanWordsFreq);
                     break;
-                case R.id.chkRemoveVoices:
-                    if (TgUtils.isGroup(chatType)) {
-                        MyToast.toast(mContext, R.string.toast_deletion_not_avail);
-                        chkRemoveVoices.setChecked(false);
-                        return;
-                    }
-
-                    task = chatTasks.getTask(ChatTask.TYPE.VOICE);
-                    task.isRemoveMessage = chkRemoveVoices.isChecked();
-                    chatTasks.saveTask(task);
-                    break;
-                case R.id.chkBanForVoice:
-                    task = chatTasks.getTask(ChatTask.TYPE.VOICE);
-                    task.isBanUser = chkBanForVoice.isChecked();
-                    chatTasks.saveTask(task);
-
-                    layerBanVoiceTime.setVisibility(task.isBanUser ? View.VISIBLE : View.GONE);
-                    chkReturnOnBanVoiceExpired.setVisibility(layerBanSticksTime.getVisibility());
-                    chkReturnOnBanVoiceExpired.setEnabled(task.isBanUser && chatTasks.getTask(ChatTask.TYPE.STICKERS).mBanTimeSec > 0);
-                    break;
-
-                case R.id.tvBtnWarnVoiceFreq:
-                    showPopupForFrequencyTask(ChatTask.TYPE.VOICE, (TextView) v);
-                    break;
-                case R.id.chkReturnOnBanVoiceExpired:
-                    task = chatTasks.getTask(ChatTask.TYPE.VOICE);
-                    task.isReturnOnBanExpired = chkReturnOnBanVoiceExpired.isChecked();
-                    chatTasks.saveTask(task);
-                    break;
-                case R.id.tvBanVoiceWarningCount:
-                    setTaskWarnCountDialog(ChatTask.TYPE.VOICE, seekBarBanVoiceAllowCount, tvBanVoiceWarningCount);
-                    break;
-
                 //Flood Control view:
                 case R.id.chkFloodControlEnabled:
                     task = chatTasks.getTask(ChatTask.TYPE.FLOOD);
@@ -1148,7 +1068,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                     startActivity(new Intent(mContext, ActivitySettings.class));
                     break;
 
-                case R.id.btnEditCommands:
+                case R.id.layerClickOpenCommand:
                     Intent intent = new Intent(mContext, ActivityChatCommands.class).putExtra("chat_id", chatId);
                     startActivityForResult(intent, Const.ACTION_REFRESH_COMMANDS);
                     break;
@@ -1156,20 +1076,111 @@ public class ActivityGroupInfo extends ActivityExtended {
                 case R.id.chkCommandsEnable:
                     task = chatTasks.getTask(ChatTask.TYPE.COMMAND);
                     task.isEnabled = chkCommandsEnable.isChecked();
-                    btnEditCommands.setEnabled(task.isEnabled);
+                    // layerClickOpenCommand.setEnabled(task.isEnabled);
+                    UIUtils.setTextColotRes(tvChatCommandsCount, task.isEnabled ? R.color.md_teal_500 : R.color.md_blue_grey_500);
                     chatTasks.saveTask(task);
                     break;
+                case R.id.tvSelectLogChat:
+                    FragmentSelectGroup f = new FragmentSelectGroup();
+                    //f.setRetainInstance(true);
+                    f.setOnChatSelected(new Callback() {
+                        @Override
+                        public void onResult(Object data) {
+                            TdApi.Chat chat = (TdApi.Chat) data;
+                            tvSelectLogChat.setText(chat.title);
+                            DBHelper.getInstance().setChatLogTargetChat(chatId, chat.id);
+                        }
+                    });
+                    f.show(getSupportFragmentManager(), "groups");
+                    break;
 
+                case R.id.chkEnableLogToChat:
+                    boolean isEnabled = chkEnableLogToChat.isChecked();
+                    DBHelper.getInstance().setChatLogEnabled(chatId, isEnabled);
+                    break;
+                case R.id.chkEnableMuteUsers:
+                    if (TgUtils.isGroup(chatType)) {
+                        MyToast.toast(mContext, R.string.toast_deletion_not_avail);
+                        chkEnableMuteUsers.setChecked(false);
+                        return;
+                    }
+
+                    task = chatTasks.getTask(ChatTask.TYPE.MutedUsers);
+                    task.isEnabled = chkEnableMuteUsers.isChecked();
+                    chatTasks.saveTask(task);
+                    break;
+                case R.id.layerClickOpenMuted:
+                    if (TgUtils.isGroup(chatType)) {
+                        MyToast.toast(mContext, R.string.toast_deletion_not_avail);
+                        return;
+                    }
+
+                    FragmentSelectUsers fUsers = new FragmentSelectUsers();
+                    fUsers.chatType = chatType;
+                    fUsers.chatlId = chatId;
+                    if (TgUtils.isSuperGroup(chatType))
+                        fUsers.channelId = channelId;
+                    else
+                        fUsers.groupId = groupId;
+
+                    // fUsers.setRetainInstance(true);
+                    fUsers.setOnUserSelected(new Callback() {
+                        @Override
+                        public void onResult(Object data) {
+                            TdApi.ChatMember member = (TdApi.ChatMember) data;
+                            if (data instanceof AdapterChatUsersLocal.ChatMemberUser) {
+                                DBHelper.getInstance().removeMutedUser(chatId, member.userId);
+                            } else {
+                                TdApi.User user = TgUtils.getUser(member.userId);
+                                DBHelper.getInstance().addMutedUser(chatId, member.userId, user.firstName + " " + user.lastName);
+                            }
+                            updateMutedUsersCount();
+                        }
+                    });
+                    fUsers.show(getSupportFragmentManager(), "users");
+                    break;
+
+                case R.id.tvWelcomeTextShort:
+                    dialogEditWelcomeText();
+                    break;
+                case R.id.chkWelcomeText:
+                    task = chatTasks.getTask(ChatTask.TYPE.WELCOME_USER);
+                    task.isEnabled = chkWelcomeText.isChecked();
+                    chatTasks.saveTask(task);
+                    break;
             }
         }
     };
 
+    private void updateCommandsCount() {
+        int chatCommandsCount = DBHelper.getInstance().getChatCommandsCount(chatId);
+        String commandsCountText;
+        if (chatCommandsCount == 0)
+            commandsCountText = getString(R.string.label_no_commands_in_chat);
+        else {
+            commandsCountText = " " + Utils.pluralValue(mContext, R.array.commands_plural, chatCommandsCount) + " ";
+            commandsCountText = chatCommandsCount + commandsCountText + getString(R.string.label_commands_count_in_chat);
+        }
+        tvChatCommandsCount.setText(commandsCountText);
+    }
 
-    void setBanEnabledForTask(ChatTask.TYPE pType, boolean isBan) {
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case Const.ACTION_REFRESH_COMMANDS:
+                updateCommandsCount();
+                break;
+        }
+    }
+    /*
+    void setBanEnabledForTask(ChatTask.TYPE pType, boolean isBan) { //TODO выпилить так как будет единый метод в онклике
         ChatTask task = chatTasks.getTask(pType);
         task.isBanUser = isBan;
         chatTasks.saveTask(task);
     }
+    */
 
 
     private void showPopupForFrequencyTask(final ChatTask.TYPE pType, final TextView tvPressedTextView) {
@@ -1366,7 +1377,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                         else
                             task.mWarnTextLast = text;
                         DBHelper.getInstance().saveWarnText(text, isFirstWarn, task.id);
-                        //chatTasks.saveTask(task);
+                        MyLog.log("save warn text for task id " + task.id + " text: " + text + " isFirst: " + isFirstWarn);
                         editText.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
 
                     }
@@ -1472,6 +1483,8 @@ public class ActivityGroupInfo extends ActivityExtended {
         });
     }
 
+
+
     /*
     private AntiSpamRule getAntispamRule() {
         AntiSpamRule antiSpamRule = DBHelper.getInstance().getAntispamRule(chatId);
@@ -1488,6 +1501,13 @@ public class ActivityGroupInfo extends ActivityExtended {
 
         if (!isChannel)
             menu.add(0, 2, 0, R.string.action_reset_warns);
+
+
+        MenuItem item = menu.add(0, 4, 0, R.string.title_add_new_task_for_chat);
+        item.setIcon(R.drawable.ic_note_add_white_24dp);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        item.setVisible(false);
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -1504,13 +1524,324 @@ public class ActivityGroupInfo extends ActivityExtended {
             case 3:
                 dialogConfirmDeleteGroup();
                 break;
+
+            case 4:
+                //addTask(ChatTask.TYPE.STICKERS, true);
+                new DialogAddTask().show();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private class DialogAddTask {
+        class TypeItem {
+            ChatTask.TYPE mType;
+            boolean isEnabled = true;
+            String mTitle;
+
+            public TypeItem(ChatTask.TYPE pType) {
+                mType = pType;
+                isEnabled = chatTasks.getTask(pType, false) == null;
+                String title = getString(TaskValues.getTitleForAddTask(pType));
+
+                mTitle = title;// "Add task for " + title;
+            }
+        }
+
+        private AlertDialog dialog;
+
+        // Адаптер
+        class TypesSimpleAdapter extends ArrayAdapter<TypeItem> {
+            LayoutInflater inflater;
+
+            public TypesSimpleAdapter(List<TypeItem> listItems) {
+                super(mContext, android.R.layout.simple_list_item_1, listItems);
+                inflater = ((Activity) mContext).getLayoutInflater();
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                boolean created = convertView == null;
+                if (created)
+                    convertView = inflater.inflate(R.layout.item_test, parent, false);
+                TypeItem item = getItem(position);
+
+                final TextView tv = UIUtils.getHolderView(convertView, R.id.tvItemTitle);
+                TextView tvAdded = UIUtils.getHolderView(convertView, R.id.tvTaskAdded);
+                tv.setText(item.mTitle);
+                tvAdded.setVisibility(item.isEnabled ? View.GONE : View.VISIBLE);
+                UIUtils.setTextColotRes(tv, item.isEnabled ? R.color.md_teal_500 : R.color.md_grey_500);
+
+                return convertView;
+            }
+        }
+
+        void show() {
+            LinearLayout layout = new LinearLayout(mContext);
+            layout.setOrientation(LinearLayout.VERTICAL);
+            int padding = UIUtils.getPixelsFromDp(16);
+            layout.setPadding(padding, 0, padding, 0);
+
+            TextView tvText = new TextView(mContext);
+            tvText.setText(R.string.title_select_task_for_chat);
+            tvText.setPadding(UIUtils.getPixelsFromDp(8), 0, 0, 0);
+            layout.addView(tvText);
+
+            ListView lv = new ListView(mContext);
+            layout.addView(lv);
+
+            final ArrayList<TypeItem> list = new ArrayList<>();
+            list.add(new TypeItem(ChatTask.TYPE.LINKS));
+            list.add(new TypeItem(ChatTask.TYPE.STICKERS));
+            list.add(new TypeItem(ChatTask.TYPE.VOICE));
+            list.add(new TypeItem(ChatTask.TYPE.IMAGES));
+            list.add(new TypeItem(ChatTask.TYPE.GIF));
+            list.add(new TypeItem(ChatTask.TYPE.AUDIO));
+            list.add(new TypeItem(ChatTask.TYPE.VIDEO));
+            list.add(new TypeItem(ChatTask.TYPE.DOCS));
+            list.add(new TypeItem(ChatTask.TYPE.GAME));
+
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mContext)
+                    .setView(layout)
+                    .setTitle(R.string.title_add_new_task_for_chat)
+                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            list.clear();
+                        }
+                    });
+
+            final TypesSimpleAdapter adapter = new TypesSimpleAdapter(list);
+            lv.setAdapter(adapter);
+
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    TypeItem item = adapter.getItem(position);
+                    if (!item.isEnabled) {
+                        MyToast.toast(mContext, R.string.toast_task_already_applied);
+                    } else {
+                        item.isEnabled = false;
+                        addTask(item.mType, true);
+                        // adapter.notifyDataSetChanged();
+                        dialog.dismiss();
+                    }
+
+                }
+            });
+
+            lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    final TypeItem item = adapter.getItem(position);
+                    if (item.isEnabled)
+                        return false;
+                    new AlertDialog.Builder(mContext)
+                            .setTitle(R.string.title_remove_taskfrom_added)
+                            .setMessage(R.string.text_confirm_remove_task)
+                            .setPositiveButton(R.string.btnYes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    ChatTask task = chatTasks.getTask(item.mType, false);
+                                    ViewGroup view = (ViewGroup) task.payload;
+                                    ViewGroup vg = (ViewGroup) view.getParent();
+                                    vg.removeView(view);
+
+                                    chatTasks.remove(task);
+                                    item.isEnabled = true;
+                                    DBHelper.getInstance().removeChatTask(task.id);
+                                    adapter.notifyDataSetChanged();
+                                }
+                            })
+                            .setNegativeButton(R.string.btnCancel, null)
+                            .show();
+                    return false;
+                }
+            });
+
+            dialog = dialogBuilder.show();
+        }
+
+    }
+
+    void addTask(ChatTask.TYPE pType, boolean canCreateNewTask) {
+
+        ChatTask task = chatTasks.getTask(pType, false);
+        if (task == null && !canCreateNewTask)
+            return;
+
+        String title = null, titleRemoveMessages = null, titleBanCheck = null;
+
+        switch (pType) {
+            //NOTE add new type here when new type implemented
+            case STICKERS:
+                title = getString(R.string.title_task_stickers);
+                titleRemoveMessages = getString(R.string.chk_remove_messages_stickers);
+                titleBanCheck = getString(R.string.chkTitleBanForSticks);
+                break;
+            case VOICE:
+                title = getString(R.string.title_task_voices);
+                titleRemoveMessages = getString(R.string.chk_remove_messages_voice);
+                titleBanCheck = getString(R.string.chkTitleBanForVoice);
+                break;
+            case LINKS:
+                title = getString(R.string.title_task_links);
+                titleRemoveMessages = getString(R.string.chk_remove_messages_links);
+                titleBanCheck = getString(R.string.chtTitleBanForLinks);
+                break;
+            case GAME:
+                title = getString(R.string.title_task_game);
+                titleRemoveMessages = getString(R.string.chk_remove_messages_game);
+                titleBanCheck = getString(R.string.chkTitleBanForGames);
+                break;
+            case IMAGES:
+                title = getString(R.string.title_task_photos);
+                titleRemoveMessages = getString(R.string.chk_remove_messages_photos);
+                titleBanCheck = getString(R.string.chkTitleBanForPhotos);
+                break;
+            case DOCS:
+                title = getString(R.string.title_task_docs);
+                titleRemoveMessages = getString(R.string.chk_remove_messages_docs);
+                titleBanCheck = getString(R.string.chkTitleBanForDocs);
+                break;
+            case GIF:
+                title = getString(R.string.title_task_gif);
+                titleRemoveMessages = getString(R.string.chk_remove_messages_gif);
+                titleBanCheck = getString(R.string.chkTitleBanForGif);
+                break;
+            case AUDIO:
+                title = getString(R.string.title_task_audio);
+                titleRemoveMessages = getString(R.string.chk_remove_messages_audio);
+                titleBanCheck = getString(R.string.chkTitleBanForAudio);
+                break;
+            case VIDEO:
+                title = getString(R.string.title_task_video);
+                titleRemoveMessages = getString(R.string.chk_remove_messages_video);
+                titleBanCheck = getString(R.string.chkTitleBanForVideo);
+                break;
+
+        }
+
+        final LinearLayout layout = getView(R.id.layerTasks);
+
+        final View view = UIUtils.inflate(mContext, R.layout.layout_base_task);
+        CheckBox chkRemoveMessage = UIUtils.getView(view, R.id.chkRemoveMessage);
+        CheckBox chkBanForMessage = UIUtils.getView(view, R.id.chkBanForMessage);
+        CheckBox chkReturnOnBanExpired = UIUtils.getView(view, R.id.chkReturnOnBanExpired);
+        Spinner spinnerBanTime = UIUtils.getView(view, R.id.spinnerBanTime);
+        EditText edtBanTimeVal = UIUtils.getView(view, R.id.edtBanTimeVal);
+        EditText edtBanFloodTimeVal = UIUtils.getView(view, R.id.edtBanFloodTimeVal);
+        Spinner spinnerBanFloodTime = UIUtils.getView(view, R.id.spinnerBanFloodTime);
+        TextView tvBtnWarnFreq = UIUtils.getView(view, R.id.tvBtnWarnFreq);
+        TextView tvTypeTitle = UIUtils.getView(view, R.id.tvTypeTitle);
+        LinearLayout layerBanParams = UIUtils.getView(view, R.id.layerBanParams);
+        SeekBar seekBarAllowCount = UIUtils.getView(view, R.id.seekBarAllowCount);
+        TextView tvBanAllowCount = UIUtils.getView(view, R.id.tvBanAllowCount);
+
+        if (TgUtils.isGroup(chatType))
+            chkRemoveMessage.setTextColor(getResources().getColor(R.color.md_grey_500));
+
+        tvTypeTitle.setText(title);
+        chkRemoveMessage.setText(titleRemoveMessages);
+        chkBanForMessage.setText(titleBanCheck);
+
+        chkRemoveMessage.setTag(R.id.tag_id_type, pType);
+        chkBanForMessage.setTag(R.id.tag_id_type, pType);
+        chkReturnOnBanExpired.setTag(R.id.tag_id_type, pType);
+        chkBanForMessage.setTag(R.id.tag_id_view, layerBanParams);
+        tvBtnWarnFreq.setTag(R.id.tag_id_type, pType);
+
+        seekBarAllowCount.setTag(R.id.tag_id_type, pType);
+        seekBarAllowCount.setTag(R.id.tag_id_view, tvBanAllowCount);
+        seekBarAllowCount.setOnSeekBarChangeListener(onSeekBarBanCountListener);
+        tvBanAllowCount.setTag(R.id.tag_id_type, pType);
+        tvBanAllowCount.setTag(R.id.tag_id_view, seekBarAllowCount);
+
+        UIUtils.setBatchClickListener(onClickListener, chkBanForMessage, chkRemoveMessage, tvBtnWarnFreq,
+                chkReturnOnBanExpired, tvBanAllowCount);
+
+        setSpinnerBanTimesListener(pType, spinnerBanTime, edtBanTimeVal, chkReturnOnBanExpired);
+        setSpinnerFloodSelectorListener(pType, spinnerBanFloodTime, edtBanFloodTimeVal);
+        setEditTextListenerToBanTimeValueNew(pType, edtBanTimeVal, chkReturnOnBanExpired, spinnerBanTime);
+
+        if (task != null) {
+            chkRemoveMessage.setChecked(task.isRemoveMessage);
+            chkBanForMessage.setChecked(task.isBanUser);
+            if (!task.isBanUser)
+                layerBanParams.setVisibility(View.GONE);
+            chkReturnOnBanExpired.setChecked(task.isReturnOnBanExpired);
+            tvBanAllowCount.setText(task.mAllowCountPerUser + "");
+            setWarnFrequencyText(tvBtnWarnFreq, task.mWarnFrequency);
+            seekBarAllowCount.setProgress(task.mAllowCountPerUser);
+
+            if (task.mBanTimeSec > 0)
+                setSecondsFormatToSpinner(task.mBanTimeSec, edtBanTimeVal, spinnerBanTime);
+            else { // forever ban. permanent
+                edtBanTimeVal.setTag("1");
+                edtBanTimeVal.setText("5");
+                chkReturnOnBanExpired.setEnabled(false);
+                edtBanTimeVal.setEnabled(false);
+                spinnerBanTime.setTag(1);
+                spinnerBanTime.setSelection(0);
+            }
+
+            if (task.mWarningsDuringTime == 0) {
+                edtBanFloodTimeVal.setTag("1");// flag for ignore save on change to default value
+                edtBanFloodTimeVal.setText("5");
+                spinnerBanFloodTime.setTag(1);// flag for skip save changes
+                spinnerBanFloodTime.setSelection(0);
+                edtBanFloodTimeVal.setEnabled(false);
+            } else {
+                setSecondsFormatToSpinner(task.mWarningsDuringTime, edtBanFloodTimeVal, spinnerBanFloodTime);
+            }
+
+        } else {
+            //set default values
+            layerBanParams.setVisibility(View.GONE);
+            seekBarAllowCount.setProgress(3);
+            tvBanAllowCount.setText("3");
+
+            //edtBanTimeValue.setEnabled(true);
+            //layerBanTimes.setVisibility(View.GONE);
+            spinnerBanTime.setTag(1);
+            spinnerBanTime.setSelection(1);
+            spinnerBanFloodTime.setTag(1);
+            spinnerBanFloodTime.setSelection(1);
+            chkReturnOnBanExpired.setChecked(true);
+        }
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, 1 /*px*/, 0, UIUtils.getPixelsFromDp(8));
+        layout.addView(view, lp);
+
+        if (task == null && canCreateNewTask) {
+            task = chatTasks.getTask(pType, true); // create task instance
+
+
+            ScrollView scrollViewMainContent = getView(R.id.scrollViewMainContent);
+            LinearLayout layerTasksParent = getView(R.id.layerTasksParent);
+            scrollViewMainContent.smoothScrollTo(0, layout.getBottom() + layerTasksParent.getTop());
+
+            int fromColor = getResources().getColor(R.color.md_green_200);
+            ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), fromColor, Color.WHITE);
+            colorAnimation.setDuration(1000); // milliseconds
+            colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+                @Override
+                public void onAnimationUpdate(ValueAnimator animator) {
+                    view.setBackgroundColor((int) animator.getAnimatedValue());
+                }
+
+            });
+            colorAnimation.start();
+        }
+        task.payload = view;
+    }
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        // menu.findItem(3).setVisible(isAdmin);
+        if (fabButton.getVisibility() == View.VISIBLE && !isChannel)
+            menu.findItem(4).setVisible(true); // visible for action Add task
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -1685,7 +2016,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                 }
 
                 TdApi.GroupFull groupFull = (TdApi.GroupFull) object;
-                ActivityGroupInfo.this.groupFull = groupFull;
+                // ActivityGroupInfo.this.groupFull = groupFull;
                 chatUsersCount = groupFull.group.memberCount;
                 isAdmin = groupFull.group.status.getConstructor() == TdApi.ChatMemberStatusCreator.CONSTRUCTOR;
                 adminId = groupFull.creatorUserId;
@@ -1818,10 +2149,12 @@ public class ActivityGroupInfo extends ActivityExtended {
 
                         if (!channelFull.channel.isSupergroup) {// channel
                             isChannel = true;
-                            findViewById(R.id.layerAutoban).setVisibility(View.GONE);
+                            findViewById(R.id.layerTasksParent).setVisibility(View.GONE);
                             findViewById(R.id.viewOther).setVisibility(View.GONE);
                             findViewById(R.id.viewWelcomeText).setVisibility(View.GONE);
                             findViewById(R.id.viewCommands).setVisibility(View.GONE);
+                            findViewById(R.id.layerLog).setVisibility(View.GONE);
+                            fabButton.hideFloatingActionButton();
 
                             tvKickedCount.setVisibility(View.GONE);
                             chkAnyoneInviteFriendsSuper.setVisibility(View.GONE);
@@ -1894,7 +2227,10 @@ public class ActivityGroupInfo extends ActivityExtended {
         viewContent.setVisibility(View.VISIBLE);
         tvChatAdmin.setText(adminName);
         chkAnyoneManageGroup.setChecked(groupAnyoneCanEdit);
+        if (!isChannel)
+            fabButton.setVisibility(View.VISIBLE);
         invalidateOptionsMenu();
+        loadChatLogInfo();
     }
 
 
@@ -1922,7 +2258,35 @@ public class ActivityGroupInfo extends ActivityExtended {
         viewLoading.setVisibility(View.GONE);
         viewContent.setVisibility(View.VISIBLE);
         tvChatAdmin.setText(adminName);
+        if (!isChannel)
+            fabButton.setVisibility(View.VISIBLE);
         invalidateOptionsMenu();
+        loadChatLogInfo();
+    }
+
+    void loadChatLogInfo() {
+        final ChatLogInfo chatLogInfo = DBHelper.getInstance().getChatLog(chatId, false);
+        if (chatLogInfo == null) {
+            //tvSelectLogChat.setText("Tap to configure exporting log to chat");
+            return;
+        }
+
+        tvSelectLogChat.setText("Loading chat info...");
+        chkEnableLogToChat.setChecked(chatLogInfo.isEnabled);
+
+        TgH.sendOnUi(new TdApi.GetChat(chatLogInfo.chatLogID), new Client.ResultHandler() {
+            @Override
+            public void onResult(TdApi.TLObject object) {
+                if (TgUtils.isError(object)) {
+                    tvSelectLogChat.setText("Error loading chat info");
+                    return;
+                }
+
+                TdApi.Chat chat = (TdApi.Chat) object;
+                tvSelectLogChat.setText("Forwarding log to chat:\n" + chat.title);
+            }
+        });
+
     }
 
     void dialogSetUsername(@Nullable final String defName) {
@@ -2091,6 +2455,46 @@ public class ActivityGroupInfo extends ActivityExtended {
                 }
             });
         }
+    }
+
+
+    void updateMutedUsersCount() {
+        int count = DBHelper.getInstance().getMutedCount(chatId);
+        if (count == 0)
+            tvMutedUsersCount.setText(R.string.text_no_muted_users);
+        else
+            tvMutedUsersCount.setText(count + " " + Utils.pluralValue(mContext, R.array.muted_users_plural, count));
+    }
+
+    void dialogEditWelcomeText() {
+        View dv = UIUtils.inflate(mContext, R.layout.dialog_input_text);
+        dv.findViewById(R.id.edtInviteUsername).setVisibility(View.GONE);
+        dv.findViewById(R.id.tvDescription).setVisibility(View.GONE);
+        TextView tvHint = UIUtils.getView(dv, R.id.tvHint);
+        final EmojiconEditText edtText = UIUtils.getView(dv, R.id.editInputText);
+        tvHint.setText(R.string.hint_enter_welcome_text);
+        edtText.setMaxLines(6);
+        ChatTask welcomeTask = chatTasks.getTask(ChatTask.TYPE.WELCOME_USER, false);
+        if (welcomeTask != null && !TextUtils.isEmpty(welcomeTask.mText))
+            edtText.setText(welcomeTask.mText);
+
+        new AlertDialog.Builder(mContext)
+                .setTitle("Welcome message")
+                .setView(dv)
+                .setCancelable(false)
+                .setPositiveButton(R.string.btnSave, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String text = edtText.getText().toString().trim();
+                        ChatTask task = chatTasks.getTask(ChatTask.TYPE.WELCOME_USER);
+                        task.mText = text;
+                        chatTasks.saveTask(task);
+                        //DBHelper.getInstance().setWelcomeText(chatId, text, chkWelcomeText.isChecked());
+                        tvWelcomeTextShort.setText(text);
+                    }
+                })
+                .setNegativeButton(R.string.btnCancel, null)
+                .show();
     }
 
     @Override

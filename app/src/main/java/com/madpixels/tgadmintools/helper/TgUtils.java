@@ -31,10 +31,10 @@ public class TgUtils {
         return object.getConstructor() == TdApi.Error.CONSTRUCTOR;
     }
 
-    public static boolean isUserPrivileged(final int role) {
-        return role == TdApi.ChatMemberStatusCreator.CONSTRUCTOR ||
-                role == TdApi.ChatMemberStatusEditor.CONSTRUCTOR ||
-                role == TdApi.ChatMemberStatusModerator.CONSTRUCTOR;
+    public static boolean isUserPrivileged(final int status) {
+        return status == TdApi.ChatMemberStatusCreator.CONSTRUCTOR ||
+                status == TdApi.ChatMemberStatusEditor.CONSTRUCTOR ||
+                status == TdApi.ChatMemberStatusModerator.CONSTRUCTOR;
     }
 
     public static boolean isSuperGroup(final int chatType) {
@@ -191,5 +191,13 @@ public class TgUtils {
 
     public static TdApi.User getUser(TdApi.ChatMember member) {
         return getUser(member.userId);
+    }
+
+    public static String getChatUsername(TdApi.Chat chat) {
+        if(isSuperGroup(chat.type.getConstructor())){
+            TdApi.ChannelChatInfo channelInfo = (TdApi.ChannelChatInfo) chat.type;
+            return channelInfo.channel.username;
+        }
+        return null;
     }
 }

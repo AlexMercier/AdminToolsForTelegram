@@ -13,9 +13,11 @@ import com.madpixels.apphelpers.Sets;
 import com.madpixels.apphelpers.Utils;
 import com.madpixels.tgadmintools.App;
 import com.madpixels.tgadmintools.Const;
+import com.madpixels.tgadmintools.adapters.AdapterChatUsersLocal;
 import com.madpixels.tgadmintools.entities.BanTask;
 import com.madpixels.tgadmintools.entities.BannedWord;
 import com.madpixels.tgadmintools.entities.ChatCommand;
+import com.madpixels.tgadmintools.entities.ChatLogInfo;
 import com.madpixels.tgadmintools.entities.ChatParticipantBan;
 import com.madpixels.tgadmintools.entities.ChatTask;
 import com.madpixels.tgadmintools.helper.TgH;
@@ -60,6 +62,38 @@ public class DBHelper extends DB {
         if (oldVersion < 2) {
             upgradeTableChatTasts();
         }
+
+        if (oldVersion < 4) {
+            upgradeTableWelcomeTexts();
+        }
+    }
+
+    private void upgradeTableWelcomeTexts() {
+        /** Move Welcome texts from old db version to new as chat task
+         */
+        Cursor c = getTable("SELECT * FROM chat_welcome_text WHERE text IS NOT NULL AND text !='' ");
+        if (c != null) {
+            ArrayList<ContentValues> cvList = new ArrayList<>();
+
+            do {
+                String text = c.getString(c.getColumnIndex("text"));
+                long chatId = c.getLong(c.getColumnIndex("chatId"));
+                boolean isEnabled = c.getInt(c.getColumnIndex("isEnabled")) == 1;
+
+                ContentValues cv = new ContentValues(4);
+                cv.put("type", ChatTask.TYPE.WELCOME_USER.name());
+                cv.put("chat_id", chatId);
+                cv.put("isEnabled", isEnabled);
+                cv.put("text", text);
+                cvList.add(cv);
+            } while (c.moveToNext());
+            c.close();
+            //Insert:
+            for (ContentValues cv : cvList) {
+                db.insertWithOnConflict(TABLE_CHAT_TASKS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+            }
+        }
+        db.execSQL("DROP TABLE chat_welcome_text");
     }
 
     private void upgradeTableChatTasts() {// upgrade chat tasks from db v1 to v2
@@ -73,13 +107,13 @@ public class DBHelper extends DB {
             if (c.getInt(c.getColumnIndex("is_remove_join_msg")) == 1) {
                 ChatTask task = new ChatTask(ChatTask.TYPE.JoinMsg, chat_id);
                 task.isEnabled = true;
-                saveAntispamTask(task);
+                saveChatTask(task);
             }
 
             if (c.getInt(c.getColumnIndex("is_remove_leaved_msg")) == 1) {
                 ChatTask task = new ChatTask(ChatTask.TYPE.LeaveMsg, chat_id);
                 task.isEnabled = true;
-                saveAntispamTask(task);
+                saveChatTask(task);
             }
 
             if (c.getInt(c.getColumnIndex("is_ban_links")) == 1 || c.getInt(c.getColumnIndex("is_remove_links")) == 1) {
@@ -98,7 +132,7 @@ public class DBHelper extends DB {
                     task.mWarnFrequency = 3;
                 task.mBanTimeSec = c.getInt(c.getColumnIndex("ban_link_age_msec")) / 1000;
 
-                saveAntispamTask(task);
+                saveChatTask(task);
             }
 
             if (c.getInt(c.getColumnIndex("is_ban_sticks")) == 1 || c.getInt(c.getColumnIndex("is_remove_sticks")) == 1) {
@@ -117,7 +151,7 @@ public class DBHelper extends DB {
                 task.isReturnOnBanExpired = c.getInt(c.getColumnIndex("is_stick_return_on_unban")) == 1;
                 task.mBanTimeSec = c.getInt(c.getColumnIndex("ban_stick_age_msec")) / 1000;
 
-                saveAntispamTask(task);
+                saveChatTask(task);
             }
 
             if (c.getInt(c.getColumnIndex("isBanForBlackWords")) == 1 || c.getInt(c.getColumnIndex("isDelMsgBlackWords")) == 1) {
@@ -141,7 +175,7 @@ public class DBHelper extends DB {
                 if (c.getInt(c.getColumnIndex("isWarnBeforeBanForWord")) == 1)
                     task.mWarnFrequency = 3;
 
-                saveAntispamTask(task);
+                saveChatTask(task);
 
             }
 
@@ -183,6 +217,9 @@ public class DBHelper extends DB {
     }
 
 
+    /**
+     * check <b>value>0</b> in column `count` on query
+     */
     private boolean isRowExists(final Cursor cursor) {
         if (cursor == null) return false;
         if (cursor.moveToFirst()) {
@@ -436,75 +473,27 @@ public class DBHelper extends DB {
         return getCount(TABLE_AUTO_KICK, "chat_id=?", chatId + "");
     }
 
-    /*
-    public int getTotalBannedCount() {
-        return getCount(TABLE_AUTO_KICK);
-    }
-    */
-
-    /*
-    public int getChatRulesCount() {
-        int total = 0;
-        String sql = "SELECT COUNT(1) FROM " + TABLE_ANTISPAM + " WHERE " +
-                "is_remove_links=1 OR is_remove_sticks=1 OR is_ban_sticks=1 OR is_ban_links=1 OR isBanForBlackWords=1 OR isDelMsgBlackWords=1" +
-                " OR is_remove_join_msg=1 OR is_remove_leaved_msg=1";
-        Cursor c = getTable(sql);
-        if (isRowExists(c))
-            total += c.getInt(0);
-
-        sql = "SELECT COUNT(1) FROM " + TABLE_CHAT_WELCOME + "WHERE isEnabled=1";
-        c = getTable(sql);
-        if (isRowExists(c))
-            total += c.getInt(0);
-
-        return total;
-    }
-    */
-
     public boolean isChatRulesExists() {
-        String sql2 = "SELECT COUNT(1) FROM " + TABLE_CHAT_TASKS + " WHERE is_ban=1 OR is_remove_msg=1 OR isEnabled=1 ;";
-        if (isRowExists(sql2))
-            return true;
+        String sql = "SELECT COUNT(1) FROM " + TABLE_CHAT_TASKS + " WHERE is_ban=1 OR is_remove_msg=1 OR isEnabled=1;";
+        return isRowExists(sql);
+        //    return true;
 
-        /*
-        String sql = "SELECT COUNT(1) FROM " + TABLE_ANTISPAM + " WHERE " +
-                "is_remove_links=1 OR is_remove_sticks=1 OR is_ban_sticks=1 OR is_ban_links=1 OR isBanForBlackWords=1 OR isDelMsgBlackWords=1" +
-                " OR is_remove_join_msg=1 OR is_remove_leaved_msg=1";
-        Cursor c = getTable(sql);
-        if (isRowExists(c))
-            return true;
-        */
+       // String sql = "SELECT COUNT(1) FROM " + TABLE_CHAT_WELCOME + " WHERE isEnabled=1";
 
-        String sql = "SELECT COUNT(1) FROM " + TABLE_CHAT_WELCOME + " WHERE isEnabled=1";
-
-        boolean welomeTextExists = isRowExists(sql);
-        return welomeTextExists;
+        //boolean welomeTextExists = isRowExists(sql);
+       // return welomeTextExists;
     }
 
-    /**
-     * @return List or null
-     */
-    /*
-    public ChatTask getAntispamTasksByType(long chat_id, ChatTask.TYPE type) {
-        String sql = "SELECT * FROM " + TABLE_CHAT_TASKS + " WHERE chat_id=? AND type=?";
-        Cursor c = getTable(sql, String.valueOf(chat_id), type.name());
-        ArrayList<ChatTask> list = getAntispamTasks(c);
-        if (list == null || list.isEmpty())
-            return null;
-
-        return list.get(0);
-    }
-    */
-    public ArrayList<ChatTask> getAntispamTasks(long chat_id, boolean onlyActiveTasks) {
+    public ArrayList<ChatTask> getChatTasks(long chat_id, boolean onlyActiveTasks) {
         String filterActiveTasks = " AND (is_ban=1 OR is_remove_msg=1 OR isEnabled=1) ";
         String sql = "SELECT * FROM " + TABLE_CHAT_TASKS + " WHERE chat_id=? ";
         if (onlyActiveTasks)
             sql += filterActiveTasks;
         Cursor c = getTable(sql, String.valueOf(chat_id));
-        return getAntispamTasks(c);
+        return getChatTasks(c);
     }
 
-    private ArrayList<ChatTask> getAntispamTasks(Cursor c) {
+    private ArrayList<ChatTask> getChatTasks(Cursor c) {
         if (c == null)
             return null;
 
@@ -521,6 +510,7 @@ public class DBHelper extends DB {
             task.isReturnOnBanExpired = c.getInt(c.getColumnIndex("is_return_on_ban_expired")) == 1;
             task.mWarnTextFirst = c.getString(c.getColumnIndex("warn_text_first"));
             task.mWarnTextLast = c.getString(c.getColumnIndex("warn_text_last"));
+            task.mText = c.getString(c.getColumnIndex("text"));
             task.mWarningsDuringTime = c.getLong(c.getColumnIndex("within_time_sec"));
             task.mWarnFrequency = c.getInt(c.getColumnIndex("warn_freq"));
             task.isBanUser = c.getInt(c.getColumnIndex("is_ban")) == 1;
@@ -532,67 +522,9 @@ public class DBHelper extends DB {
         c.close();
 
         return tasks;
-
-
     }
 
-    /*
-    public AntiSpamRule getAntispamRule(final long chat_id) {
-        String sql = "SELECT * FROM " + TABLE_ANTISPAM + " WHERE chat_id=" + chat_id;
-        Cursor c = getTable(sql);
-        if (c == null) return null;
-
-        AntiSpamRule antiSpamRule = new AntiSpamRule();
-        antiSpamRule.id = c.getInt(c.getColumnIndex("_id"));
-        antiSpamRule.chat_id = chat_id;
-        //int testBool = c.getInt(c.getColumnIndex("is_remove_links"));
-        //MyLog.log("testBool=" + testBool);
-        antiSpamRule.isRemoveLinks = c.getInt(c.getColumnIndex("is_remove_links")) == 1;
-        antiSpamRule.isRemoveStickers = c.getInt(c.getColumnIndex("is_remove_sticks")) == 1;
-        antiSpamRule.isBanForLinks = c.getInt(c.getColumnIndex("is_ban_links")) == 1;
-        antiSpamRule.isBanForStickers = c.getInt(c.getColumnIndex("is_ban_sticks")) == 1;
-
-
-//
-        antiSpamRule.mAllowLinksCount = c.getInt(c.getColumnIndex("ban_links_allow_count"));
-        antiSpamRule.mWarnTextLink = c.getString(c.getColumnIndex("ban_link_warn_text"));
-        antiSpamRule.isLinkReturnOnUnban = c.getInt(c.getColumnIndex("is_link_return_on_unban")) == 1;
-        antiSpamRule.mLinkBanAgeMsec = c.getInt(c.getColumnIndex("ban_link_age_msec"));
-//
-//
-        antiSpamRule.isWarnBeforeStickersBan = c.getInt(c.getColumnIndex("is_warn_before_stickers_ban")) == 1;
-        antiSpamRule.mAllowStickersCount = c.getInt(c.getColumnIndex("ban_sticks_allow_count"));
-        antiSpamRule.mWarnTextStickers = c.getString(c.getColumnIndex("ban_stick_warn_text"));
-        antiSpamRule.isStickerReturnOnUnban = c.getInt(c.getColumnIndex("is_stick_return_on_unban")) == 1;
-        antiSpamRule.mStickerBanAgeMsec = c.getInt(c.getColumnIndex("ban_stick_age_msec"));
-
-        antiSpamRule.option_link_banage_val = c.getInt(c.getColumnIndex("option_links_banage_value"));
-        antiSpamRule.option_links_banage_mp = c.getInt(c.getColumnIndex("option_links_banage_multiplier"));
-        antiSpamRule.option_sticks_banage_val = c.getInt(c.getColumnIndex("option_sticks_banage_value"));
-        antiSpamRule.option_sticks_banage_mp = c.getInt(c.getColumnIndex("option_sticks_banage_multiplier"));
-
-        antiSpamRule.isBanForBlackWords = c.getInt(c.getColumnIndex("isBanForBlackWords")) == 1;
-        antiSpamRule.isDelMsgBlackWords = c.getInt(c.getColumnIndex("isDelMsgBlackWords")) == 1;
-        antiSpamRule.isBlackWordReturnOnBanExp = c.getInt(c.getColumnIndex("isBlackWordReturnOnBanExp")) == 1;
-        antiSpamRule.option_blackword_banage_val = c.getInt(c.getColumnIndex("option_blackword_banage_val"));
-        antiSpamRule.option_blackword_banage_mp = c.getInt(c.getColumnIndex("option_blackword_banage_mp"));
-        antiSpamRule.mBlackWordBanAgeMsec = c.getInt(c.getColumnIndex("ban_blackword_age_msec"));
-        antiSpamRule.isAlertAboutWordBan = c.getInt(c.getColumnIndex("isAlertOnBanWord")) == 1;
-        antiSpamRule.isWarnBeforeBanForWord = c.getInt(c.getColumnIndex("isWarnBeforeBanForWord")) == 1;
-        antiSpamRule.mWarnTextBlackWords = c.getString(c.getColumnIndex("ban_words_warn_text"));
-        antiSpamRule.banWordsFloodLimit = c.getInt(c.getColumnIndex("banWordsFloodLimit"));
-        antiSpamRule.isWarnBeforeLinksBan = c.getInt(c.getColumnIndex("is_warn_before_links_ban")) == 1;
-
-        antiSpamRule.isRemoveJoinMessage = c.getInt(c.getColumnIndex("is_remove_join_msg")) == 1;
-        antiSpamRule.isRemoveLeaveMessage = c.getInt(c.getColumnIndex("is_remove_leaved_msg")) == 1;
-
-        c.close();
-        return antiSpamRule;
-    }
-*/
-
-
-    public void saveAntispamTask(ChatTask task) {
+    public void saveChatTask(ChatTask task) {
         ContentValues cv = new ContentValues();
         cv.put("type", task.mType.name());
         cv.put("chat_id", task.chat_id);
@@ -601,6 +533,7 @@ public class DBHelper extends DB {
         cv.put("is_return_on_ban_expired", task.isReturnOnBanExpired);
         cv.put("warn_text_first", task.mWarnTextFirst);
         cv.put("warn_text_last", task.mWarnTextLast);
+        cv.put("text", task.mText);
         cv.put("within_time_sec", task.mWarningsDuringTime);
         cv.put("warn_freq", task.mWarnFrequency);
         cv.put("is_ban", task.isBanUser);
@@ -608,60 +541,12 @@ public class DBHelper extends DB {
         cv.put("isEnabled", task.isEnabled);
 
         try {
-            db.insertWithOnConflict(TABLE_CHAT_TASKS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+            long id = db.insertWithOnConflict(TABLE_CHAT_TASKS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+            task.id = (int) id; // update task id if Replace was
         } catch (Exception e) {
             MyLog.log(e);
         }
     }
-
-    /*
-    public void setAntiSpamRule(long chat_id, AntiSpamRule antiSpamRule) {
-        ContentValues cv = new ContentValues(6);
-        cv.put("chat_id", chat_id);
-        cv.put("is_remove_links", antiSpamRule.isRemoveLinks);
-        cv.put("is_remove_sticks", antiSpamRule.isRemoveStickers);
-        cv.put("is_ban_links", antiSpamRule.isBanForLinks);
-        cv.put("is_ban_sticks", antiSpamRule.isBanForStickers);
-        cv.put("is_warn_before_links_ban", antiSpamRule.isWarnBeforeLinksBan);
-
-        cv.put("ban_links_allow_count", antiSpamRule.mAllowLinksCount);
-        cv.put("ban_link_warn_text", antiSpamRule.mWarnTextLink);
-        cv.put("is_link_return_on_unban", antiSpamRule.isLinkReturnOnUnban);
-        cv.put("ban_link_age_msec", antiSpamRule.mLinkBanAgeMsec);
-//
-        cv.put("ban_sticks_allow_count", antiSpamRule.mAllowStickersCount);
-        cv.put("ban_stick_warn_text", antiSpamRule.mWarnTextStickers);
-        cv.put("is_stick_return_on_unban", antiSpamRule.isStickerReturnOnUnban);
-        cv.put("ban_stick_age_msec", antiSpamRule.mStickerBanAgeMsec);
-        cv.put("is_warn_before_stickers_ban", antiSpamRule.isWarnBeforeStickersBan);
-        cv.put("option_links_banage_value", antiSpamRule.option_link_banage_val);
-        cv.put("option_links_banage_multiplier", antiSpamRule.option_links_banage_mp);
-        cv.put("option_sticks_banage_value", antiSpamRule.option_sticks_banage_val);
-        cv.put("option_sticks_banage_multiplier", antiSpamRule.option_sticks_banage_mp);
-
-        cv.put("isDelMsgBlackWords", antiSpamRule.isDelMsgBlackWords);
-        cv.put("isBanForBlackWords", antiSpamRule.isBanForBlackWords);
-        cv.put("isBlackWordReturnOnBanExp", antiSpamRule.isBlackWordReturnOnBanExp);
-        cv.put("option_blackword_banage_val", antiSpamRule.option_blackword_banage_val);
-        cv.put("option_blackword_banage_mp", antiSpamRule.option_blackword_banage_mp);
-        cv.put("ban_blackword_age_msec", antiSpamRule.mBlackWordBanAgeMsec);
-        cv.put("isAlertOnBanWord", antiSpamRule.isAlertAboutWordBan);
-        cv.put("isWarnBeforeBanForWord", antiSpamRule.isWarnBeforeBanForWord);
-        cv.put("ban_words_warn_text", antiSpamRule.mWarnTextBlackWords);
-        cv.put("banWordsFloodLimit", antiSpamRule.banWordsFloodLimit);
-
-        cv.put("is_remove_join_msg", antiSpamRule.isRemoveJoinMessage);
-        cv.put("is_remove_leaved_msg", antiSpamRule.isRemoveLeaveMessage);
-
-
-        try {
-            long insertid = db.insertWithOnConflict(TABLE_ANTISPAM, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
-            MyLog.log("antiSpamRule insert id " + insertid);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    */
 
     public ChatParticipantBan getBanById(long chat_id, int user_id) {
         String sql = "SELECT * FROM " + BAN_INFO_TABLE + " WHERE chat_id=" + chat_id + " AND user_id=" + user_id;
@@ -826,8 +711,8 @@ public class DBHelper extends DB {
         }
     }
 
-    public ArrayList<LogUtil.LogEntity> getLog(int offset) {
-        String sql = "SELECT * FROM " + TABLE_LOG_ACTIONS + " ORDER BY _id DESC LIMIT " + offset + ", 5";
+    public ArrayList<LogUtil.LogEntity> getLog(int offset, int count) {
+        String sql = "SELECT * FROM " + TABLE_LOG_ACTIONS + " ORDER BY _id DESC LIMIT " + offset + ", " + count;
         Cursor c = getTable(sql);
 
         if (c != null) {
@@ -951,11 +836,13 @@ public class DBHelper extends DB {
 
     }
 
+    /*
     public String getWelcomeText(final long chatId) {
         try {
             Cursor c = getTable("SELECT text FROM " + TABLE_CHAT_WELCOME + " WHERE chatId=? AND isEnabled=1 AND text IS NOT NULL AND text !='' ", new String[]{chatId + ""});
             if (c != null) {
                 String text = c.getString(c.getColumnIndex("text"));
+
                 c.close();
                 return text;
             }
@@ -964,7 +851,9 @@ public class DBHelper extends DB {
         }
         return null;
     }
+    */
 
+    /*
     public Object[] getWelcomeTextObject(long chatId) {
         try {
             Cursor c = getTable("SELECT * FROM " + TABLE_CHAT_WELCOME + " WHERE chatId=?", new String[]{chatId + ""});
@@ -979,7 +868,25 @@ public class DBHelper extends DB {
         }
         return null;
     }
+    */
 
+    /*
+    public void setWelcomeTextEnabled(long chatId, boolean isEnabled) {
+        ContentValues cv = new ContentValues(2);
+        cv.put("chatId", chatId);
+        cv.put("isEnabled", isEnabled);
+        try {
+            if (isRowExists(TABLE_CHAT_WELCOME, "chatId", chatId + ""))
+                db.update(TABLE_CHAT_WELCOME, cv, "chatId=?", new String[]{chatId + ""});
+            else
+                db.insertWithOnConflict(TABLE_CHAT_WELCOME, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        } catch (Exception e) {
+
+        }
+    }
+    */
+
+    /*
     public void setWelcomeText(long chatId, String text, boolean isEnabled) {
         ContentValues cv = new ContentValues(3);
         cv.put("chatId", chatId);
@@ -992,6 +899,7 @@ public class DBHelper extends DB {
 
         }
     }
+    */
 
     public void updateBannedWord(BannedWord word) {
         ContentValues cv = new ContentValues(4);
@@ -1251,6 +1159,122 @@ public class DBHelper extends DB {
     public void deleteChatCommand(long id) {
         try {
             db.delete(TABLE_CHAT_COMMAND, "_id=?", new String[]{id + ""});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeChatTask(int taskID) {
+        if (taskID == 0)
+            return;
+
+        try {
+            db.delete(TABLE_CHAT_TASKS, "_id=?", new String[]{taskID + ""});
+        } catch (Exception e) {
+            MyLog.log(e);
+        }
+    }
+
+    public void setChatLogTargetChat(long chatId, long id) {
+        ContentValues cv = new ContentValues(3);
+        cv.put("chat_id", chatId);
+        cv.put("chat_id_log", id);
+
+        updateChatLogInfo(chatId, cv);
+    }
+
+    public void setChatLogEnabled(long chatId, boolean isEnabled) {
+        ContentValues cv = new ContentValues(3);
+        cv.put("chat_id", chatId);
+        cv.put("isEnabled", isEnabled);
+        updateChatLogInfo(chatId, cv);
+    }
+
+
+    public ChatLogInfo getChatLog(long chatID, boolean isReturnIfEnabbled) {
+        String WHERE = isReturnIfEnabbled ? " AND (isEnabled=1 and chat_id_log!=0)" : "";
+        String sql = "SELECT * FROM " + TABLE_CHAT_LOG + " WHERE chat_id=? " + WHERE + " LIMIT 1";
+        Cursor c = getTable(sql, chatID + "");
+        if (c != null) {
+            if (c.moveToFirst()) {
+                boolean isEnabled = c.getInt(c.getColumnIndex("isEnabled")) == 1;
+                long chatLogId = c.getLong(c.getColumnIndex("chat_id_log"));
+                ChatLogInfo chatLogInfo = new ChatLogInfo();
+                chatLogInfo.chatID = chatID;
+                chatLogInfo.chatLogID = chatLogId;
+                chatLogInfo.isEnabled = isEnabled;
+                c.close();
+                return chatLogInfo;
+            }
+            c.close();
+        }
+        return null;
+    }
+
+    private void updateChatLogInfo(long chatId, ContentValues cv) {
+        try {
+            if (isRowExists(TABLE_CHAT_LOG, "chat_id", chatId + "")) {
+                db.update(TABLE_CHAT_LOG, cv, "chat_id=?", new String[]{chatId + ""});
+            } else {
+                db.insert(TABLE_CHAT_LOG, null, cv);
+            }
+        } catch (Exception e) {
+            MyLog.log(e);
+        }
+    }
+
+    public void addMutedUser(long chatID, int userID, String username) {
+        ContentValues cv = new ContentValues();
+        cv.put("chat_id", chatID);
+        cv.put("user_id", userID);
+        cv.put("user_name", username.trim());
+        try {
+            db.insertWithOnConflict(TABLE_MUTED_USERS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        } catch (Exception e) {
+            MyLog.log(e);
+        }
+    }
+
+
+    public boolean isUserMuted(long chatId, int senderUserId) {
+        String sql = "SELECT COUNT(1) FROM " + TABLE_MUTED_USERS + " WHERE chat_id=? AND user_id=?";
+        Cursor c = getTable(sql, chatId + "", senderUserId + "");
+        return isRowExists(c);
+    }
+
+    public int getMutedCount(long chatId) {
+        return getCount(TABLE_MUTED_USERS, "chat_id=?", chatId + "");
+
+    }
+
+    /**
+     * @return return a list of "local" users, only id and firstName given.
+     */
+    public ArrayList<AdapterChatUsersLocal.ChatMemberUser> getMutedUsers(long chatlId, int localOffset, int count) {
+        String sql = "SELECT * FROM " + TABLE_MUTED_USERS + " WHERE chat_id=? ORDER BY _id LIMIT " + localOffset + ", " + count;
+        Cursor c = getTable(sql, chatlId + "");
+        if (c != null) {
+            ArrayList<AdapterChatUsersLocal.ChatMemberUser> users = new ArrayList<>();
+            do {
+                TdApi.User user = new TdApi.User();
+                user.id = c.getInt(c.getColumnIndex("user_id"));
+                user.firstName = c.getString(c.getColumnIndex("user_name"));
+
+                AdapterChatUsersLocal.ChatMemberUser member = new AdapterChatUsersLocal.ChatMemberUser();
+                member.localUser = user;
+                member.userId = user.id;
+                users.add(member);
+
+            } while (c.moveToNext());
+            c.close();
+            return users;
+        }
+        return null;
+    }
+
+    public void removeMutedUser(long chatId, int userId) {
+        try {
+            db.delete(TABLE_MUTED_USERS, "chat_id=? AND user_id=?", new String[]{chatId + "", userId + ""});
         } catch (Exception e) {
             e.printStackTrace();
         }

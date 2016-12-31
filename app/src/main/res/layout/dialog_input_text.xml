@@ -10,7 +10,7 @@
         android:text="@string/input_new_chat_title"
         android:id="@+id/tvHint" />
 
-    <EditText
+    <io.github.rockerhieu.emojicon.EmojiconEditText
         android:maxLines="3"
         android:hint="Input Text"
         android:layout_width="match_parent"
@@ -18,7 +18,10 @@
         android:id="@+id/editInputText"
         android:layout_gravity="center_horizontal" />
 
+
+
     <TextView
+        android:id="@+id/tvDescription"
         android:text="For creating group you must add at least 1 user. Please enter @username of your friend. You can leave this field empty to add default bot:"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -408,6 +408,8 @@ public class ActivityChatUsers extends ActivityExtended {
 
                     mAdapter.getList().addAll(users);
                     onUiThread(updateList);
+                }else{
+                    MyToast.toast(getActivity(), "Error loading chat members");
                 }
             }
         });

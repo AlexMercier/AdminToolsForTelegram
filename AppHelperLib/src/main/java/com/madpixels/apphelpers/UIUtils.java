@@ -159,7 +159,7 @@ public class UIUtils {
         return tb;
     }
 
-    public static void setTextColotRes(final TextView textView, final int colorRes) {
+    public static void setTextColotRes(final TextView textView,@ColorRes final int colorRes) {
         final int c = textView.getResources().getColor(colorRes);
         textView.setTextColor(c);
     }

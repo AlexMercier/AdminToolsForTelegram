@@ -31,7 +31,7 @@
     <string name="action_unban_all">Desbanear a todos</string>
     <string name="adminsCount">Admins:</string>
     <string name="auth_cloud_pass_hint">Introduce tu constraseña en la nube</string>
-    <string name="auth_confirmcode_hint">introduce el codigo de activacion enviado por sms</string>
+    <string name="auth_confirmcode_hint">introduce el codigo de auth enviado por sms</string>
     <string name="auth_phone_hint">Introduce tu numero de telefono</string>
     <string name="ban_reason">Motivo del ban</string>
     <string name="ban_soft_hint">"Nota: la app oficial de Telegram no tiene herramienta interna para ban temporal, por lo que esta app usa una lista de ban propia.
@@ -39,7 +39,7 @@
     <string name="btnContinue">Continuar</string>
     <string name="btnSave">Guardar</string>
     <string name="btn_submit">Enviar</string>
-    <string name="btn_yes">Si</string>
+    <string name="btnYes">Si</string>
     <string name="button_delete">Borrar</string>
     <string name="button_rate_us">Si te gusta esta app, haz click para puntuarla en google play</string>
     <string name="btnCancel">Cancelar</string>
@@ -72,7 +72,7 @@
     <string name="chk_remove_messages_stickers">Eliminar mensajes con stickers</string>
     <string name="chtTitleAlertOnBlackWordBan">Notificar al chat del ban</string>
     <string name="chtTitleBanForLinks">Ban por links</string>
-    <string name="close">Cerrar</string>
+    <string name="btnClose">Cerrar</string>
     <string name="create_chat_title">Titulo del chat</string>
     <string name="create_group">Crear grupo</string>
     <string name="create_supergroup">Crear supergrupo</string>
@@ -113,7 +113,7 @@
     <string name="label_ban_period">Duracion del ban</string>
     <string name="label_ban_time_prefix">para</string>
     <string name="label_banwords_warntext">Mensaje de aviso:</string>
-    <string name="label_empty">La lista esta vacia</string>
+    <string name="text_list_empty">La lista esta vacia</string>
     <string name="label_loading">Cargando...</string>
     <string name="label_loading_chats_count">Cargando chats...</string>
     <string name="label_note_ban_simple_groups">Nota: En no supergrupos lan lista de ban está ausente , por lo que esta aplicación sólo se iniciará cuando el usuario trate de volver al chat.</string>
@@ -127,10 +127,10 @@
     <string name="logAction_banForSticker">Ban por flood de stickers</string>
     <string name="logAction_banUser">Has baneado al usuario</string>
     <string name="logAction_banwordsFloodWarn">Avisar al usuario por usar palabras de la lista negra</string>
-    <string name="logAction_delMsgWithBlackWord">Mensaje eliminado con la palabra prohibida</string>
+    <string name="logAction_removedBlackWordMessage">Mensaje eliminado con la palabra prohibida</string>
     <string name="logAction_linksFloodWarn">Advertir al usuario sobre el ban</string>
-    <string name="logAction_removeLink">Mensaje eliminado con el url</string>
-    <string name="logAction_removeSticker">Mensaje eliminado con sticker</string>
+    <string name="logAction_removedLink">Mensaje eliminado con el url</string>
+    <string name="logAction_removedSticker">Mensaje eliminado con sticker</string>
     <string name="logAction_return_to_chat">Retornar al usuario cuando el tiempo de ban finalice</string>
     <string name="logAction_stickersFloodWarn">Avisar al usuario sobre stickers-flood</string>
     <string name="logAction_unbanByAdminInvite">Desbanear con invitacion del admin</string>

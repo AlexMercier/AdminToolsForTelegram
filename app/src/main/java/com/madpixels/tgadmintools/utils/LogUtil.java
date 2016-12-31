@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.madpixels.apphelpers.MyLog;
@@ -15,7 +16,11 @@ import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.activity.ActivityLogView;
 import com.madpixels.tgadmintools.db.DBHelper;
 import com.madpixels.tgadmintools.entities.BanTask;
+import com.madpixels.tgadmintools.entities.Callback;
+import com.madpixels.tgadmintools.entities.ChatTask;
+import com.madpixels.tgadmintools.helper.TaskValues;
 import com.madpixels.tgadmintools.helper.TgH;
+import com.madpixels.tgadmintools.helper.TgUtils;
 import com.madpixels.tgadmintools.services.MyNotification;
 
 import org.drinkless.td.libcore.telegram.Client;
@@ -27,6 +32,42 @@ import org.json.JSONObject;
  * Created by Snake on 15.03.2016.
  */
 public class LogUtil {
+
+    Callback onLogCallback;
+    public Object callbackPayload;
+    public LogEntity logEntity;
+
+    public LogUtil() {
+    }
+
+    public LogUtil(Callback onLogCallback, Object callbackPayload) {
+        this.onLogCallback = onLogCallback;
+        this.callbackPayload = callbackPayload;
+    }
+
+    public void logWarningBeforeBan(ChatTask.TYPE type, TdApi.Chat chat, TdApi.UpdateNewMessage message, int tryes) {
+        Action action;
+        action = TaskValues.getWarningAction(type);
+
+        final String chatTitle = chat.title;
+        final long chatId = chat.id;
+        final int user_id = message.message.senderUserId;
+        String chatUsername = TgUtils.getChatUsername(chat);
+        try {
+            JSONObject logData = new JSONObject()
+                    .put("type", action)
+                    .put("chatId", chatId)
+                    .put("chatType", chat.type)
+                    .put("chatTitle", chatTitle)
+                    .put("userId", user_id);
+            if(!TextUtils.isEmpty(chatUsername))
+                logData.put("chatUsername", chatUsername);
+            logData.put("payload", tryes);
+            logWithUserInfo(action, user_id, logData);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public static class LogEntity {
@@ -87,6 +128,8 @@ public class LogUtil {
         }
 
         private void compileLog() {
+            if (logText != null)// already compiled
+                return;
             logText = jsonData;
             String actionTitle = "";
             try {
@@ -97,42 +140,43 @@ public class LogUtil {
                 if (!username.isEmpty())
                     username = " @" + username;
 
-                String chatTitle = null, userFullName = null, logTime = null, linkUrl = null;
+                String chatUsername = json.optString("chatUsername");
+                if (!chatUsername.isEmpty())
+                    chatUsername = " @" + chatUsername;
+
+                String chatTitle = null, userFullName = null, logTime = null, linkUrl = null,
+                        userIdText=null;
 
                 if (json.has("chatTitle"))
-                    chatTitle = String.format(String.format("%s: %s\n", getString(R.string.log_title_group), json.getString("chatTitle")));
-                if (json.has("userFullname")) {
+                    chatTitle = String.format(String.format("%s: %s %s\n", getString(R.string.log_title_group), json.getString("chatTitle"), chatUsername.trim()));
+                if (json.has("userFullname"))
                     userFullName = String.format(String.format("%s: %s%s\n", getString(R.string.log_title_username), json.getString("userFullname"), username));
-                }
                 if (json.has("ts"))
-                    logTime = String.format("%s: %s", getString(R.string.log_title_time), Utils.TimestampToDate(json.optLong("ts") / 1000)); // time
-                if (json.has("link"))
-                    linkUrl = String.format(String.format("%s: %s", getString(R.string.log_title_banurl), json.getString("link")));
-                ///if(json.has("banAge"))
-                //    banTime = String.format("\n%s: %s", getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(json.optLong("banAge") / 1000));//ban length
+                    logTime = String.format("%s: %s", getString(R.string.log_title_time), Utils.TimestampToDate(json.optLong("ts") / 1000));
+                if(userId!=0)
+                    userIdText = String.format("User id: %s\n" , userId);
 
+
+                actionTitle = getString(TaskValues.getTitleLogAction(action));
                 switch (action) {
+                    //NOTE add new type here when new type implemented
                     case AutoKickFromGroup:
-                        actionTitle = getString(R.string.logAction_autokick);
                         long ts;
-                        String s = chatTitle + userFullName + logTime;
+                        String s = chatTitle +userIdText+ userFullName + logTime;
                         logText = s;
 
                         break;
                     case AutoReturnToChat:
-                        actionTitle = getString(R.string.logAction_return_to_chat);
                         if (json.has("error")) {
                             s = json.getString("error") + "\n";
-                            s+= "User id: "+json.getInt("userId")+"\n";
-                        }
-                        else
+                            s += "User id: " + json.getInt("userId") + "\n";
+                        } else
                             s = chatTitle + userFullName;
                         s += logTime;
                         logText = s;
 
                         break;
                     case AutoUnban:
-                        actionTitle = getString(R.string.logAction_autoUnban);
                         if (json.has("error")) {
                             s = json.getString("error") + "\n" +
                                     chatTitle + userFullName;
@@ -143,7 +187,7 @@ public class LogUtil {
                         logText = s;
                         break;
                     case BanForLink:
-                        actionTitle = getString(R.string.logAction_banForLink);
+                        // actionTitle = getString(R.string.logAction_banForLink);
                         s = chatTitle + userFullName + logTime;
                         JSONObject payload = json.getJSONObject("payload");
                         if (payload.has("error"))
@@ -151,16 +195,24 @@ public class LogUtil {
                         else {
                             long banTime = payload.getLong("banAge");
                             linkUrl = payload.getString("link");
-                            s += String.format("\n%s: %s", getString(R.string.log_title_banurl), linkUrl) ;
+                            s += String.format("\n%s: %s", getString(R.string.log_title_banurl), linkUrl);
                             s += String.format("\n%s: %s", getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banTime / 1000));//ban length
                         }
                         s += String.format("\n%s: %s", getString(R.string.log_title_message), payload.getString("text"));
                         logText = s;
                         break;
+
+                    //Ban for attachments:
+                    case BanForImages:
+                    case BanForDocs:
                     case BanForSticker:
-                        actionTitle = getString(R.string.logAction_banForSticker);
+                    case BanForVoice:
+                    case BanForGame:
+                    case BanForGif:
+                    case BanForAudio:
+                    case BanForVideo:
                         ts = json.getLong("ts");
-                        s = chatTitle + userFullName + logTime; // time
+                        s = chatTitle +userIdText+ userFullName + logTime;
 
                         payload = json.getJSONObject("payload");
                         long banAge = payload.getLong("banAge");
@@ -171,48 +223,86 @@ public class LogUtil {
 
                         logText = s;
                         break;
+
+                    /* Remove messaage: */
                     case RemoveLink:
-                        actionTitle = getString(R.string.logAction_removeLink);
-                        // ts = json.getLong("ts");
-                        s = chatTitle + userFullName +
+                        s = chatTitle +userIdText+ userFullName +
                                 String.format("%s: %s\n", getString(R.string.log_title_banurl), json.getString("payload")) +//banned url
                                 logTime;
                         logText = s;
                         break;
+                    case DeleteMsgBlackWord:
+                        s = chatTitle +userIdText+ userFullName + logTime +
+                                String.format("\n%s: %s", getString(R.string.log_title_bannedword), json.getString("payload"));
+                        logText = s;
+                        break;
+                    case RemoveFlood:
+                        payload = new JSONObject(json.getString("payload"));
+                        String messageText = payload.getString("msg");
+                        int limit = payload.optInt("limit");
+                        int floodCount = payload.optInt("flood");
+
+                        s = chatTitle +userIdText+ userFullName + logTime;
+                        s += String.format("\nFlood: %s/%s", floodCount, limit);
+                        s += String.format("\n%s: %s", getString(R.string.log_title_message), messageText);
+                        logText = s;
+                        break;
+                    case RemoveVoice:
+                    case RemoveDocs:
+                    case RemoveGame:
+                    case RemoveGif:
+                    case RemoveImage:
                     case RemoveSticker:
-                        actionTitle = getString(R.string.logAction_removeSticker);
-                        // ts = json.getLong("ts");
-                        s = chatTitle + userFullName + logTime; // time
+                    case RemoveAudio:
+                    case RemoveVideo:
+                        s = chatTitle +userIdText+ userFullName + logTime;
+                        logText = s;
+                        break;
+                    case RemoveMuted:
+                        String message = json.optString("payload");
+                        s = chatTitle +userIdText+"Message: "+message+"\n"+userFullName + logTime;
                         logText = s;
                         break;
 
-                    case StickersFloodWarn:
-                        actionTitle = getString(R.string.logAction_stickersFloodWarn);
-                        // ts = json.getLong("ts");
-                        s = chatTitle + userFullName + logTime; // time
+                    /* Other */
+                    case CommandExecError:
+                        payload = json.getJSONObject("payload");
+                        s = chatTitle + logTime + "\n" +
+                                String.format("Command: %s\n", payload.getString("cmd")) +
+                                String.format("Error: %s\n", payload.getString("error")) +
+                                String.format("Body: %s\n", payload.getString("answer"));
                         logText = s;
                         break;
+
+                    //Warning for attachments:
+                    case GameFloodWarn:
+                    case DocsFloodWarn:
+                    case ImagesFloodWarn:
+                    case GifsFloodWarn:
+                    case AudioFloodWarn:
+                    case VoiceFloodWarn:
+                    case StickersFloodWarn:
+                    case VideoFloodWarn:
+
+                        s = chatTitle +userIdText+ userFullName + logTime;
+                        logText = s;
+                        break;
+
                     case BanWordsFloodWarn:
-                        actionTitle = getString(R.string.logAction_banwordsFloodWarn);
-                        // ts = json.getLong("ts");
-                        s = chatTitle + userFullName + logTime;
+                        s = chatTitle +userIdText+ userFullName + logTime;
                         logText = s;
                         break;
                     case LinksFloodAttempt:
-                        actionTitle = getString(R.string.logAction_linksFloodWarn);
-                        // ts = json.getLong("ts");
                         payload = json.getJSONObject("payload");
-                        s = chatTitle + userFullName +
+                        s = chatTitle +userIdText+ userFullName +
                                 String.format("%s: %s\n", getString(R.string.log_title_banurl), payload.getString("link")) +
                                 // "Link: " + payload.getString("link") + "\n" +
                                 logTime;
                         logText = s;
                         break;
                     case AutoUnbanByAdminInvite:
-                        actionTitle = getString(R.string.logAction_unbanByAdminInvite);
-                        //ts = json.getLong("ts");
                         payload = json.getJSONObject("payload");
-                        s = chatTitle + userFullName +
+                        s = chatTitle +userIdText+ userFullName +
                                 String.format("%s: %s\n", getString(R.string.log_title_admin), payload.getString("adminName")) +
                                 // "Admin: " + payload.getString("adminName") + "\n" +
                                 logTime;
@@ -220,28 +310,17 @@ public class LogUtil {
                         break;
 
                     case BanForBlackWord:
-                        actionTitle = getString(R.string.logAction_banForBlackWord);
-                        // ts = json.getLong("ts");
-                        s = chatTitle + userFullName + logTime;
+                        s = chatTitle +userIdText+ userFullName + logTime;
                         payload = json.getJSONObject("payload");
                         long banTime = payload.getLong("banAge") / 1000;
                         s += String.format("\n%s: %s", getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banTime)) +
                                 String.format("\n%s: %s", getString(R.string.log_title_bannedword), payload.getString("word")) +
-                                //"\nBan word: " + payload.getString("word") +
                                 String.format("\n%s: %s", getString(R.string.log_title_message), payload.getString("text"));
                         logText = s;
                         break;
 
-                    case DeleteMsgBlackWord:
-                        actionTitle = getString(R.string.logAction_delMsgWithBlackWord);
-                        //ts = json.getLong("ts");
-                        s = chatTitle + userFullName + logTime +
-                                String.format("\n%s: %s", getString(R.string.log_title_bannedword), json.getString("payload"));
-                        logText = s;
-                        break;
+
                     case BanManually:
-                        actionTitle = getString(R.string.logAction_banUser);
-                        // ts = json.getLong("ts");
                         payload = json.getJSONObject("payload");
                         banTime = payload.getLong("banAge") / 1000;
                         s = chatTitle + userFullName + logTime +
@@ -253,36 +332,15 @@ public class LogUtil {
                         logText = s;
                         break;
 
-                    case RemoveFlood:
-                        actionTitle = getString(R.string.logAction_delMsgForFlood);
-                        payload = new JSONObject(json.getString("payload"));
-                        String messageText = payload.getString("msg");
-                        int limit = payload.optInt("limit");
-                        int floodCount = payload.optInt("flood");
-
-                        s = chatTitle + userFullName + logTime;
-                        s+= String.format("\nFlood: %s/%s", floodCount, limit);
-                        s += String.format("\n%s: %s", getString(R.string.log_title_message), messageText);
-                        logText = s;
-                        break;
 
                     case BanForFlood:
-                        actionTitle = getString(R.string.logAction_banForFlood);
-                        s = chatTitle + userFullName + logTime;
+                        s = chatTitle +userIdText+ userFullName + logTime;
                         payload = json.getJSONObject("payload");
                         banTime = payload.getLong("banAge") / 1000;
-                        s += String.format("\n%s: %s", getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banTime));// +
-                                //String.format("\n%s: %s", getString(R.string.log_title_), payload.getString("word")) +
-                                //"\nBan word: " + payload.getString("word") +
-                                //String.format("\n%s: %s", getString(R.string.log_title_message), payload.getString("text"));
+                        s += String.format("\n%s: %s", getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banTime));
                         logText = s;
                         break;
 
-                    case RemoveVoice:
-                        actionTitle = getString(R.string.logAction_removeVoice);
-                        s = chatTitle + userFullName + logTime;
-                        logText = s;
-                        break;
 
                     default:
                         actionTitle = action.name();
@@ -334,11 +392,14 @@ public class LogUtil {
     public enum Action {
         StickersFloodWarn, LinksFloodAttempt, RemoveSticker, BanForSticker, RemoveLink, BanForLink,
         AutoKickFromGroup, AutoUnban, AutoUnbanByAdminInvite, AutoReturnToChat, BanWordsFloodWarn,
-        BanForImages, BanForBlackWord, DeleteMsgBlackWord, BanManually, ImagesFloodWarn, BanForVoice, RemoveVoice, VoiceFloodWarn,
-        BanForFlood, RemoveFlood
+        BanForImages, BanForBlackWord, DeleteMsgBlackWord, BanManually, ImagesFloodWarn, BanForVoice,
+        RemoveVoice, VoiceFloodWarn, BanForFlood, BanForGame, RemoveGame, CommandExecError, RemoveImage,
+        GameFloodWarn, BanForDocs, RemoveDocs, DocsFloodWarn, GifsFloodWarn, BanForGif, RemoveGif,
+        BanForAudio, RemoveAudio, AudioFloodWarn, VideoFloodWarn, RemoveVideo, BanForVideo, RemoveFlood,
+        RemoveMuted
     }
 
-    public static void logAutoKickUser(long chat_id, int chatType, int user_id, String chatTitle) {
+    public void logAutoKickUser(long chat_id, int chatType, int user_id, String chatTitle) {
         try {
             JSONObject logData = new JSONObject()
                     .put("type", Action.AutoKickFromGroup)
@@ -352,7 +413,7 @@ public class LogUtil {
         }
     }
 
-    public static void logAutoUnbanAndReturnError(BanTask ban, String error) {
+    public void logAutoUnbanAndReturnError(BanTask ban, String error) {
         try {
             JSONObject logData = new JSONObject()
                     .put("type", Action.AutoReturnToChat)
@@ -368,7 +429,7 @@ public class LogUtil {
         }
     }
 
-    public static void logAutoUnbanAndReturn(final BanTask ban) {
+    public void logAutoUnbanAndReturn(final BanTask ban) {
         final JSONObject logData = new JSONObject();
         try {
             logData
@@ -397,11 +458,11 @@ public class LogUtil {
         });
     }
 
-    private static void logAction(final Action action, JSONObject logData) {
+    private void logAction(final Action action, JSONObject logData) {
         logAction(action, logData, false);
     }
 
-    public static void logAction(final Action action, JSONObject logData, boolean silent) {
+    public void logAction(final Action action, JSONObject logData, boolean silent) {
         try {
             logData.put("ts", System.currentTimeMillis());
         } catch (JSONException e) {
@@ -411,21 +472,15 @@ public class LogUtil {
         ActivityLogView.updateLog();
         Analytics.sendReport("LogAction", action.name(), "");
 
-        if (!silent && Sets.getBoolean(Const.NOTIFICATION_LOG, true)) {
-            LogEntity log = new LogEntity(action, logData.toString());
-            showLogNotification(log.getTitle() + "\n" + log.getLogText());
-            /*
-            MyNotification n = new MyNotification(100, App.getContext());
-            n.mNotificationBuilder.setContentText(App.getContext().getText(R.string.notification_show_hint));
-            n.setStyle(new NotificationCompat.BigTextStyle());
-            n.appendBigText(log.getTitle()+"\n"+log.getLogText());
+        LogEntity log = new LogEntity();
+        log.action = action;
+        log.jsonData = logData.toString();
 
-            Intent intent = new Intent(App.getContext(), ActivityLogView.class);
-            PendingIntent pIntent = PendingIntent.getActivity(App.getContext(), 10, intent, 0);
-            n.setContentIntent(pIntent);
-            n.alert();
-            */
+        if (!silent && Sets.getBoolean(Const.NOTIFICATION_LOG, true)) {
+            log.compileLog();
+            showLogNotification(log.getTitle() + "\n" + log.getLogText());
         }
+        callbackLog(log);
     }
 
     public static void showLogNotification(final String logMessage) {
@@ -440,7 +495,7 @@ public class LogUtil {
         n.alert();
     }
 
-    static void logWithUserInfo(final Action action, int userId, final JSONObject logData) {
+    void logWithUserInfo(final Action action, int userId, final JSONObject logData) {
         TgH.send(new TdApi.GetUser(userId), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
@@ -457,6 +512,7 @@ public class LogUtil {
                     logData.put("userFullname", userFullName)
                             .put("username", userName);
                     logAction(action, logData);
+
                 } catch (Exception e) {
 
                 }
@@ -464,14 +520,22 @@ public class LogUtil {
         });
     }
 
-    public static void logBanUser(final Action action, TdApi.Chat chat, TdApi.UpdateNewMessage message) {
+    void callbackLog(LogEntity log) {
+        if (onLogCallback == null)
+            return;
+        this.logEntity = log;
+        onLogCallback.onResult(this);
+    }
+
+    public void logBanUser(final Action action, TdApi.Chat chat, TdApi.UpdateNewMessage message) {
         logBanUser(action, chat, message, null);
     }
 
-    public static void logBanUser(final Action action, TdApi.Chat chat, TdApi.UpdateNewMessage message, JSONObject payload) {
+    public void logBanUser(final Action action, TdApi.Chat chat, TdApi.UpdateNewMessage message, JSONObject payload) {
         final String chatTitle = chat.title;
         final long chatId = chat.id;
         final int user_id = message.message.senderUserId;
+        String chatUsername = TgUtils.getChatUsername(chat);
         try {
             JSONObject logData = new JSONObject()
                     .put("type", action)
@@ -479,6 +543,8 @@ public class LogUtil {
                     .put("chatType", chat.type)
                     .put("chatTitle", chatTitle)
                     .put("userId", user_id);
+            if(!TextUtils.isEmpty(chatUsername))
+                logData.put("chatUsername", chatUsername);
             if (payload != null)
                 logData.put("payload", payload);
             logWithUserInfo(action, user_id, logData);
@@ -487,15 +553,16 @@ public class LogUtil {
         }
     }
 
-    public static void logDeleteMessage(final Action action, TdApi.Chat chat, TdApi.UpdateNewMessage message) {
+    public void logDeleteMessage(final Action action, TdApi.Chat chat, TdApi.UpdateNewMessage message) {
         logDeleteMessage(action, chat, message, null);
     }
 
 
-    public static void logDeleteMessage(final Action action, TdApi.Chat chat, TdApi.UpdateNewMessage message, String payload) {
+    public void logDeleteMessage(final Action action, TdApi.Chat chat, TdApi.UpdateNewMessage message, String payload) {
         final String chatTitle = chat.title;
         final long chatId = chat.id;
         final int user_id = message.message.senderUserId;
+        String chatUsername = TgUtils.getChatUsername(chat);
 
         try {
             JSONObject logData = new JSONObject()
@@ -504,6 +571,8 @@ public class LogUtil {
                     .put("chatType", chat.type)
                     .put("chatTitle", chatTitle)
                     .put("userId", user_id);
+            if(!TextUtils.isEmpty(chatUsername))
+                logData.put("chatUsername", chatUsername);
             if (payload != null)
                 logData.put("payload", payload);
             logWithUserInfo(action, user_id, logData);
@@ -512,66 +581,11 @@ public class LogUtil {
         }
     }
 
-    public static void logBanForStickerAttempt(TdApi.Chat chat, TdApi.UpdateNewMessage message, int attemptsCount) {
+    public void logWarningBeforeBanForLink(TdApi.Chat chat, TdApi.UpdateNewMessage message, int attemptsCount, String link) {
         final String chatTitle = chat.title;
         final long chatId = chat.id;
         final int user_id = message.message.senderUserId;
-        try {
-            JSONObject logData = new JSONObject()
-                    .put("type", Action.StickersFloodWarn)
-                    .put("chatId", chatId)
-                    .put("chatType", chat.type)
-                    .put("chatTitle", chatTitle)
-                    .put("userId", user_id);
-            logData.put("payload", attemptsCount);
-            logWithUserInfo(Action.StickersFloodWarn, user_id, logData);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /*
-    public static void logBanForFloodAttempt(TdApi.Chat chat, TdApi.UpdateNewMessage message, int attemptsCount) {
-        final String chatTitle = chat.title;
-        final long chatId = chat.id;
-        final int user_id = message.message.senderUserId;
-        try {
-            JSONObject logData = new JSONObject()
-                    .put("type", Action.BanForFlood)
-                    .put("chatId", chatId)
-                    .put("chatType", chat.type)
-                    .put("chatTitle", chatTitle)
-                    .put("userId", user_id);
-            logData.put("payload", attemptsCount);
-            logWithUserInfo(Action.BanForFlood, user_id, logData);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-    */
-
-    public static void logBanForBanWordAttempt(TdApi.Chat chat, TdApi.UpdateNewMessage message, int attemptsCount) {
-        final String chatTitle = chat.title;
-        final long chatId = chat.id;
-        final int user_id = message.message.senderUserId;
-        try {
-            JSONObject logData = new JSONObject()
-                    .put("type", Action.BanWordsFloodWarn)
-                    .put("chatId", chatId)
-                    .put("chatType", chat.type)
-                    .put("chatTitle", chatTitle)
-                    .put("userId", user_id);
-            logData.put("payload", attemptsCount);
-            logWithUserInfo(Action.BanWordsFloodWarn, user_id, logData);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void logBanForLinksAttempt(TdApi.Chat chat, TdApi.UpdateNewMessage message, int attemptsCount, String link) {
-        final String chatTitle = chat.title;
-        final long chatId = chat.id;
-        final int user_id = message.message.senderUserId;
+        String chatUsername = TgUtils.getChatUsername(chat);
         try {
             JSONObject logData = new JSONObject()
                     .put("type", Action.LinksFloodAttempt)
@@ -579,6 +593,8 @@ public class LogUtil {
                     .put("chatTitle", chatTitle)
                     .put("chatType", chat.type)
                     .put("userId", user_id);
+            if(!TextUtils.isEmpty(chatUsername))
+                logData.put("chatUsername", chatUsername);
             JSONObject payload = new JSONObject().put("count", attemptsCount).put("link", link);
             logData.put("payload", payload);
             logWithUserInfo(Action.LinksFloodAttempt, user_id, logData);
@@ -587,7 +603,7 @@ public class LogUtil {
         }
     }
 
-    public static void logAutoRemoveFromBanListError(final BanTask ban, final String error) {
+    public void logAutoRemoveFromBanListError(final BanTask ban, final String error) {
         TgH.send(new TdApi.GetChat(ban.chat_id), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
@@ -611,7 +627,7 @@ public class LogUtil {
         });
     }
 
-    public static void logAutoRemoveFromBanList(final BanTask ban) {
+    public void logAutoRemoveFromBanList(final BanTask ban) {
         TgH.send(new TdApi.GetChat(ban.chat_id), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
@@ -631,12 +647,13 @@ public class LogUtil {
         });
     }
 
-    public static void logUserUnbannedByInvite(final TdApi.Chat chat, final TdApi.User user, int adminId) {
+    public void logUserUnbannedByInvite(final TdApi.Chat chat, final TdApi.User user, int adminId) {
         TgH.send(new TdApi.GetUser(adminId), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
                 TdApi.User admin = (TdApi.User) object;
                 try {
+                    String chatUsername = TgUtils.getChatUsername(chat);
                     JSONObject j = new JSONObject()
                             .put("chatTitle", chat.title)
                             .put("chatId", chat.id)
@@ -644,6 +661,9 @@ public class LogUtil {
                             .put("chatType", chat.type.getConstructor())
                             .put("userFullname", user.firstName + " " + user.lastName)
                             .put("username", user.username);
+                    if(!TextUtils.isEmpty(chatUsername))
+                        j.put("chatUsername", chatUsername);
+
                     JSONObject payload = new JSONObject()
                             .put("adminId", admin.id)
                             .put("adminName", admin.firstName + " " + admin.lastName)
@@ -656,6 +676,7 @@ public class LogUtil {
             }
         });
     }
+
 
     public static void logBanUserManually(long chat_id, int chatType, String chatTitle,
                                           TdApi.User user, String banText, long ban_age) {
@@ -672,7 +693,27 @@ public class LogUtil {
                     .put("userFullname", user.firstName + " " + user.lastName)
                     .put("username", user.username)
                     .put("payload", payload);
-            logAction(Action.BanManually, j, true);
+            new LogUtil().
+                    logAction(Action.BanManually, j, true);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void execCommandError(TdApi.Chat chat, String cmd, String error, String answer) {
+        try {
+            JSONObject payload = new JSONObject()
+                    .put("cmd", cmd)
+                    .put("error", error)
+                    .put("answer", answer);
+
+            JSONObject j = new JSONObject()
+                    .put("chatTitle", chat.title)
+                    .put("chatId", chat.id)
+                    .put("chatType", chat.type.getConstructor())
+                    .put("payload", payload);
+            logAction(Action.CommandExecError, j, true);
 
         } catch (JSONException e) {
             e.printStackTrace();

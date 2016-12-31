@@ -46,7 +46,7 @@
         <activity android:name="com.madpixels.tgadmintools.activity.ActivityLogView"
             android:theme="@style/ToolbarTheme" />
         <activity android:name=".activity.ActivityBannedWordsList" />
-        <activity android:name=".activity.ActivityChatCommands" />
+        <activity android:name=".activity.ActivityChatCommands" android:theme="@style/ToolbarTheme" />
 
 
         <receiver android:name="com.madpixels.tgadmintools.services.ReceiverStartupSystem">

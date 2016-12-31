@@ -5,11 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <include layout="@layout/toolbar" />
 
     <LinearLayout
         android:id="@+id/viewTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
         android:orientation="vertical">
 
 
@@ -25,5 +27,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/viewTop"></ListView>
+
+    <TextView
+        android:id="@+id/tvListIsEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/hint_press_to_add_command"
+        android:textAlignment="center"
+        android:textColor="@color/md_teal_500" />
 
 </RelativeLayout>

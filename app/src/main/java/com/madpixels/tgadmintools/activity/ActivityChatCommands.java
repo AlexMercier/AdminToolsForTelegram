@@ -43,6 +43,7 @@ public class ActivityChatCommands extends ActivityExtended {
     private long chatId;
     private Adapter mAdapter;
     private ProgressBar prgLoading;
+    TextView tvListIsEmpty;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -54,7 +55,8 @@ public class ActivityChatCommands extends ActivityExtended {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_commands_list);
-        UIUtils.setActionBarWithBackArrow(this);
+        // UIUtils.setActionBarWithBackArrow(this);
+        UIUtils.setToolbarWithBackArrow(this, R.id.toolbar);
         setTitle("Chat commands");
 
         Bundle b = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();
@@ -62,6 +64,7 @@ public class ActivityChatCommands extends ActivityExtended {
 
         lvCommandsList = getView(R.id.lvCommandsList);
         prgLoading = getView(R.id.prgLoading);
+        tvListIsEmpty = getView(R.id.tvListIsEmpty);
 
         mAdapter = new Adapter();
         lvCommandsList.setAdapter(mAdapter);
@@ -113,6 +116,8 @@ public class ActivityChatCommands extends ActivityExtended {
         DBHelper.getInstance().deleteChatCommand(cmd.id);
         mAdapter.list.remove(index);
         mAdapter.notifyDataSetChanged();
+        if(mAdapter.isEmpty())
+            tvListIsEmpty.setVisibility(View.VISIBLE);
 
         return super.onContextItemSelected(item);
     }
@@ -141,6 +146,8 @@ public class ActivityChatCommands extends ActivityExtended {
         protected void onPostExecute(Void aVoid) {
             mAdapter.notifyDataSetChanged();
             prgLoading.setVisibility(View.GONE);
+            if(!mAdapter.isEmpty())
+                tvListIsEmpty.setVisibility(View.GONE);
         }
     }
 
@@ -240,6 +247,7 @@ public class ActivityChatCommands extends ActivityExtended {
                             DBHelper.getInstance().updateCommand(cmd);
                         }
                         mAdapter.notifyDataSetChanged();
+                        tvListIsEmpty.setVisibility(View.GONE);
                     }
                 })
                 .show();
@@ -271,12 +279,13 @@ public class ActivityChatCommands extends ActivityExtended {
                 .setTitle(R.string.title_dialog_clear_all)
                 .setMessage(R.string.text_clear_all_commands_for_chat)
                 .setNeutralButton(R.string.btnCancel, null)
-                .setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.btnYes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         DBHelper.getInstance().clearChatCommands(chatId);
                         mAdapter.list.clear();
                         mAdapter.notifyDataSetChanged();
+                        tvListIsEmpty.setVisibility(View.VISIBLE);
                     }
                 })
                 .show();

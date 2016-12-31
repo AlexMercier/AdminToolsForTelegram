@@ -6,8 +6,10 @@ package com.madpixels.tgadmintools.entities;
 
 public class ChatTask {
     public boolean isEnabled = false; //now using only for blackwords
+    public Object payload;
 
-    public enum TYPE {STICKERS, IMAGES, LINKS, BANWORDS, VOICE, LeaveMsg, JoinMsg, FLOOD, COMMAND}
+    public enum TYPE {STICKERS, IMAGES, LINKS, BANWORDS, VOICE, LeaveMsg, JoinMsg, FLOOD, GAME, DOCS,
+        GIF, AUDIO, VIDEO, COMMAND, MutedUsers, WELCOME_USER}
 
     public TYPE mType;
     public int id; // id in database
@@ -16,7 +18,7 @@ public class ChatTask {
     public int mAllowCountPerUser = 3;
     public long mBanTimeSec = 60 * 5; //default 5 min, 0 - forever.
     public boolean isReturnOnBanExpired = true;
-    public String mWarnTextFirst, mWarnTextLast;
+    public String mWarnTextFirst, mWarnTextLast, mText;
     public long mWarningsDuringTime = 5 * 60;// 5 minute default. .
 
     public boolean isRemoveMessage = false;

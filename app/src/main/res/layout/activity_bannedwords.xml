@@ -5,6 +5,8 @@
     android:background="@color/md_white_1000"
     android:orientation="vertical">
 
+    <include layout="@layout/toolbar" />
+
     <TextView
         android:id="@+id/tvListStatus"
         android:layout_width="wrap_content"
@@ -13,7 +15,7 @@
         android:text="List is empty"
         android:textAlignment="center" />
 
-    <LinearLayout
+    <LinearLayout android:layout_below="@+id/toolbar"
         android:id="@+id/idHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

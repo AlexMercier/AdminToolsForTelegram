@@ -70,7 +70,7 @@ public class ActivityLogView extends ActivityExtended {
 
 
         if (mAdapter.isEmpty())
-            tvState.setText(R.string.label_empty);
+            tvState.setText(R.string.text_list_empty);
         else
             tvState.setVisibility(View.INVISIBLE);
 
@@ -100,7 +100,7 @@ public class ActivityLogView extends ActivityExtended {
                         .setTitle("Confirm")
                         .setMessage(R.string.action_clear_log)
                         .setNegativeButton(R.string.btnCancel, null)
-                        .setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.btnYes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 DBHelper.getInstance().clearLog();
@@ -114,6 +114,25 @@ public class ActivityLogView extends ActivityExtended {
         return super.onOptionsItemSelected(item);
     }
 
+    private static boolean canUnbanUser(LogUtil.Action action){
+        switch (action){
+            case BanForSticker:case BanForVoice:case BanForGame:case BanForLink:case AutoKickFromGroup:
+            case BanForBlackWord: case BanForFlood:
+                return true;
+        }
+        return false;
+    }
+
+    private static boolean hasUserInfo(LogUtil.LogEntity log){
+        switch (log.action){
+            case BanForBlackWord:case DeleteMsgBlackWord:case RemoveSticker:case RemoveLink:case LinksFloodAttempt:
+            case StickersFloodWarn: case VoiceFloodWarn: case GameFloodWarn: case GifsFloodWarn: case ImagesFloodWarn:
+            case VideoFloodWarn: case DocsFloodWarn:
+                return log.hasUserName();
+        }
+        return false;
+    }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         AdapterView.AdapterContextMenuInfo cInfo = (AdapterView.AdapterContextMenuInfo) menuInfo;
@@ -121,17 +140,14 @@ public class ActivityLogView extends ActivityExtended {
         LogUtil.LogEntity log = mAdapter.getItem(pos);
         if (log.hasChatId())
             menu.add(0, 1, 0, R.string.action_open_chat_info);
-        if (log.action == LogUtil.Action.BanForSticker || log.action == LogUtil.Action.BanForLink || log.action == LogUtil.Action.AutoKickFromGroup) {
+        if (canUnbanUser(log.action)) {
             menu.add(0, 2, 0, R.string.action_return_to_chat);
         }
 
         if (log.action == LogUtil.Action.BanForLink || log.action== LogUtil.Action.LinksFloodAttempt) {
             menu.add(0, 5, 0, R.string.action_add_link_to_wl);
         }
-        if (log.action == LogUtil.Action.BanForBlackWord || log.action == LogUtil.Action.DeleteMsgBlackWord
-                || log.action == LogUtil.Action.RemoveSticker || log.action == LogUtil.Action.RemoveLink
-                || log.action == LogUtil.Action.LinksFloodAttempt || log.action == LogUtil.Action.StickersFloodWarn) {
-            if (log.hasUserName())
+        if (hasUserInfo(log)) {
                 menu.add(0, 4, 0, R.string.action_open_userninfo);
         }
 
@@ -262,12 +278,13 @@ public class ActivityLogView extends ActivityExtended {
         new Thread() {
             @Override
             public void run() {
-                final ArrayList<LogUtil.LogEntity> logs = DBHelper.getInstance().getLog(offset);
+                final int count = mAdapter.isEmpty()?5:50;
+                final ArrayList<LogUtil.LogEntity> logs = DBHelper.getInstance().getLog(offset, count);
                 onUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (logs != null) {
-                            if (logs.size() < 5) isListEnd = true;
+                            if (logs.size() < count) isListEnd = true;
                             mAdapter.list.addAll(logs);
                             mAdapter.notifyDataSetChanged();
                             tvState.setVisibility(View.GONE);

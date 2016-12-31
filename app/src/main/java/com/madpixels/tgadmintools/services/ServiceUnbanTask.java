@@ -13,6 +13,7 @@ import com.madpixels.apphelpers.Utils;
 import com.madpixels.tgadmintools.BuildConfig;
 import com.madpixels.tgadmintools.db.DBHelper;
 import com.madpixels.tgadmintools.entities.BanTask;
+import com.madpixels.tgadmintools.entities.Callback;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
 import com.madpixels.tgadmintools.utils.LogUtil;
@@ -101,7 +102,7 @@ public class ServiceUnbanTask extends Service {
                 MyLog.log(object.toString());
                 if(object.getConstructor()== TdApi.Ok.CONSTRUCTOR) {
                     DBHelper.getInstance().removeBanTask(ban);
-                    LogUtil.logAutoUnbanAndReturn(ban);
+                    new LogUtil(onLogCallback, ban).logAutoUnbanAndReturn(ban);
                 }else{
                     if(TgUtils.isError(object)){//DONE если удаление не удалось (например error 3 chat not found) то получается вечный loop
                         TdApi.Error e = (TdApi.Error) object;
@@ -113,13 +114,13 @@ public class ServiceUnbanTask extends Service {
                                         @Override
                                         public void onResult(TdApi.TLObject object) {
                                             if(TgUtils.isError(object))
-                                                LogUtil.logAutoUnbanAndReturnError(ban, object.toString());
+                                                new LogUtil(onLogCallback, ban).logAutoUnbanAndReturnError(ban, object.toString());
                                         }
                                     });
                                 }
                             });
                         }else //code!=3:
-                            LogUtil.logAutoUnbanAndReturnError(ban, object.toString());
+                            new LogUtil(onLogCallback, ban).logAutoUnbanAndReturnError(ban, object.toString());
                     }
                     DBHelper.getInstance().removeBanTask(ban);
                 }
@@ -137,7 +138,7 @@ public class ServiceUnbanTask extends Service {
                     if(TgUtils.isOk(object)) {
                         MyLog.log(object.toString());
                         DBHelper.getInstance().removeBannedUser(ban.chat_id, ban.user_id);
-                        LogUtil.logAutoRemoveFromBanList(ban);
+                        new LogUtil(onLogCallback, ban).logAutoRemoveFromBanList(ban);
                         next();
                     }else{
                         // Load banned users for load user
@@ -150,7 +151,7 @@ public class ServiceUnbanTask extends Service {
                             public void onResult(TdApi.TLObject object) {
                                 if(!TgUtils.isOk(object)) {
                                     DBHelper.getInstance().setUnbanError(ban);
-                                    LogUtil.logAutoRemoveFromBanListError(ban, object.toString());
+                                    new LogUtil(onLogCallback, ban).logAutoRemoveFromBanListError(ban, object.toString());
                                 }
                                 next();
                             }
@@ -161,9 +162,18 @@ public class ServiceUnbanTask extends Service {
         }else{
             DBHelper.getInstance().removeBannedUser(ban.chat_id, ban.user_id);
             DBHelper.getInstance().removeUserFromAutoKick(ban.chat_id, ban.user_id);
-            LogUtil.logAutoRemoveFromBanList(ban);
+            new LogUtil(onLogCallback, ban).logAutoRemoveFromBanList(ban);
         }
     }
+
+    Callback onLogCallback = new Callback() {
+        @Override
+        public void onResult(Object data) {
+            LogUtil log = (LogUtil) data;
+            BanTask ban = (BanTask) log.callbackPayload;
+            ServiceChatTask.logToChat(ban.chat_id, log.logEntity);
+        }
+    };
 
     @Nullable
     @Override

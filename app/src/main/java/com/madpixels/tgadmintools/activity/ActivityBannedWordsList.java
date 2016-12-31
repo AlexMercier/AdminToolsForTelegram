@@ -54,7 +54,7 @@ public class ActivityBannedWordsList extends ActivityExtended {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bannedwords);
-        UIUtils.setActionBarWithBackArrow(this);
+        UIUtils.setToolbarWithBackArrow(this, R.id.toolbar);
         setTitle("Banned words");
 
         Bundle b = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();
@@ -165,7 +165,7 @@ public class ActivityBannedWordsList extends ActivityExtended {
                 .setTitle(R.string.title_dialog_clear_all)
                 .setMessage(R.string.text_clear_all_banwords_for_chat)
                 .setNeutralButton(R.string.btnCancel, null)
-                .setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.btnYes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         DBHelper.getInstance().clearBanWords(chatID);
@@ -320,8 +320,10 @@ public class ActivityBannedWordsList extends ActivityExtended {
         View v = UIUtils.inflate(mContext, R.layout.dialog_all_banwords);
 
         ListView lvWords = UIUtils.getView(v, R.id.lvAllBannedWords);
+        TextView tvBanWordsIsEmpty = UIUtils.getView(v,R.id.tvBanWordsIsEmpty);
         final AdapterAllWords adapterAllWords = new AdapterAllWords();
         lvWords.setAdapter(adapterAllWords);
+        tvBanWordsIsEmpty.setVisibility(View.INVISIBLE);
 
         new AlertDialog.Builder(mContext)
                 .setCancelable(false)
@@ -350,6 +352,9 @@ public class ActivityBannedWordsList extends ActivityExtended {
         ArrayList<BannedWord> words = DBHelper.getInstance().getAllWordsBlackList(chatID);
         adapterAllWords.list.addAll(words);
         adapterAllWords.notifyDataSetChanged();
+        if(adapterAllWords.isEmpty()){
+            tvBanWordsIsEmpty.setVisibility(View.VISIBLE);
+        }
     }
 
     private class AdapterAllWords extends BaseAdapter {

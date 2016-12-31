@@ -51,7 +51,7 @@
     <string name="online_last_seen">last seen recently</string>
     <string name="last_seen_at">last seen at </string>
     <string name="founded_deleted_users">Founded %s deleted accounts. Remove them from group?\nThis may take some time and maybe aborted by telegram flood control</string>
-    <string name="close">Close</string>
+    <string name="btnClose">Close</string>
     <string name="revoke_user_admin">Revoke admin privilegies</string>
     <string name="ban_reason">Ban reason</string>
     <string name="action_group_was_converted">Group was converted to supergorup</string>
@@ -67,8 +67,8 @@
     <string name="logAction_autoUnban">Remove user from ban-list after ban expired</string>
     <string name="logAction_banForLink">Ban for spam</string>
     <string name="logAction_banForSticker">Ban for sticker flood</string>
-    <string name="logAction_removeLink">Removed message with url</string>
-    <string name="logAction_removeSticker">Removed message with sticker</string>
+    <string name="logAction_removedLink">Deleted Link message</string>
+    <string name="logAction_removedSticker">Deleted Sticker message</string>
 
 
     <string name="label_allow_count">Allowed count per user:</string>
@@ -79,8 +79,8 @@
     <string name="title_ban_age">Ban time:</string>
     <string name="check_return_after_bantime_expired">Return to chat after bantime expired</string>
     <string name="title_group_info">Manage group</string>
-    <string name="logAction_stickersFloodWarn">Warn user about ban for stikers-flood</string>
-    <string name="logAction_linksFloodWarn">Warn user about ban for spam</string>
+    <string name="logAction_stickersFloodWarn">Warn user of stikers flood</string>
+    <string name="logAction_linksFloodWarn">Warn user of ban for spam</string>
     <string name="text_publish_banreason" formatted="false">User %username% was banned by reason: %reason%</string>
     <string name="deleted_accounts_hint">Notice: Telegram not allow to remove deleted accounts, but this accounts self-removed after ~1 week.
         \nSo don\'t worry about that</string>
@@ -95,7 +95,7 @@
     <string name="logAction_unbanByAdminInvite">Unban by admin invite</string>
     <string name="action_show_log_notification">Show log notifications</string>
     <string name="action_clear_log">Clear all log events</string>
-    <string name="btn_yes">Yes</string>
+    <string name="btnYes">Yes</string>
     <string name="chk_remove_messages_links">Remove messages with links</string>
     <string name="chk_remove_messages_stickers">Remove message with stickers</string>
     <string name="titleLogLifetime">Clear log after</string>
@@ -122,7 +122,7 @@
     <string name="create_chat_title">Chat title</string>
     <string name="dialog_new_chat_title">Create group</string>
     <string name="group_created">Group created</string>
-    <string name="label_empty">List is empty</string>
+    <string name="text_list_empty">List is empty</string>
     <string name="text_ban_time">Ban date:</string>
     <string name="text_ban_permanently">Permanent ban</string>
     <string name="text_ban_temporary">Temporary ban. Expired at:</string>
@@ -142,13 +142,13 @@
     <string name="hint_each_whitelink_at_new_line">Each link at new line</string>
     <string name="hint_blackwords">Enter each word at new line</string>
     <string name="check_delMsgBlackWords">Delete message with blacklisted words</string>
-    <string name="logAction_delMsgWithBlackWord">Deleted message with banned word</string>
+    <string name="logAction_removedBlackWordMessage">Deleted blacklisted words message</string>
     <string name="action_change_user">Logout</string>
     <string name="dialog_title_logout">Logout</string>
     <string name="dialog_text_logout">Are you sure to logout current accout?</string>
     <string name="dialog_title_auth">Auth</string>
     <string name="auth_phone_hint">Enter your phone number</string>
-    <string name="auth_confirmcode_hint">Enter activation code sent via sms</string>
+    <string name="auth_confirmcode_hint">Enter auth code sent via sms</string>
     <string name="auth_cloud_pass_hint">Enter your cloud password</string>
     <string name="btn_submit">Submit</string>
     <string name="label_loading">Loading...</string>
@@ -163,7 +163,7 @@
     <string name="caption_users_whitelist">Users whitelist</string>
     <string name="check_ignore_antispam_for_shared">Ignore antispam rules for shared contacts</string>
     <string name="label_notice_ignore_antispam_for_shared">Ignore rules for shared contacts is enabled in settings</string>
-    <string name="toast_deletion_not_avail">Deletion available only for SuperGroup</string>
+    <string name="toast_deletion_not_avail">Deletion messages available only for SuperGroup</string>
     <string name="toast_access_denied_admin">Access denied.\nOnly creator can edit this option</string>
     <string name="toast_user_unblacklisted">User was removed from black list</string>
     <string name="toast_user_was_restored_to_chat">User was returned to chat</string>
@@ -173,7 +173,7 @@
     <string name="chkWarnBeforeBanWord">Warn before ban</string>
     <string name="action_open_chat_info">Open chat info</string>
     <string name="action_open_userninfo">Open user info</string>
-    <string name="logAction_banwordsFloodWarn">Warn user about use of banwords</string>
+    <string name="logAction_banwordsFloodWarn">Warn user of using banwords</string>
     <string name="warntext_links_default_firts">First warning. Stop spam</string>
     <string name="warntext_stickers_default_last">Last warning. Stickers flood</string>
     <string name="warntext_banword_first">First warn. Using banned word not allowed</string>
@@ -268,15 +268,15 @@
     <string name="text_banned_words_list_empty">List is empty</string>
     <string name="action_banwords_import_from_chat">Import from other chat banwords list</string>
     <string name="title_import_words">Select words to import</string>
-    <string name="text_flood_messages_count_per_user">Messages count per user</string>
+    <string name="text_flood_messages_count_per_user">Messages count limit per user</string>
     <string name="text_flood_control_watch_within_time">Flood control within time:</string>
     <string name="logAction_banForFlood">Ban for flood</string>
     <string name="warntext_flood_default_last">Last warning. Prevent flooding</string>
     <string name="btnBanUser">Ban</string>
-    <string name="btn_banned_words_list_empty">Banned words list is empty.\nPress to add</string>
+    <string name="btn_banned_words_list_empty">Banned words list is empty</string>
     <string name="banned_words_count">%d banned words for this chat</string>
-    <string name="logAction_delMsgForFlood">Deleted flood message</string>
-    <string name="logAction_removeVoice">Deleted Voice message</string>
+    <string name="logAction_removedFloodMessage">Deleted flood message</string>
+    <string name="logAction_removedVoice">Deleted Voice message</string>
     <string name="text_antispam_alert_title">Antispam alert!</string>
     <string name="caption_alerts_title">Antispam alert title</string>
     <string name="action_add_link_to_wl">Add link to white list</string>
@@ -292,7 +292,96 @@
     <string name="chk_chatcommand_only_admin_can_execute">Only admin can execute command</string>
     <string name="title_chat_commands">Chat commands</string>
     <string name="btn_chat_commands_manage">Edit commands</string>
+    <string name="text_label_inviter">Inviter:</string>
+    <string name="error_auth_pin_incorrect">Error\nCloud password (PIN) is incorrect</string>
+    <string name="error_phone_not_registered">This phone number is not registered.\nTry againg?</string>
+    <string name="label_commands_count_in_chat">for this chat</string>
+    <string name="label_no_commands_in_chat">Commands not yet added</string>
+    <string name="title_select_task_for_chat">Select type of task to apply for chat</string>
+    <string name="toast_task_already_applied">This task is already added.\nLong click to remove it</string>
+    <string name="title_add_new_task_for_chat">Add new task</string>
+    <string name="hint_press_to_add_command">Press Add to add new command</string>
+    <string name="title_task_stickers">Stickers task</string>
+    <string name="title_task_voices">Voices task</string>
+    <string name="title_task_links">Links task (antispam)</string>
+    <string name="text_command_execute_access_denied">Access denied.\nOnly admin can execute this command</string>
+    <string name="warntext_bangame_first">First warn. Sharing Game not allowed in this chat</string>
+    <string name="warntext_bangame_last">Last warning. Sharing Game flood</string>
+    <string name="logAction_banForGame">Ban for game sharing</string>
+    <string name="title_task_game">Games via @gamebot</string>
+    <string name="chk_remove_messages_game">Remove message with Games</string>
+    <string name="chkTitleBanForGames">Ban for Games</string>
+    <string name="title_task_add_stickers">Stickers</string>
+    <string name="title_task_add_voices">Voices</string>
+    <string name="title_task_add_link">Links (antispam)</string>
+    <string name="title_task_add_games">Games via @gamebot</string>
+    <string name="logAction_execCommandError">Error executing command</string>
+    <string name="title_banwords">Blacklisted words</string>
+    <string name="title_flood_control">Flood control</string>
+    <string name="warntext_banphoto_first">First warning. Photos flood not allowed</string>
+    <string name="warntext_banphoto_last">Last warning. Stop the photo flood</string>
+    <string name="logAction_banForPhotos">Ban for photos flood</string>
+    <string name="title_task_add_photos">Photos</string>
+    <string name="logAction_removedGameMessage">Deleted Game message</string>
+    <string name="logAction_removedPhoto">Deleted Photo message</string>
+    <string name="title_task_photos">Photos</string>
+    <string name="chk_remove_messages_photos">Remove messages with Photos</string>
+    <string name="chkTitleBanForPhotos">Ban for photos</string>
+    <string name="title_task_docs" >Files (Documents)</string>
+    <string name="chk_remove_messages_docs">Remove messages with files</string>
+    <string name="chkTitleBanForDocs">Ban for files</string>
+    <string name="logAction_removedDocs">Deleted Document</string>
+    <string name="logAction_DocsFloodWarn">Warn user of documents flood</string>
+    <string name="logAction_PhotosFloodWarn">Warn user of photos flood</string>
+    <string name="title_task_add_documents">Documents</string>
+    <string name="logAction_banForDocs">Ban for Documents flood</string>
+    <string name="warntext_bandocs_first">First warning. Attachments not allowed</string>
+    <string name="warntext_bandocs_last">Last warning. Attachments flood</string>
+    <string name="title_remove_taskfrom_added">Remove task</string>
+    <string name="text_confirm_remove_task">Are you sure to remove this task?</string>
+    <string name="title_task_gif">GIF</string>
+    <string name="chk_remove_messages_gif">Remove messages with GIF</string>
+    <string name="chkTitleBanForGif">Ban for Gif</string>
+    <string name="logAction_banForGifs">Ban for GIF flood</string>
+    <string name="logAction_removedGif">Deleted Gif message</string>
+    <string name="logAction_gifsFloodWarn">Warn user of Gif flood</string>
+    <string name="title_task_add_gif">GIF</string>
+    <string name="warntext_bangifs_first">First warning. Gifs flood</string>
+    <string name="warntext_bangifs_last">Last warning. Stop the Gifs flood</string>
+    <string name="title_task_audio">Audio</string>
+    <string name="chk_remove_messages_audio">Remove Messages with Audio</string>
+    <string name="chkTitleBanForAudio">Ban for Audio</string>
+    <string name="logAction_banForAudio">Ban for Audio</string>
+    <string name="logAction_removedAudio">Deleted Audio</string>
+    <string name="logAction_audioFloodWarn">Warn user of using audio</string>
+    <string name="warntext_banAudio_first">First warning. Audios flood</string>
+    <string name="warntext_banAudio_last">Last warning. Stop the Audios flood</string>
+    <string name="title_task_video">Video</string>
+    <string name="chk_remove_messages_video">Remove message with Video</string>
+    <string name="chkTitleBanForVideo">Ban for Video</string>
+    <string name="warntext_banVideo_first">First warning. Videos flood</string>
+    <string name="warntext_banVideo_last">Last warning. Videos flood</string>
+    <string name="logAction_banForVideo">Ban for Videos flood</string>
+    <string name="logAction_removedVideo">Deleted Video message</string>
+    <string name="logAction_videoFloodWarn">Warn user of videos flood</string>
+    <string name="logAction_removedMutedMessage">Deleted message from muted user</string>
+    <string name="text_select_users_to_mute">Select users to mute them.\nAll new messages from these users will be deleted</string>
+    <string name="title_task_mute_users">Mute users</string>
+    <string name="text_no_muted_users">No muted users for this chat</string>
+    <string name="label_select_user_to_mute">Select user to mute him</string>
+    <string name="label_select_user_to_remove_mute">Select user to remove him from mute</string>
+    <string name="toast_user_added_to_muted">User added to mute</string>
+    <string name="toast_user_removed_from_muted">User removed from mute</string>
 
+    <string name="dialog_recent_changes">
+        New in v.%s
+        \nReorganized chat tasks menu
+        \nAdded ban filter for all Telegram attachments: Gif, Audio, Video, Game, Doc etc..
+        \nAdded Mute User menu - read-only mode for supergroup users
+        \nAdded features for exporting Log to Telegram
+        \nFixed authorization, now you can request code via call and sms.
+        \nFixed hashtags in banwords filter
+    </string>
 
     <string-array name="ban_times">
         <item>Min.</item>
@@ -327,5 +416,16 @@
         <item>Kick self user</item>
     </string-array>
 
+    <string-array name="commands_plural">
+        <item>command</item><!-- 1 command -->
+        <item>commands</item><!-- 2 commands -->
+        <item>commands</item><!-- 5 commands -->
+    </string-array>
+
+    <string-array name="muted_users_plural">
+        <item>muted user</item><!-- 1 item -->
+        <item>muted users</item><!-- 2 items -->
+        <item>muted users</item><!-- 5 items -->
+    </string-array>
 
 </resources>

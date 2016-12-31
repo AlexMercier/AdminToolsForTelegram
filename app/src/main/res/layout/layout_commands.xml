@@ -3,11 +3,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="16dp"
-    android:background="@color/md_blue_grey_50"
     android:orientation="vertical"
-    android:padding="8dp">
+    >
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/title_chat_commands"
+        android:textColor="@color/md_blue_600"
+        android:textStyle="bold" />
 
     <CheckBox
         android:id="@+id/chkCommandsEnable"
@@ -16,28 +20,39 @@
         android:checked="false"
         android:text="@string/check_enabled" />
 
-    <TextView
-        android:id="@+id/tvChatCommandsCount"
+    <LinearLayout
+        android:id="@+id/layerClickOpenCommand"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_weight="0"
+        android:clickable="true"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
         android:background="?attr/selectableItemBackground"
-        android:paddingBottom="8dp"
+        android:focusable="true">
 
-        android:text="Commands not yet added"
-        android:textAlignment="center"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/md_teal_500" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/profile_list" />
 
-    <Button
-        android:id="@+id/btnEditCommands"
-        android:layout_width="wrap_content"
-        android:layout_height="36dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/btn_teal_borders"
-        android:text="@string/btn_chat_commands_manage"
-        android:textAlignment="center" />
+        <TextView
+            android:id="@+id/tvChatCommandsCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp"
+            android:layout_weight="0"
+
+
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:text="@string/label_no_commands_in_chat"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/md_teal_500" />
+
+    </LinearLayout>
 
 
 </LinearLayout>

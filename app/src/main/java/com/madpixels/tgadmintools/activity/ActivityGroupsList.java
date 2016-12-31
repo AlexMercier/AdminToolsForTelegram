@@ -188,13 +188,14 @@ public class ActivityGroupsList extends ActivityExtended {
     };
 
 
+    private TdApi.Chat lastClickedChat = null;
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         if (info.position < 1) return;
         int pos = info.position - mListViewChats.getHeaderViewsCount();
 
-        TdApi.Chat chat = mAdapter.getItem(pos);
+        TdApi.Chat chat = lastClickedChat = mAdapter.getItem(pos);
 
         menu.setHeaderTitle(chat.title);
 
@@ -222,6 +223,8 @@ public class ActivityGroupsList extends ActivityExtended {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         if (info.position < 1) return false;
         TdApi.Chat chat = mAdapter.getItem(info.position - mListViewChats.getHeaderViewsCount());
+        if(lastClickedChat!=chat)//prevent missclicking
+            chat = lastClickedChat;
         switch (item.getItemId()) {
             case 1:
                 if (!TgUtils.isGroup(chat.type.getConstructor())) {
@@ -435,6 +438,7 @@ public class ActivityGroupsList extends ActivityExtended {
                         public void run() {
                             tvLoadingCount.setText("Loading chats error");
                             tvLoadingCount.setTextColor(Color.RED);
+                            prgLoadingChats.setVisibility(View.GONE);
                         }
                     });
                 }

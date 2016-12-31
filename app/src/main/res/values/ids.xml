@@ -4,4 +4,7 @@
 
     <string name="lang_code">en</string>
     <item name="id_position" type="id" />
+    <item name="tag_id_view" type="id" />
+    <item name="tag_id_type" type="id" />
+    <item name="btnFab" type="id" />
 </resources>

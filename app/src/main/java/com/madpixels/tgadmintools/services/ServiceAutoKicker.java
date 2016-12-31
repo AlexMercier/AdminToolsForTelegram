@@ -124,14 +124,23 @@ public class ServiceAutoKicker extends Service {
     }
 
     private void logKickAction(TdApi.Chat chat, int userId) {
-        LogUtil.logAutoKickUser(chat.id, chat.type.getConstructor(), userId, chat.title);
+        new LogUtil(onLogCallback, chat).logAutoKickUser(chat.id, chat.type.getConstructor(), userId, chat.title);
     }
 
     void unbanUserOnInvitedByAdmin(TdApi.Chat chat, TdApi.User user, int adminId) {
         DBHelper.getInstance().removeUserFromAutoKick(chat.id, user.id);
         DBHelper.getInstance().removeBanTask(chat.id, user.id);
-        LogUtil.logUserUnbannedByInvite(chat, user, adminId);
+        new LogUtil(onLogCallback, chat).logUserUnbannedByInvite(chat, user, adminId);
     }
+
+    Callback onLogCallback = new Callback() {
+        @Override
+        public void onResult(Object data) {
+            LogUtil log = (LogUtil) data;
+            TdApi.Chat chat = (TdApi.Chat) log.callbackPayload;
+            ServiceChatTask.logToChat(chat.id, log.logEntity);
+        }
+    };
 
 
     @Override
