@@ -1,6 +1,6 @@
 package com.madpixels.tgadmintools.services;
 
-import android.annotation.TargetApi;
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -34,6 +34,7 @@ public class ServiceBackgroundStarter extends Service {
         } else {
             MyLog.log("ServiceBackgroundStarter services already started");
             registerNextStartForBackgroundService();
+            stopSelf();
         }
 
         return START_STICKY;
@@ -52,6 +53,7 @@ public class ServiceBackgroundStarter extends Service {
                 onAuthorized();
 
                 registerNextStartForBackgroundService();
+                stopSelf();
             }
         });
     }
@@ -61,44 +63,41 @@ public class ServiceBackgroundStarter extends Service {
         MainActivity.initializeLanguage(this);
         ServiceAutoKicker.registerTask(getBaseContext());
         ServiceChatTask.start(getBaseContext());
+        ServiceUnbanTask.registerTask(getBaseContext());
 
-        MyLog.log("ServiceBackgroundStarter runned tasks");
+        MyLog.log("ServiceBackgroundStarter started");
     }
 
 
-    @TargetApi(Build.VERSION_CODES.M)
-    private void registerNextStartForBackgroundService() {
-        Intent myIntent = new Intent(getBaseContext(), ServiceBackgroundStarter.class);
-        /*
-        PendingIntent pi = PendingIntent.getService(getBaseContext(), 0, myIntent, PendingIntent.FLAG_NO_CREATE);
-        boolean isAlreadySet = pi != null;
-        if (isAlreadySet) {
-            //pi.cancel();
-            MyLog.log("Alarm ServiceBackgroundStarter already set. Skip register alarm");
-            return;
-        }
-        */
+    @SuppressLint("NewApi")
+    public static void registerStart(Context mContext, final long registerAt){
+        Intent myIntent = new Intent(mContext, ServiceBackgroundStarter.class);
+        PendingIntent pi = PendingIntent.getService(mContext, 0, myIntent, 0);
+        AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
 
-        PendingIntent pi = PendingIntent.getService(getBaseContext(), 0, myIntent, 0);
-        AlarmManager alarmManager = (AlarmManager) getBaseContext().getSystemService(Context.ALARM_SERVICE);
 
-        long delayMillis = 1000 * 60 * 5;// 5 min
-        long timeAlarmTrigger = System.currentTimeMillis() + delayMillis;
-        MyLog.log("ServiceBackgroundStarter next start at: "+Utils.TimestampToDate(timeAlarmTrigger/1000));
+        MyLog.log("ServiceBackgroundStarter next start at: "+Utils.TimestampToDate(registerAt/1000));
 
         boolean isPowerSafeMode_API23 = false;
         if (Build.VERSION.SDK_INT < 19) {
-            //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, firstCall, frequency, pi);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, timeAlarmTrigger, pi);
-            // MyLog.log("alarmManager registered at " + System.currentTimeMillis() + " , firstCall at " + firstCall);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, registerAt, pi);
             return;
         }
 
         if (Build.VERSION.SDK_INT < 23 || isPowerSafeMode_API23) // Если киткат, или запрещена работа в лоу режиме
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeAlarmTrigger, pi);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, registerAt, pi);
         else // Только для апи 23+:
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeAlarmTrigger, pi);
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, registerAt, pi);
     }
+
+
+    private void registerNextStartForBackgroundService() {
+        long delayMillis = 1000 * 60 * 5;// 5 min
+        long timeAlarmTrigger = System.currentTimeMillis() + delayMillis;
+        registerStart(getBaseContext(), timeAlarmTrigger);
+    }
+
+
 
     @Nullable
     @Override

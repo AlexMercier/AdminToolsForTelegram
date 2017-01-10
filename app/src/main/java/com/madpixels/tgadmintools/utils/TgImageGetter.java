@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.os.Handler;
+import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 
 import com.madpixels.tgadmintools.helper.TgH;
@@ -55,14 +56,7 @@ public class TgImageGetter {
         }
 
         avatars.put(photo_id, true);
-
-        TgH.TG().send(new TdApi.DownloadFile(photo_id), new Client.ResultHandler() {
-            @Override
-            public void onResult(TdApi.TLObject object) {
-
-            }
-        });
-
+        TgH.send(new TdApi.DownloadFile(photo_id));
         return null;
     }
 
@@ -77,14 +71,18 @@ public class TgImageGetter {
                     boolean ok = readBitmap(f.file.id, f.file.path);
                     // MyLog.log("file updated: " + f.file.id+" "+ok);
                     // TODO onCallback.onResult(new TdApi.Ok());
-                    if (onUpdateHandler != null)
-                        hand.post(onUpdateHandler);
+                    invalidate();
                 } else {
                     // MyLog.log("File id not in table: " + f.file.id);
                 }
             }
         }
     };
+
+    public void invalidate(){
+        if (onUpdateHandler != null)
+        hand.post(onUpdateHandler);
+    }
 
     boolean readBitmap(int fileId, String path) {
         Bitmap bmp = BitmapFactory.decodeFile(path);
@@ -144,6 +142,17 @@ public class TgImageGetter {
 
     public TgImageGetter setRounded(boolean rounded) {
         this.isRounded = rounded;
+        return this;
+    }
+
+
+    public TgImageGetter setAdapter(final BaseAdapter adapter) {
+        setUpdateCallback(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+            }
+        });
         return this;
     }
 }

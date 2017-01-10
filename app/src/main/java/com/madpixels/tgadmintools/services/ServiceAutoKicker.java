@@ -13,6 +13,7 @@ import com.madpixels.tgadmintools.entities.Callback;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
 import com.madpixels.tgadmintools.utils.AdminUtils;
+import com.madpixels.tgadmintools.utils.CommonUtils;
 import com.madpixels.tgadmintools.utils.LogUtil;
 
 import org.drinkless.td.libcore.telegram.Client.ResultHandler;
@@ -38,6 +39,7 @@ public class ServiceAutoKicker extends Service {
                     TgH.setUpdatesHandler(updatesHandler);
                 else{
                     // show auth error to the user ?
+                    stopSelf();
                 }
             }
         });
@@ -89,7 +91,7 @@ public class ServiceAutoKicker extends Service {
                 public void onResult(TdApi.TLObject object) {
                     if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR) {
                         final TdApi.Chat chat = (TdApi.Chat) object;
-                        AdminUtils.checkUserIsAdminInChat((TdApi.Chat) object, fromId, new Callback() {
+                        AdminUtils.checkUserIsAdminInChat(((TdApi.Chat) object).id, fromId, new Callback() {
                             @Override
                             public void onResult(Object data) {
                                 boolean isAdmin = (boolean) data;
@@ -138,7 +140,7 @@ public class ServiceAutoKicker extends Service {
         public void onResult(Object data) {
             LogUtil log = (LogUtil) data;
             TdApi.Chat chat = (TdApi.Chat) log.callbackPayload;
-            ServiceChatTask.logToChat(chat.id, log.logEntity);
+            CommonUtils.forwardLogEventToChat(chat.id, log.logEntity);
         }
     };
 

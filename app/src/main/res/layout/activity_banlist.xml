@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <include layout="@layout/toolbar" />
 
@@ -14,16 +13,20 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
 
-    <ListView android:dividerHeight="10dp" android:layout_above="@+id/adView"
-        android:id="@+id/listViewBanned" android:paddingBottom="10dp" android:clipToPadding="false"
+    <ListView
+        android:id="@+id/listViewBanned"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar" />
+        android:layout_above="@+id/adView"
+        android:layout_below="@+id/toolbar"
+        android:clipToPadding="false"
+        android:dividerHeight="10dp"
+        android:paddingBottom="10dp" />
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/adView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:id="@+id/adView"></LinearLayout>
+        android:orientation="horizontal"></LinearLayout>
 </RelativeLayout>

@@ -22,6 +22,9 @@ package org.drinkless.td.libcore.telegram;
 
 import android.util.Log;
 
+import com.madpixels.apphelpers.MyLog;
+import com.madpixels.tgadmintools.BuildConfig;
+
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -210,6 +213,7 @@ public class Client implements Runnable {
             handler.onResult(object);
         } catch (Throwable cause) {
             Log.w("DLTD", "handler throws", cause);
+            if(BuildConfig.DEBUG) MyLog.log(cause);
         }
 
         //update handler stays forever

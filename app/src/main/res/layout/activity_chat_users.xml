@@ -2,31 +2,58 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/md_white_1000"
-    >
+    android:background="#fafafa"
+    android:orientation="vertical">
 
     <include layout="@layout/toolbar" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
-
-    <ListView
-        android:layout_above="@+id/adView"
-        android:id="@+id/listViewUsers"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar" />
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar"
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/adView"></LinearLayout>
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:background="@color/md_white_1000">
 
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:indeterminate="true"
+            android:id="@+id/progressBarLoadMore" />
+
+
+        <TextView
+            android:id="@+id/tvMembersCout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:paddingRight="16dp"
+            android:text="999" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true" />
+
+
+        <ListView android:layout_alignParentTop="true"
+            android:id="@+id/listViewUsers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/adView"
+            android:clipToPadding="false"
+            android:divider="@null"
+            android:padding="8dp" />
+
+
+        <LinearLayout
+            android:id="@+id/adView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal"></LinearLayout>
+    </RelativeLayout>
 </RelativeLayout>

@@ -143,7 +143,7 @@ public class FragmentSelectUsers extends DialogFragment {
         if (TgUtils.isSuperGroup(chatType))
             loadSuperGroupMembers();
         else {
-            getGroupUsers();
+            loadGroupMembers();
         }
     }
 
@@ -226,7 +226,7 @@ public class FragmentSelectUsers extends DialogFragment {
     };
 
 
-    void getGroupUsers() {
+    void loadGroupMembers() {
         progressBarLoadingChats.setVisibility(View.VISIBLE);
         isLoading = true;
         TgH.sendOnUi(new TdApi.GetGroupFull(groupId), new Client.ResultHandler() {
@@ -237,7 +237,6 @@ public class FragmentSelectUsers extends DialogFragment {
                     isListEnd = true;
 
                     List<TdApi.ChatMember> users = Arrays.asList(group.members);
-
 
                     mAdapter.getList().addAll(users);
                     mAdapter.notifyDataSetChanged();
@@ -267,16 +266,14 @@ public class FragmentSelectUsers extends DialogFragment {
                     offset += users.members.length;
                     if (users.members.length < getCount)
                         isListEnd = true;
-                    if (mAdapter.getCount() == 0) {
-                        /// setTotal(users.totalCount);
-                    }
+
                     List<TdApi.ChatMember> usersList = Arrays.asList(users.members);
                     mAdapter.getList().addAll(usersList);
                     mAdapter.notifyDataSetChanged();
+
                     progressBarLoadingChats.setVisibility(View.GONE);
                     tvStatus.setText(R.string.label_select_user_to_mute);
                     isLoading = false;
-
                 } else {
                     MyToast.toast(getActivity(), "Error loading chat members");
                     dismiss();

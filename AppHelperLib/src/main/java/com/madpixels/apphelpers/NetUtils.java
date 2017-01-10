@@ -21,6 +21,7 @@ public class NetUtils {
 
     int timeout = 25000;
     private boolean isXMLRequest = false;
+    private boolean isGZIPEncoding = true;
     private String UA = "Mozilla/5.0 (Linux; Android; TelegramStickersApp Build/JRO03D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Safari/535.19";
 
     public NetUtils withTimeout(int msec) {
@@ -33,8 +34,13 @@ public class NetUtils {
         return this;
     }
 
-    public static String getRequest(final String url) throws IOException {
-        return new NetUtils().get(url);
+    public static String getRequest(final String url) {
+        try {
+            return new NetUtils().get(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     public static String postRequest(final String url, String... params) {
@@ -58,18 +64,37 @@ public class NetUtils {
         con.setConnectTimeout(timeout);
         con.setReadTimeout(timeout);
         con.setRequestProperty("User-Agent", UA);
-        con.setRequestProperty("Accept-Encoding", "gzip,deflate,lzma,sdch");
+        if (isGZIPEncoding)
+            con.setRequestProperty("Accept-Encoding", "gzip,deflate,lzma,sdch");
+        // con.setRequestProperty("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
         if (isXMLRequest) {
             con.setRequestProperty("X-Requested-With", "XMLHttpRequest");
         }
 
         con.setRequestMethod("GET");
-        int responseCode = con.getResponseCode();
+        int responseCode;
+        try {
+            responseCode = con.getResponseCode();
+        } catch (IOException e) {
+            // HttpUrlConnection will throw an IOException if any 4XX
+            // response is sent. If we request the status again, this
+            // time the internal status will be properly set, and we'll be
+            // able to retrieve it.
+            e.printStackTrace();
+            responseCode = con.getResponseCode();
+        }
 
         String encoding = con.getHeaderField("Content-Encoding");
         boolean gzipped = encoding != null && encoding.toLowerCase().contains("gzip");
 
-        InputStream inputStream = con.getInputStream();
+        InputStream inputStream;
+        try {
+            inputStream = con.getInputStream();
+        } catch (Exception e) {
+            inputStream = con.getErrorStream();
+        }
+
+
         InputStream responseStream;
         if (gzipped)
             responseStream = new BufferedInputStream(new GZIPInputStream(inputStream));
@@ -114,8 +139,9 @@ public class NetUtils {
             connection.setRequestMethod("POST");
             connection.setRequestProperty("User-Agent", UA);
             connection.setConnectTimeout(timeout);
-            connection.setRequestProperty("Accept-Encoding", "gzip,deflate,lzma,sdch");
-            // set to json connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            if (isGZIPEncoding)
+                connection.setRequestProperty("Accept-Encoding", "gzip,deflate,lzma,sdch");
+            // connection.setRequestProperty("Content-Type", "application/json");
 
             connection.setRequestProperty("Content-Length", "" +
                     Integer.toString(post_data_bytes.length));
@@ -126,8 +152,7 @@ public class NetUtils {
             connection.setDoOutput(true);
 
             //Send request
-            DataOutputStream wr = new DataOutputStream(
-                    connection.getOutputStream());
+            DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
             wr.write(post_data_bytes);
             wr.flush();
             wr.close();
@@ -135,7 +160,9 @@ public class NetUtils {
             //read Response
             String encoding = connection.getHeaderField("Content-Encoding");
             boolean gzipped = encoding != null && encoding.toLowerCase().contains("gzip");
-            InputStream inputStream = connection.getInputStream();
+            int code = connection.getResponseCode();
+
+            InputStream inputStream = code == 200 ? connection.getInputStream() : connection.getErrorStream();
             InputStream responseStream;
             if (gzipped)
                 responseStream = new BufferedInputStream(new GZIPInputStream(inputStream));

@@ -54,17 +54,20 @@ import com.madpixels.tgadmintools.Const;
 import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.adapters.AdapterChatUsersLocal;
 import com.madpixels.tgadmintools.db.DBHelper;
+import com.madpixels.tgadmintools.entities.BotToken;
 import com.madpixels.tgadmintools.entities.Callback;
 import com.madpixels.tgadmintools.entities.ChatLogInfo;
 import com.madpixels.tgadmintools.entities.ChatTask;
-import com.madpixels.tgadmintools.entities.ChatTaskControl;
+import com.madpixels.tgadmintools.entities.ChatTaskManager;
+import com.madpixels.tgadmintools.fragments.FragmentBotTokens;
 import com.madpixels.tgadmintools.fragments.FragmentSelectGroup;
 import com.madpixels.tgadmintools.fragments.FragmentSelectUsers;
 import com.madpixels.tgadmintools.helper.DialogInputValue;
+import com.madpixels.tgadmintools.helper.SendMessageHelper;
 import com.madpixels.tgadmintools.helper.TaskValues;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
-import com.madpixels.tgadmintools.services.ServiceChatTask;
+import com.madpixels.tgadmintools.utils.CommonUtils;
 import com.madpixels.tgadmintools.utils.TgImageGetter;
 
 import org.drinkless.td.libcore.telegram.Client;
@@ -86,16 +89,16 @@ public class ActivityGroupInfo extends ActivityExtended {
 
     ImageButton btnAva;
     TextView tvChatUsername, tvUsersCount, tvAdminsCount, tvKickedCount, tvMutedUsersCount,
-            tvInviteLink, tvChatType, tvBanWordsAllowCount, tvSelectLogChat, tvWelcomeTextShort,
-            tvBtnWarnBanWordsFreq, tvFloodMsgAllowCount,
+            tvInviteLink, tvChatType, tvBanWordsAllowCount, tvSelectLogEventsToChat, tvWelcomeTextShort,
+            tvBtnWarnBanWordsFreq, tvFloodMsgAllowCount, tvSelectBot,
             tvBtnWarnBanFloodFreq, tvChatCommandsCount;
     EmojiconTextView tvTitle, tvChatDescription, tvChatAdmin;
     View viewContent, viewLoading, layerBanForBlackWord,
             layerFloodControl, layerClickOpenCommand;
     Button btnConvertToSuper;
-    CheckBox chkAnyoneInviteFriendsSuper, chkAnyoneManageGroup, chkEnableMuteUsers,
-            chkWelcomeText, chkReturnOnBannedWordsExpired, chkBlackListedWordsEnabled,
-            chkRemoveJoinedMsg, chkRemoveLeaveMsg, chkEnableLogToChat,
+    CheckBox chkAnyoneInviteFriendsSuper, chkAnyoneManageGroup, chkEnableMuteUsers, chkPublicBanWords,
+            chkWelcomeText, chkReturnOnBannedWordsExpired, chkBlackListedWordsEnabled, chkPublicBanForFlood,
+            chkRemoveJoinedMsg, chkRemoveLeaveMsg, chkEnableLogToChat, chkMuteAll, chkMuteJoined,
             chkFloodControlEnabled, chkBanFloodUser, chkReturnOnBanFloodExpired, chkCommandsEnable;
     EditText //edtWelcomeText,
             edtBannedWordBanTimesVal,
@@ -121,7 +124,7 @@ public class ActivityGroupInfo extends ActivityExtended {
     int adminId = 0;
     boolean isChannel = false;
 
-    private ChatTaskControl chatTasks;
+    private ChatTaskManager chatTasks;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -162,6 +165,7 @@ public class ActivityGroupInfo extends ActivityExtended {
         fabButton.setVisibility(View.INVISIBLE);
 
         final ScrollView scrollViewMainContent = getView(R.id.scrollViewMainContent);
+        //scroller for hide/show fab button
         scrollViewMainContent.setOnTouchListener(new View.OnTouchListener() {
             int startTouchY = 0, lastScrollY = 0;
             boolean SCROLL_DIRECTION_TO_DOWN = false;
@@ -195,8 +199,8 @@ public class ActivityGroupInfo extends ActivityExtended {
         });
 
 
-        UIUtils.include(this, R.id.layer_words_antispam, R.layout.layout_words_antispam);
-        UIUtils.include(this, R.id.layer_flood_control, R.layout.layout_flood_control);
+        UIUtils.include(this, R.id.layer_words_antispam, R.layout.layout_task_banwords);
+        UIUtils.include(this, R.id.layer_flood_control, R.layout.layout_task_flood_control);
         UIUtils.include(this, R.id.layer_commands, R.layout.layout_commands);
 
         btnAva = getView(R.id.imgBtnChatAva);
@@ -241,23 +245,30 @@ public class ActivityGroupInfo extends ActivityExtended {
         spinnerBanFloodTime = getView(R.id.spinnerBanFloodTime);
         layerFloodControl = getView(R.id.layerFloodControl);
         tvBtnWarnBanFloodFreq = getView(R.id.tvBtnWarnBanFloodFreq);
-        tvSelectLogChat = getView(R.id.tvSelectLogChat);
+        tvSelectLogEventsToChat = getView(R.id.tvSelectLogEventsToChat);
         chkEnableLogToChat = getView(R.id.chkEnableLogToChat);
         chkEnableMuteUsers = getView(R.id.chkEnableMuteUsers);
         View layerClickOpenMuted = getView(R.id.layerClickOpenMuted);
         tvMutedUsersCount = getView(R.id.tvMutedUsersCount);
+        chkMuteAll = getView(R.id.chkMuteAll);
+        chkMuteJoined = getView(R.id.chkMuteJoined);
         TextView tvBannedWordsCount = getView(R.id.tvBannedWordsCount);
+        View layerSelectBot = getView(R.id.layerSelectBot);
+        tvSelectBot = getView(R.id.tvSelectBot);
+        chkPublicBanWords = getView(R.id.chkPublicBanWords);
+        chkPublicBanForFlood = getView(R.id.chkPublicBanForFlood);
 
         setTitle(R.string.title_group_info);
         tvTitle.setText(chatTitle);
 
         UIUtils.setBatchClickListener(onClickListener, tvChatUsername, btnConvertToSuper, tvTitle, tvChatAdmin,
                 tvInviteLink, tvAdminsCount, tvUsersCount, tvKickedCount, chkReturnOnBannedWordsExpired,
-                tvBanWordsAllowCount, tvBannedWordsCount, fabButton, tvSelectLogChat, chkEnableLogToChat,
+                tvBanWordsAllowCount, tvBannedWordsCount, fabButton, tvSelectLogEventsToChat, chkEnableLogToChat,
                 tvBtnWarnBanWordsFreq, chkBlackListedWordsEnabled, chkEnableMuteUsers, tvChatDescription,
                 chkFloodControlEnabled, tvFloodMsgAllowCount, chkBanFloodUser, chkReturnOnBanFloodExpired,
                 tvBtnWarnBanFloodFreq, tvNoticePhoneBookEnabled, layerClickOpenCommand, chkCommandsEnable,
-                layerClickOpenMuted, tvWelcomeTextShort, chkWelcomeText);
+                layerClickOpenMuted, tvWelcomeTextShort, chkWelcomeText, chkMuteAll, chkMuteJoined,
+                layerSelectBot, chkPublicBanWords, chkPublicBanForFlood);
 
         if (Sets.getBoolean(Const.ANTISPAM_IGNORE_SHARED_CONTACTS, Const.ANTISPAM_IGNORE_SHARED_CONTACTS_DEFAULT)) {
             tvNoticePhoneBookEnabled.setText(getString(R.string.label_notice_ignore_antispam_for_shared));
@@ -279,7 +290,7 @@ public class ActivityGroupInfo extends ActivityExtended {
         UIUtils.setBatchClickListener(onClickListener, chkRemoveLeaveMsg, chkRemoveJoinedMsg);
 
 
-        chatTasks = new ChatTaskControl(chatId);
+        chatTasks = new ChatTaskManager(chatId);
 
 
         addTask(ChatTask.TYPE.LINKS, false);
@@ -308,6 +319,8 @@ public class ActivityGroupInfo extends ActivityExtended {
             UIUtils.setTextColotRes(chkRemoveLeaveMsg, R.color.md_grey_500);
             UIUtils.setTextColotRes(chkEnableMuteUsers, R.color.md_grey_500);
             UIUtils.setTextColotRes(tvMutedUsersCount, R.color.md_grey_500);
+            UIUtils.setTextColotRes(chkMuteAll, R.color.md_grey_500);
+            UIUtils.setTextColotRes(chkMuteJoined, R.color.md_grey_500);
         }
 
 
@@ -320,6 +333,13 @@ public class ActivityGroupInfo extends ActivityExtended {
             ChatTask taskMutedUsers = chatTasks.getTask(ChatTask.TYPE.MutedUsers, false);
             if (taskMutedUsers != null) {
                 chkEnableMuteUsers.setChecked(taskMutedUsers.isEnabled);
+                chkMuteAll.setChecked(taskMutedUsers.isRemoveMessage);
+                chkMuteJoined.setChecked(taskMutedUsers.isBanUser);
+                if (!taskMutedUsers.isEnabled) {
+                    UIUtils.setTextColotRes(tvMutedUsersCount, R.color.md_grey_500);
+                    UIUtils.setTextColotRes(chkMuteAll, R.color.md_grey_500);
+                    UIUtils.setTextColotRes(chkMuteJoined, R.color.md_grey_500);
+                }
             }
 
             ChatTask taskFlood = chatTasks.getTask(ChatTask.TYPE.FLOOD, false);
@@ -328,6 +348,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                     chkFloodControlEnabled.setChecked(true);
                 else
                     layerFloodControl.setVisibility(View.GONE);
+                chkPublicBanForFlood.setChecked(taskFlood.isPublicToChat);
 
                 chkBanFloodUser.setChecked(taskFlood.isBanUser);
                 tvFloodMsgAllowCount.setText(taskFlood.mAllowCountPerUser + "");
@@ -375,6 +396,7 @@ public class ActivityGroupInfo extends ActivityExtended {
             ChatTask taskBanWords = chatTasks.getTask(ChatTask.TYPE.BANWORDS, false);
             if (taskBanWords != null) {
                 chkBlackListedWordsEnabled.setChecked(taskBanWords.isEnabled);
+                chkPublicBanWords.setChecked(taskBanWords.isPublicToChat);
 
                 if (taskBanWords.mBanTimeSec > 0) {
                     setSecondsFormatToSpinner(taskBanWords.mBanTimeSec, edtBannedWordBanTimesVal, spinnerBannedWordBanTimes);
@@ -855,9 +877,12 @@ public class ActivityGroupInfo extends ActivityExtended {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.btnFab:
+                    if (fabButton.isHidden())
+                        return;
                     new DialogAddTask().show();
                     break;
 
+                /** ============= BASE TASK ============ **/
                 case R.id.chkRemoveMessage:
                     CheckBox cbox = (CheckBox) v;
                     if (TgUtils.isGroup(chatType)) {
@@ -871,7 +896,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                     task.isRemoveMessage = cbox.isChecked();
                     chatTasks.saveTask(task);
                     break;
-                case R.id.chkBanForMessage: //TODO chkReturnOnBanLinksExpired.setEnabled(isBan && chatTasks.getTask(ChatTask.TYPE.LINKS).mBanTimeSec > 0);
+                case R.id.chkBanForMessage:
                     pType = (ChatTask.TYPE) v.getTag(R.id.tag_id_type);
                     View layerBanParams = (View) v.getTag(R.id.tag_id_view);
                     cbox = (CheckBox) v;
@@ -901,16 +926,23 @@ public class ActivityGroupInfo extends ActivityExtended {
                     chatTasks.saveTask(task);
                     break;
 
+                case R.id.chkPublicBan:
+                    pType = (ChatTask.TYPE) v.getTag(R.id.tag_id_type);
+                    cbox = (CheckBox) v;
+
+                    task = chatTasks.getTask(pType);
+                    task.isPublicToChat = cbox.isChecked();
+                    chatTasks.saveTask(task);
+                    break;
+
                 case R.id.tvBanAllowCount:
                     pType = (ChatTask.TYPE) v.getTag(R.id.tag_id_type);
                     SeekBar seekBarAllowCount = (SeekBar) v.getTag(R.id.tag_id_view);
                     setTaskWarnCountDialog(pType, seekBarAllowCount, (TextView) v);
                     break;
+                /** ================================== **/
 
-                case R.id.tvBannedWordsCount:
-                    startActivity(new Intent(mContext, ActivityBannedWordsList.class).putExtra("chat_id", chatId));
 
-                    break;
                 case R.id.tvChatUsername:
                     if (isAdmin)
                         dialogSetUsername(chatUsername);
@@ -937,12 +969,34 @@ public class ActivityGroupInfo extends ActivityExtended {
                     switchAnyoneManageGroup();
                     break;
 
+                /** =================== BANWORDS ================ **/
                 case R.id.chkBlackListedWordsEnabled:
                     task = chatTasks.getTask(ChatTask.TYPE.BANWORDS);
                     task.isEnabled = chkBlackListedWordsEnabled.isChecked();
                     layerBanForBlackWord.setVisibility(task.isEnabled ? View.VISIBLE : View.GONE);
                     chatTasks.saveTask(task);
                     break;
+                case R.id.chkPublicBanWords:
+                    task = chatTasks.getTask(ChatTask.TYPE.BANWORDS);
+                    task.isPublicToChat = chkPublicBanWords.isChecked();
+                    chatTasks.saveTask(task);
+                    break;
+                case R.id.tvBannedWordsCount:
+                    startActivity(new Intent(mContext, ActivityBannedWordsList.class).putExtra("chat_id", chatId));
+                    break;
+                case R.id.chkReturnOnBannedWordsExpired:
+                    task = chatTasks.getTask(ChatTask.TYPE.BANWORDS);
+                    task.isReturnOnBanExpired = chkReturnOnBannedWordsExpired.isChecked();
+                    chatTasks.saveTask(task);
+                    break;
+                case R.id.tvBanWordsAllowCount:
+                    setTaskWarnCountDialog(ChatTask.TYPE.BANWORDS, null, tvBanWordsAllowCount);
+                    break;
+
+                case R.id.tvBtnWarnBanWordsFreq:
+                    showPopupForFrequencyTask(ChatTask.TYPE.BANWORDS, tvBtnWarnBanWordsFreq);
+                    break;
+                /** ========================= **/
 
 
                 case R.id.tvInviteLink:
@@ -984,11 +1038,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                                 .putExtra("chat_id", chatId));
                     }
                     break;
-                case R.id.chkReturnOnBannedWordsExpired:
-                    task = chatTasks.getTask(ChatTask.TYPE.BANWORDS);
-                    task.isReturnOnBanExpired = chkReturnOnBannedWordsExpired.isChecked();
-                    chatTasks.saveTask(task);
-                    break;
+
 
                 case R.id.chkRemoveLeaveMsg:
                     if (TgUtils.isGroup(chatType)) {
@@ -997,15 +1047,9 @@ public class ActivityGroupInfo extends ActivityExtended {
                         return;
                     }
 
-//                    antiSpamRule = getAntispamRule();
-//                    antiSpamRule.isRemoveLeaveMessage = chkRemoveLeaveMsg.isChecked();
-//                    saveAntispamRule(antiSpamRule);
-
                     task = chatTasks.getTask(ChatTask.TYPE.LeaveMsg);
                     task.isEnabled = chkRemoveLeaveMsg.isChecked();
                     chatTasks.saveTask(task);
-                    if (task.isEnabled)
-                        ServiceChatTask.start(mContext);
                     break;
 
                 case R.id.chkRemoveJoinedMsg:
@@ -1018,26 +1062,17 @@ public class ActivityGroupInfo extends ActivityExtended {
                     task = chatTasks.getTask(ChatTask.TYPE.JoinMsg);
                     task.isEnabled = chkRemoveJoinedMsg.isChecked();
                     chatTasks.saveTask(task);
-
-//                    antiSpamRule = getAntispamRule();
-//                    antiSpamRule.isRemoveJoinMessage = chkRemoveJoinedMsg.isChecked();
-//                    saveAntispamRule(antiSpamRule);
-                    if (task.isEnabled)
-                        ServiceChatTask.start(mContext);
                     break;
 
 
-                case R.id.tvBanWordsAllowCount:
-                    setTaskWarnCountDialog(ChatTask.TYPE.BANWORDS, null, tvBanWordsAllowCount);
-                    break;
-
-                case R.id.tvBtnWarnBanWordsFreq:
-                    showPopupForFrequencyTask(ChatTask.TYPE.BANWORDS, tvBtnWarnBanWordsFreq);
-                    break;
-                //Flood Control view:
+                /** ================== Messaging flood ============= **/
                 case R.id.chkFloodControlEnabled:
                     task = chatTasks.getTask(ChatTask.TYPE.FLOOD);
                     task.isEnabled = chkFloodControlEnabled.isChecked();
+                    if (!TgUtils.isSuperGroup(chatType)) {
+                        task.isBanUser = true; //Force enable ban user for non-supergroups, coz we can't delete messages at this type of group.
+                        chkBanFloodUser.setChecked(true);
+                    }
                     chatTasks.saveTask(task);
                     layerFloodControl.setVisibility(task.isEnabled ? View.VISIBLE : View.GONE);
                     break;
@@ -1045,6 +1080,13 @@ public class ActivityGroupInfo extends ActivityExtended {
                     setTaskWarnCountDialog(ChatTask.TYPE.FLOOD, null, tvFloodMsgAllowCount);
                     break;
                 case R.id.chkBanFloodUser:
+                    if (!TgUtils.isSuperGroup(chatType)) {
+                        //Force enable ban user for non-supergroups, coz we can't delete messages at this type of group.
+                        MyToast.toast(mContext, "You can't disable ban users for non-supergroups because telegram not support deletion in non-supergroups");
+                        chkBanFloodUser.setChecked(true);
+                        return;
+                    }
+
                     task = chatTasks.getTask(ChatTask.TYPE.FLOOD);
                     task.isBanUser = chkBanFloodUser.isChecked();
                     chatTasks.saveTask(task);
@@ -1053,8 +1095,6 @@ public class ActivityGroupInfo extends ActivityExtended {
                     chkReturnOnBanFloodExpired.setEnabled(b);
                     edtFloodBanTimeVal.setEnabled(b);
                     spinnerBanFloodTime.setEnabled(b);
-
-
                     break;
                 case R.id.chkReturnOnBanFloodExpired:
                     task = chatTasks.getTask(ChatTask.TYPE.FLOOD);
@@ -1064,6 +1104,13 @@ public class ActivityGroupInfo extends ActivityExtended {
                 case R.id.tvBtnWarnBanFloodFreq:
                     showPopupForFrequencyTask(ChatTask.TYPE.FLOOD, (TextView) v);
                     break;
+                case R.id.chkPublicBanForFlood:
+                    task = chatTasks.getTask(ChatTask.TYPE.FLOOD);
+                    task.isPublicToChat = chkPublicBanForFlood.isChecked();
+                    chatTasks.saveTask(task);
+                    break;
+                /** =========================== **/
+
                 case R.id.tvNoticePhoneBookEnabled:
                     startActivity(new Intent(mContext, ActivitySettings.class));
                     break;
@@ -1073,6 +1120,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                     startActivityForResult(intent, Const.ACTION_REFRESH_COMMANDS);
                     break;
 
+
                 case R.id.chkCommandsEnable:
                     task = chatTasks.getTask(ChatTask.TYPE.COMMAND);
                     task.isEnabled = chkCommandsEnable.isChecked();
@@ -1080,23 +1128,14 @@ public class ActivityGroupInfo extends ActivityExtended {
                     UIUtils.setTextColotRes(tvChatCommandsCount, task.isEnabled ? R.color.md_teal_500 : R.color.md_blue_grey_500);
                     chatTasks.saveTask(task);
                     break;
-                case R.id.tvSelectLogChat:
-                    FragmentSelectGroup f = new FragmentSelectGroup();
-                    //f.setRetainInstance(true);
-                    f.setOnChatSelected(new Callback() {
-                        @Override
-                        public void onResult(Object data) {
-                            TdApi.Chat chat = (TdApi.Chat) data;
-                            tvSelectLogChat.setText(chat.title);
-                            DBHelper.getInstance().setChatLogTargetChat(chatId, chat.id);
-                        }
-                    });
-                    f.show(getSupportFragmentManager(), "groups");
+                case R.id.tvSelectLogEventsToChat:
+                    dialogSelectGroup();
                     break;
 
                 case R.id.chkEnableLogToChat:
                     boolean isEnabled = chkEnableLogToChat.isChecked();
                     DBHelper.getInstance().setChatLogEnabled(chatId, isEnabled);
+                    UIUtils.setTextColotRes(tvSelectLogEventsToChat, isEnabled ? R.color.md_teal_500 : R.color.md_grey_500);
                     break;
                 case R.id.chkEnableMuteUsers:
                     if (TgUtils.isGroup(chatType)) {
@@ -1108,6 +1147,10 @@ public class ActivityGroupInfo extends ActivityExtended {
                     task = chatTasks.getTask(ChatTask.TYPE.MutedUsers);
                     task.isEnabled = chkEnableMuteUsers.isChecked();
                     chatTasks.saveTask(task);
+
+                    UIUtils.setTextColotRes(tvMutedUsersCount, task.isEnabled ? R.color.md_teal_500 : R.color.md_grey_500);
+                    UIUtils.setTextColotRes(chkMuteAll, task.isEnabled ? R.color.md_black_1000 : R.color.md_grey_500);
+                    UIUtils.setTextColotRes(chkMuteJoined, task.isEnabled ? R.color.md_black_1000 : R.color.md_grey_500);
                     break;
                 case R.id.layerClickOpenMuted:
                     if (TgUtils.isGroup(chatType)) {
@@ -1123,7 +1166,6 @@ public class ActivityGroupInfo extends ActivityExtended {
                     else
                         fUsers.groupId = groupId;
 
-                    // fUsers.setRetainInstance(true);
                     fUsers.setOnUserSelected(new Callback() {
                         @Override
                         public void onResult(Object data) {
@@ -1139,6 +1181,30 @@ public class ActivityGroupInfo extends ActivityExtended {
                     });
                     fUsers.show(getSupportFragmentManager(), "users");
                     break;
+                case R.id.chkMuteAll:
+                    if (TgUtils.isGroup(chatType)) {
+                        chkMuteAll.setChecked(false);
+                        MyToast.toast(mContext, R.string.toast_deletion_not_avail);
+                        return;
+                    }
+
+                    task = chatTasks.getTask(ChatTask.TYPE.MutedUsers);
+                    task.isRemoveMessage = chkMuteAll.isChecked();
+                    chatTasks.saveTask(task);
+                    if (task.isEnabled)
+                        dialogNotifyChatToReadonlyMode(task.isRemoveMessage);
+                    break;
+                case R.id.chkMuteJoined:
+                    if (TgUtils.isGroup(chatType)) {
+                        chkMuteJoined.setChecked(false);
+                        MyToast.toast(mContext, R.string.toast_deletion_not_avail);
+                        return;
+                    }
+
+                    task = chatTasks.getTask(ChatTask.TYPE.MutedUsers);
+                    task.isBanUser = chkMuteJoined.isChecked();
+                    chatTasks.saveTask(task);
+                    break;
 
                 case R.id.tvWelcomeTextShort:
                     dialogEditWelcomeText();
@@ -1148,9 +1214,34 @@ public class ActivityGroupInfo extends ActivityExtended {
                     task.isEnabled = chkWelcomeText.isChecked();
                     chatTasks.saveTask(task);
                     break;
+                case R.id.layerSelectBot:
+                    FragmentBotTokens fragmentBotTokens = new FragmentBotTokens();
+                    fragmentBotTokens.setOnBotSelectedCallback(new Callback() {
+                        @Override
+                        public void onResult(Object data) {
+                            int bot_db_id = (int) data;
+                            if (bot_db_id == 0) {// remove bot
+                                tvSelectBot.setText(R.string.text_bot_not_selected);
+                                DBHelper.getInstance().removeChatTask(chatTasks.getTask(ChatTask.TYPE.CHAT_BOT).id);
+                                return;
+                            }
+                            BotToken botToken = DBHelper.getInstance().getBotToken(bot_db_id);
+                            if (botToken != null) {
+                                tvSelectBot.setText(botToken.mFirstName);
+                                ChatTask task = chatTasks.getTask(ChatTask.TYPE.CHAT_BOT);
+                                task.mText = botToken.mToken;
+                                chatTasks.saveTask(task);
+                                TdApi.TLFunction f = new TdApi.ChangeChatMemberStatus(chatId, botToken.bot_id, new TdApi.ChatMemberStatusEditor());
+                                TgH.send(f);
+                            }
+                        }
+                    });
+                    fragmentBotTokens.show(getSupportFragmentManager(), "groups");
+                    break;
             }
         }
     };
+
 
     private void updateCommandsCount() {
         int chatCommandsCount = DBHelper.getInstance().getChatCommandsCount(chatId);
@@ -1542,7 +1633,7 @@ public class ActivityGroupInfo extends ActivityExtended {
             public TypeItem(ChatTask.TYPE pType) {
                 mType = pType;
                 isEnabled = chatTasks.getTask(pType, false) == null;
-                String title = getString(TaskValues.getTitleForAddTask(pType));
+                String title = TaskValues.getTitleForAddTask(pType);
 
                 mTitle = title;// "Add task for " + title;
             }
@@ -1563,7 +1654,7 @@ public class ActivityGroupInfo extends ActivityExtended {
             public View getView(int position, View convertView, ViewGroup parent) {
                 boolean created = convertView == null;
                 if (created)
-                    convertView = inflater.inflate(R.layout.item_test, parent, false);
+                    convertView = inflater.inflate(R.layout.item_task_list, parent, false);
                 TypeItem item = getItem(position);
 
                 final TextView tv = UIUtils.getHolderView(convertView, R.id.tvItemTitle);
@@ -1655,7 +1746,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                             })
                             .setNegativeButton(R.string.btnCancel, null)
                             .show();
-                    return false;
+                    return true;
                 }
             });
 
@@ -1737,6 +1828,7 @@ public class ActivityGroupInfo extends ActivityExtended {
         LinearLayout layerBanParams = UIUtils.getView(view, R.id.layerBanParams);
         SeekBar seekBarAllowCount = UIUtils.getView(view, R.id.seekBarAllowCount);
         TextView tvBanAllowCount = UIUtils.getView(view, R.id.tvBanAllowCount);
+        CheckBox chkPublicBan = UIUtils.getView(view, R.id.chkPublicBan);
 
         if (TgUtils.isGroup(chatType))
             chkRemoveMessage.setTextColor(getResources().getColor(R.color.md_grey_500));
@@ -1750,6 +1842,7 @@ public class ActivityGroupInfo extends ActivityExtended {
         chkReturnOnBanExpired.setTag(R.id.tag_id_type, pType);
         chkBanForMessage.setTag(R.id.tag_id_view, layerBanParams);
         tvBtnWarnFreq.setTag(R.id.tag_id_type, pType);
+        chkPublicBan.setTag(R.id.tag_id_type, pType);
 
         seekBarAllowCount.setTag(R.id.tag_id_type, pType);
         seekBarAllowCount.setTag(R.id.tag_id_view, tvBanAllowCount);
@@ -1758,7 +1851,7 @@ public class ActivityGroupInfo extends ActivityExtended {
         tvBanAllowCount.setTag(R.id.tag_id_view, seekBarAllowCount);
 
         UIUtils.setBatchClickListener(onClickListener, chkBanForMessage, chkRemoveMessage, tvBtnWarnFreq,
-                chkReturnOnBanExpired, tvBanAllowCount);
+                chkReturnOnBanExpired, tvBanAllowCount, chkPublicBan);
 
         setSpinnerBanTimesListener(pType, spinnerBanTime, edtBanTimeVal, chkReturnOnBanExpired);
         setSpinnerFloodSelectorListener(pType, spinnerBanFloodTime, edtBanFloodTimeVal);
@@ -1773,6 +1866,7 @@ public class ActivityGroupInfo extends ActivityExtended {
             tvBanAllowCount.setText(task.mAllowCountPerUser + "");
             setWarnFrequencyText(tvBtnWarnFreq, task.mWarnFrequency);
             seekBarAllowCount.setProgress(task.mAllowCountPerUser);
+            chkPublicBan.setChecked(task.isPublicToChat);
 
             if (task.mBanTimeSec > 0)
                 setSecondsFormatToSpinner(task.mBanTimeSec, edtBanTimeVal, spinnerBanTime);
@@ -2002,7 +2096,6 @@ public class ActivityGroupInfo extends ActivityExtended {
         TgH.send(f, new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                // MyLog.log(object.toString());
                 if (TgUtils.isError(object)) {
                     TdApi.Error error = (TdApi.Error) object;
                     if (error.code == 6 && !isFinishing()) {
@@ -2016,7 +2109,6 @@ public class ActivityGroupInfo extends ActivityExtended {
                 }
 
                 TdApi.GroupFull groupFull = (TdApi.GroupFull) object;
-                // ActivityGroupInfo.this.groupFull = groupFull;
                 chatUsersCount = groupFull.group.memberCount;
                 isAdmin = groupFull.group.status.getConstructor() == TdApi.ChatMemberStatusCreator.CONSTRUCTOR;
                 adminId = groupFull.creatorUserId;
@@ -2036,6 +2128,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                     @Override
                     public void run() {
                         onGroupInfoLoaded();
+                        getBotForChat();
                     }
                 });
             }
@@ -2103,13 +2196,6 @@ public class ActivityGroupInfo extends ActivityExtended {
         }
     };
 
-    AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-        }
-    };
-
     private void getSuperGroupInfo() {
         TdApi.TLFunction f = new TdApi.GetChannelFull(channelId);
         TgH.send(f, new Client.ResultHandler() {
@@ -2147,13 +2233,14 @@ public class ActivityGroupInfo extends ActivityExtended {
                         } else
                             getSuperAdmins();
 
-                        if (!channelFull.channel.isSupergroup) {// channel
+                        if (!channelFull.channel.isSupergroup) {// is channel
                             isChannel = true;
                             findViewById(R.id.layerTasksParent).setVisibility(View.GONE);
                             findViewById(R.id.viewOther).setVisibility(View.GONE);
                             findViewById(R.id.viewWelcomeText).setVisibility(View.GONE);
                             findViewById(R.id.viewCommands).setVisibility(View.GONE);
                             findViewById(R.id.layerLog).setVisibility(View.GONE);
+                            findViewById(R.id.layerBot).setVisibility(View.GONE);
                             fabButton.hideFloatingActionButton();
 
                             tvKickedCount.setVisibility(View.GONE);
@@ -2163,6 +2250,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                             tvChatType.setText(R.string.chatTypeChannel);
                         } else {
                             tvChatType.setText(R.string.chatTypeSuperGroup);
+                            getBotForChat();
                         }
                     }
                 });
@@ -2265,25 +2353,27 @@ public class ActivityGroupInfo extends ActivityExtended {
     }
 
     void loadChatLogInfo() {
-        final ChatLogInfo chatLogInfo = DBHelper.getInstance().getChatLog(chatId, false);
+        final ChatLogInfo chatLogInfo = DBHelper.getInstance().getLogEventsToChat(chatId, false);
         if (chatLogInfo == null) {
-            //tvSelectLogChat.setText("Tap to configure exporting log to chat");
+            //tvSelectLogEventsToChat.setText("Tap to configure exporting log to chat");
             return;
         }
 
-        tvSelectLogChat.setText("Loading chat info...");
+        tvSelectLogEventsToChat.setText("Loading chat info...");
         chkEnableLogToChat.setChecked(chatLogInfo.isEnabled);
+        if (!chatLogInfo.isEnabled)
+            UIUtils.setTextColotRes(tvSelectLogEventsToChat, R.color.md_grey_500);
 
         TgH.sendOnUi(new TdApi.GetChat(chatLogInfo.chatLogID), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
                 if (TgUtils.isError(object)) {
-                    tvSelectLogChat.setText("Error loading chat info");
+                    tvSelectLogEventsToChat.setText("Error loading chat info");
                     return;
                 }
 
                 TdApi.Chat chat = (TdApi.Chat) object;
-                tvSelectLogChat.setText("Forwarding log to chat:\n" + chat.title);
+                tvSelectLogEventsToChat.setText("Forwarding log to chat:\n" + chat.title);
             }
         });
 
@@ -2466,6 +2556,40 @@ public class ActivityGroupInfo extends ActivityExtended {
             tvMutedUsersCount.setText(count + " " + Utils.pluralValue(mContext, R.array.muted_users_plural, count));
     }
 
+    private void dialogNotifyChatToReadonlyMode(final boolean isReadonly) {
+        //// This chat is now in read-only mode.
+        // This chat is no longer in read-only mode.
+        View dv = UIUtils.inflate(mContext, R.layout.dialog_input_text);
+        dv.findViewById(R.id.edtInviteUsername).setVisibility(View.GONE);
+        dv.findViewById(R.id.tvDescription).setVisibility(View.GONE);
+        TextView tvHint = UIUtils.getView(dv, R.id.tvHint);
+        final EmojiconEditText edtText = UIUtils.getView(dv, R.id.editInputText);
+
+        tvHint.setText(isReadonly ? R.string.title_chat_in_readonly_mode : R.string.title_chat_no_in_readonly);
+
+        final String defaultMessage = getString(isReadonly ? R.string.text_chat_in_readonly_now : R.string.text_chat_not_in_readonly);
+        edtText.setText(Sets.getString(isReadonly ? "text_chat_readonly" : "text_chat_not_readonly", defaultMessage));
+        edtText.setMaxLines(6);
+
+        new AlertDialog.Builder(mContext)
+                .setTitle("Read-Only Mode")
+                .setView(dv)
+                .setCancelable(false)
+                .setPositiveButton(R.string.btnSend, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String text = edtText.getText().toString().trim();
+                        if (!text.equals(defaultMessage))
+                            Sets.set(isReadonly ? "text_chat_readonly" : "text_chat_not_readonly", text);
+
+                        SendMessageHelper.sendMessageItalic(chatId, text);
+                    }
+                })
+                .setNegativeButton(R.string.btnCancel, null)
+                .show();
+
+    }
+
     void dialogEditWelcomeText() {
         View dv = UIUtils.inflate(mContext, R.layout.dialog_input_text);
         dv.findViewById(R.id.edtInviteUsername).setVisibility(View.GONE);
@@ -2496,6 +2620,45 @@ public class ActivityGroupInfo extends ActivityExtended {
                 .setNegativeButton(R.string.btnCancel, null)
                 .show();
     }
+
+    void getBotForChat() {
+        ChatTask task = DBHelper.getInstance().getChatTask(chatId, ChatTask.TYPE.CHAT_BOT);
+        if (task != null) {
+            BotToken botToken = DBHelper.getInstance().getBotToken(task.mText);
+            if (botToken == null)
+                tvSelectBot.setText(task.mText);
+            else
+                tvSelectBot.setText(botToken.mFirstName);
+        }
+    }
+
+    private void dialogSelectGroup() {
+        FragmentSelectGroup f = new FragmentSelectGroup();
+        f.setOnChatSelected(new Callback() {
+            @Override
+            public void onResult(Object data) {
+                TdApi.Chat chat = (TdApi.Chat) data;
+                tvSelectLogEventsToChat.setText(chat.title);
+                DBHelper.getInstance().setChatLogTargetChat(chatId, chat.id);
+
+                //Invite bot for selected group in specified:
+                String token = CommonUtils.useBotForAlert(chatId);
+                if (token == null) return;//bot is not specified  for chat
+                BotToken botToken = DBHelper.getInstance().getBotToken(token);
+                if (botToken != null) {
+                    TdApi.TLFunction f = new TdApi.ChangeChatMemberStatus(chat.id, botToken.bot_id, new TdApi.ChatMemberStatusEditor());
+                    TgH.send(f, new Client.ResultHandler() {
+                        @Override
+                        public void onResult(TdApi.TLObject object) {
+                            MyLog.log(object.toString());
+                        }
+                    });
+                }
+            }
+        });
+        f.show(getSupportFragmentManager(), "groups");
+    }
+
 
     @Override
     public void onBackPressed() {

@@ -31,7 +31,7 @@ public class ServiceGarbageCollector extends Service{
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pi);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + AlarmManager.INTERVAL_HOUR,
-                AlarmManager.INTERVAL_HOUR*2,  pi); // каждые два часа
+                AlarmManager.INTERVAL_HALF_DAY,  pi); // каждые два часа
     }
 
     @Override

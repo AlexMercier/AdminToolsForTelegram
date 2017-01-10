@@ -44,7 +44,7 @@ android:orientation="vertical">
         android:src="@drawable/profile_list" />
 
     <TextView
-        android:id="@+id/tvSelectLogChat"
+        android:id="@+id/tvSelectLogEventsToChat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"

@@ -16,6 +16,7 @@ import com.madpixels.tgadmintools.entities.BanTask;
 import com.madpixels.tgadmintools.entities.Callback;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
+import com.madpixels.tgadmintools.utils.CommonUtils;
 import com.madpixels.tgadmintools.utils.LogUtil;
 
 import org.drinkless.td.libcore.telegram.Client;
@@ -99,7 +100,7 @@ public class ServiceUnbanTask extends Service {
         TgH.TG().send(fReturnUser, new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                MyLog.log(object.toString());
+
                 if(object.getConstructor()== TdApi.Ok.CONSTRUCTOR) {
                     DBHelper.getInstance().removeBanTask(ban);
                     new LogUtil(onLogCallback, ban).logAutoUnbanAndReturn(ban);
@@ -171,7 +172,7 @@ public class ServiceUnbanTask extends Service {
         public void onResult(Object data) {
             LogUtil log = (LogUtil) data;
             BanTask ban = (BanTask) log.callbackPayload;
-            ServiceChatTask.logToChat(ban.chat_id, log.logEntity);
+            CommonUtils.forwardLogEventToChat(ban.chat_id, log.logEntity);
         }
     };
 

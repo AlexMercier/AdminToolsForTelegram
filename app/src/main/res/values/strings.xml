@@ -127,7 +127,7 @@
     <string name="text_ban_permanently">Permanent ban</string>
     <string name="text_ban_temporary">Temporary ban. Expired at:</string>
     <string name="action_unban_all">Unban all</string>
-    <string name="textRoleAdmin">Administrator</string>
+    <string name="textRoleAdmin">Creator</string>
     <string name="textRoleModerator">Moderator</string>
     <string name="textChatRole">Role:</string>
     <string name="check_enabled">Enable</string>
@@ -211,7 +211,7 @@
     <string name="text_warn_on_first_last_warn">On first and last messages</string>
     <string name="text_warn_on_second_and_last_warn">On 2\'d and last messages</string>
     <string name="text_warn_always">Warn always</string>
-    <string name="tex_warn_count_for_user_before_ban">Warnings for user:</string>
+    <string name="text_warn_count_for_user_before_ban">Warnings for user:</string>
     <string name="log_title_group">Group</string>
     <string name="log_title_username">User</string>
     <string name="log_title_time">Time</string>
@@ -304,6 +304,7 @@
     <string name="title_task_stickers">Stickers task</string>
     <string name="title_task_voices">Voices task</string>
     <string name="title_task_links">Links task (antispam)</string>
+    <string name="text_command_leave_not_error_creator">Creator can\'t leave the channel</string>
     <string name="text_command_execute_access_denied">Access denied.\nOnly admin can execute this command</string>
     <string name="warntext_bangame_first">First warn. Sharing Game not allowed in this chat</string>
     <string name="warntext_bangame_last">Last warning. Sharing Game flood</string>
@@ -327,7 +328,7 @@
     <string name="title_task_photos">Photos</string>
     <string name="chk_remove_messages_photos">Remove messages with Photos</string>
     <string name="chkTitleBanForPhotos">Ban for photos</string>
-    <string name="title_task_docs" >Files (Documents)</string>
+    <string name="title_task_docs">Files (Documents)</string>
     <string name="chk_remove_messages_docs">Remove messages with files</string>
     <string name="chkTitleBanForDocs">Ban for files</string>
     <string name="logAction_removedDocs">Deleted Document</string>
@@ -375,13 +376,60 @@
 
     <string name="dialog_recent_changes">
         New in v.%s
-        \nReorganized chat tasks menu
-        \nAdded ban filter for all Telegram attachments: Gif, Audio, Video, Game, Doc etc..
-        \nAdded Mute User menu - read-only mode for supergroup users
-        \nAdded features for exporting Log to Telegram
-        \nFixed authorization, now you can request code via call and sms.
-        \nFixed hashtags in banwords filter
+        \n new option Mute all users
+        \n new option Mute new joined users
+        \n Notification to chat when user was banned
+        \n Now you can select bot to send notifications to chat via bot
+        \n Optimization and improvements
     </string>
+    <string name="btnSendNewSmsCode">Resend SMS Code</string>
+    <string name="btnRequestAuthCall">Call auth code</string>
+    <string name="title_chat_in_readonly_mode">Notify members that chat is in read-only mod:</string>
+    <string name="title_chat_no_in_readonly">Notify members that chat is no longer in read-only mod:</string>
+    <string name="text_chat_in_readonly_now">This chat is now in read-only mode.</string>
+    <string name="text_chat_not_in_readonly">This chat is no longer in read-only mode.</string>
+    <string name="btnSend">Send</string>
+    <string name="chkMuteAllMembers">Mute all except admins</string>
+    <string name="chkMuteJoinedMembers">Mute all new joined users</string>
+    <string name="logAction_sendViaBotError">Send message via Bot error</string>
+    <string name="text_bot_not_selected">Bot not selected</string>
+    <string name="text_send_notifications_as_bot">Send notifications as Bot</string>
+    <string name="text_select_bot_none">Select None for disable bot to this group</string>
+    <string name="option_remove_bot">Remove bot from list</string>
+    <string name="title_select_bot">Select Bot</string>
+    <string name="hint_botfather_for_createbot">Use BotFather to cretae new bot</string>
+    <string name="hint_insert_bot_token">Insert bot token</string>
+    <string name="hint_select_existing_bot_token">or select existing bot from list below</string>
+    <string name="action_mute_user">Mute user (Read-only)</string>
+    <string name="text_mute_user_now">You need to enable Mute task in the chat settings to mute user.\nEnable now?</string>
+    <string name="btnSkip">Skip</string>
+    <string name="text_chat_title">Title:</string>
+    <string name="text_hint_cmd_change_title">Please specify chat title after command.\nExample:</string>
+    <string name="text_confirm_select_group_for_logging">Set this group to forward log events?</string>
+    <string name="logAction_userTitleChanged">The user has changed the title of the group</string>
+    <string name="logAction_gameFloodWarn">Warn user of Game flood</string>
+    <string name="logAction_voiceFloodWarn">Warn user of voice flood</string>
+    <string name="log_title_oldChangedChatTitle">Old title</string>
+    <string name="title_backup_restore_settings">Backup/Restore Settings</string>
+    <string name="text_backup_description">Save backup to sdcard and Telegram Cloud Storage</string>
+    <string name="btn_backup_settings">Create Backup</string>
+    <string name="btn_backup_restore_settings">Restore backup</string>
+    <string name="text_backup_restore_description">Select backup file from sdcard to restore. All existing tasks for chats will be overwritten!</string>
+    <string name="text_backup_saved">File saved to \'%s\'.\n\nDo you want to save backup to Telegram Cloud Storage?</string>
+    <string name="toast_user_was_removed">User was removed from chat.\nUser can join again if wants</string>
+    <string name="toast_error_remove_user">Remove user error</string>
+    <string name="logAction_removedJoinMessage">Removed Join message</string>
+    <string name="chtTitlePublicBan">Publish ban to chat</string>
+    <string name="logAction_removeLeaveMessage">Removed User Leave message</string>
+    <string name="text_dozen_battery_white_list_api23">
+        <b>Note:</b> If the application is suspended in the background, you must add it to Android Doze whitelist in
+        \n<b>Settings -> Battery -> Menu -> Battery Optimization</b>b>
+        \n(or <b>Settings->Apps->Advanced->Battery Optimization</b>)
+        \nand exclude app from optimization to allow app work in background.</string>
+    <string name="text_battery_optimization_state_disabled">Current State: Ok. App optimization disabled</string>
+    <string name="text_battery_optimization_state_enabled">Current State: App optimization enabled. App may stop work in the background</string>
+    <string name="text_note_battery_optimization"><b>Note:</b> <font color='#009688'>Battery Optimization</font></string>
+
 
     <string-array name="ban_times">
         <item>Min.</item>
@@ -414,6 +462,7 @@
     <string-array name="command_types">
         <item>Text answer</item>
         <item>Kick self user</item>
+        <item>Change title</item>
     </string-array>
 
     <string-array name="commands_plural">

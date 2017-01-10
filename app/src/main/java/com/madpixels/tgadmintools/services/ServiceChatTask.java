@@ -1,16 +1,19 @@
 package com.madpixels.tgadmintools.services;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.madpixels.apphelpers.MyLog;
 import com.madpixels.apphelpers.Sets;
+import com.madpixels.apphelpers.Utils;
 import com.madpixels.tgadmintools.BuildConfig;
 import com.madpixels.tgadmintools.Const;
 import com.madpixels.tgadmintools.R;
@@ -20,17 +23,21 @@ import com.madpixels.tgadmintools.entities.BannedWord;
 import com.madpixels.tgadmintools.entities.Callback;
 import com.madpixels.tgadmintools.entities.ChatCommand;
 import com.madpixels.tgadmintools.entities.ChatTask;
-import com.madpixels.tgadmintools.entities.ChatTaskControl;
-import com.madpixels.tgadmintools.entities.ChatLogInfo;
+import com.madpixels.tgadmintools.entities.ChatTaskManager;
+import com.madpixels.tgadmintools.entities.FormattedTagText;
+import com.madpixels.tgadmintools.entities.LogEntity;
+import com.madpixels.tgadmintools.helper.CommandsExecutor;
 import com.madpixels.tgadmintools.helper.TaskValues;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
 import com.madpixels.tgadmintools.utils.AdminUtils;
+import com.madpixels.tgadmintools.utils.CommonUtils;
 import com.madpixels.tgadmintools.utils.LogUtil;
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.drinkless.td.libcore.telegram.TdApi.UpdateNewMessage;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,28 +52,45 @@ public class ServiceChatTask extends Service {
 
     private static boolean isStoppedByUser = false;
     public static boolean IS_RUNNING = false;
+    private long mTimeServiceStart;
+    boolean isStartForeground = false;
+    private MyNotification foregroundNotification;
+    private int startID;
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     public static void start(Context mContext) {
         if (!IS_RUNNING && DBHelper.getInstance().isChatRulesExists()) {
             mContext.startService(new Intent(mContext, ServiceChatTask.class));
             ServiceBackgroundStarter.startService(mContext); //run background starter helper
-            if (BuildConfig.DEBUG)
-                LogUtil.showLogNotification("ServiceAntispam started with rules exists");
         }
     }
 
     @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        MyLog.log("ServiceChatTasks removed");
+        // if(!isStopByUser)
+        //     startService(new Intent(this, ServiceStickerScanner.class));
+        super.onTaskRemoved(rootIntent);
+    }
+
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        MyLog.log("ServiceAntispam started");
+        startID = startId;
+        MyLog.log("ServiceChatTasks started. " + startID);
         if (ServiceChatTask.IS_RUNNING) {
-            MyLog.log("ServiceAntispam is already running");
+            MyLog.log("ServiceChatTasks is already running");
             TgH.init(this);
             TgH.send(new TdApi.GetAuthState());
             return START_STICKY;
         }
 
+        if (BuildConfig.DEBUG)
+            LogUtil.showLogNotification("ServiceChatTasks started with rules exists");
+
         isStoppedByUser = false;
         IS_RUNNING = true;
+        mTimeServiceStart = System.currentTimeMillis();
 
         TgH.init(this, new Client.ResultHandler() {
             @Override
@@ -75,7 +99,7 @@ public class ServiceChatTask extends Service {
             }
         });
 
-        boolean isStartForeground = Sets.getBoolean(Const.START_SERVICE_AS_FOREGROUND, true);
+        isStartForeground = Sets.getBoolean(Const.START_SERVICE_AS_FOREGROUND, true);
         if (isStartForeground) {
             createForegroundNotification();
         }
@@ -84,78 +108,91 @@ public class ServiceChatTask extends Service {
     }
 
     private void createForegroundNotification() {
-        MyNotification notification = new MyNotification(300, this);
+        foregroundNotification = new MyNotification(300, this);
         PendingIntent pIntent = PendingIntent.getActivity(this, 11, new Intent(this, MainActivity.class), 0);
-        notification.setContentIntent(pIntent);
-        notification.mNotificationBuilder.setPriority(Notification.PRIORITY_MIN);
-        notification.mNotificationBuilder.setContentInfo(getString(R.string.text_notification_descr_background));
-        notification.startForeground(this);
+        foregroundNotification.setContentIntent(pIntent);
+        foregroundNotification.mNotificationBuilder.setPriority(Notification.PRIORITY_MIN);
+        foregroundNotification.mNotificationBuilder.setContentInfo(getString(R.string.text_notification_descr_background));
+        foregroundNotification.startForeground(this);
+    }
+
+    void updateForegroundNotification() {
+        long sec = (System.currentTimeMillis() - mTimeServiceStart) / 1000;
+        foregroundNotification.mNotificationBuilder.setContentText("uptime: " + Utils.convertSecToReadableDate(sec));
+        foregroundNotification.alert();
     }
 
 
     final Client.ResultHandler onUpdate = new Client.ResultHandler() {
         @Override
         public void onResult(TdApi.TLObject object) {
-            if (object.getConstructor() == TdApi.UpdateNewMessage.CONSTRUCTOR) {
-                TdApi.UpdateNewMessage message = (TdApi.UpdateNewMessage) object;
+            if (object.getConstructor() != TdApi.UpdateNewMessage.CONSTRUCTOR)
+                return;
 
-                long chatId = message.message.chatId;
+            TdApi.UpdateNewMessage message = (TdApi.UpdateNewMessage) object;
 
-                ChatTaskControl antispamTasks = new ChatTaskControl(chatId, true);
+            if (isStartForeground && BuildConfig.DEBUG)
+                updateForegroundNotification();
 
-                if (TgUtils.isUserJoined(message.message) && antispamTasks.hasWelcomeText()) {
-                    String welcomeText = antispamTasks.getTask(ChatTask.TYPE.WELCOME_USER, false).mText;
-                    if (!TextUtils.isEmpty(welcomeText))
-                        sendWelcomeText(message, welcomeText);
-                }
+            if (BuildConfig.DEBUG && message.message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
+                TdApi.MessageText msgContent = (TdApi.MessageText) message.message.content;
 
-                //Check for command execute:
-                if (antispamTasks.hasCommands() && message.message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
-                    TdApi.MessageText msgContent = (TdApi.MessageText) message.message.content;
-                    if (msgContent.text.startsWith("/") && msgContent.text.length() > 1) {
-                        final String command = msgContent.text.substring(1).toLowerCase();
-                        ChatCommand cmd = DBHelper.getInstance().getChatCommand(antispamTasks.chatId, command);
-                        if (cmd != null) {
-                            if(checkUserIsMuted(message,antispamTasks))
-                                return;
-                            new ChatCommandExecute(message, antispamTasks, cmd);
-                            return;
-                        }
-                    }
-                }
-
-                if (!message.message.canBeDeleted)
-                    return;
-
-                if (antispamTasks.isEmpty())
-                    return;
-
-                if (antispamTasks.isRemoveLeaveMessage(message)) {
-                    AdminUtils.deleteMessage(message, null);
+                if (msgContent.text.equals("p")) {
+                    sendPing(message.message);
                     return;
                 }
-
-                if (antispamTasks.isRemoveJoinedMessage(message)) {
-                    AdminUtils.deleteMessage(message, null);
-                    return;
-                }
-
-                if (BuildConfig.DEBUG && message.message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
-                    TdApi.MessageText msgContent = (TdApi.MessageText) message.message.content;
-
-                    if (msgContent.text.equals("p")) {
-                        sendPing(message.message);
-                    }
-                }
-
-                // Игнорируем все сообщения от нас самих.
-                if (!BuildConfig.DEBUG) {
-                    if (TgH.selfProfileId == message.message.senderUserId)
-                        return;
-                }
-
-                checkMessageForTask(message, antispamTasks);
             }
+
+            ChatTaskManager taskManager = new ChatTaskManager(message.message.chatId, true);
+            if (taskManager.isEmpty())
+                return;
+
+            if (TgUtils.isUserJoined(message.message) && taskManager.hasWelcomeText()) {
+                String welcomeText = taskManager.getTask(ChatTask.TYPE.WELCOME_USER, false).mText;
+                if (!TextUtils.isEmpty(welcomeText)) {
+                    sendWelcomeText(message, welcomeText);
+                }
+            }
+
+            //Check for command execute:
+            if (taskManager.hasCommands() && message.message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
+                TdApi.MessageText msgContent = (TdApi.MessageText) message.message.content;
+                if (msgContent.text.startsWith("/") && msgContent.text.length() > 1) {
+                    final String[] params = msgContent.text.split(" ", 2);
+                    final String command = params[0].substring(1).toLowerCase();
+                    ChatCommand cmd = DBHelper.getInstance().getChatCommand(taskManager.chatId, command);
+                    if (cmd != null) {
+                        if (checkUserIsMuted(message, taskManager)) // ignore commands from muted users
+                            return;
+                        new ChatCommandExecute(message, taskManager, cmd, params);
+                        return;
+                    }
+                }
+            }
+
+            if (!message.message.canBeDeleted)
+                return;
+
+            // Игнорируем все сообщения от нас самих.
+            if (!BuildConfig.DEBUG) {
+                if (TgH.selfProfileId == message.message.senderUserId)
+                    return;
+            }
+
+            if (taskManager.isRemoveLeaveMessage(message)) {
+                AdminUtils.deleteMessage(message, null);
+                logLeaveUserMessageDeleted(message, taskManager);
+                return;
+            }
+
+            if (taskManager.isRemoveJoinedMessage(message)) {
+                AdminUtils.deleteMessage(message, null);
+                logJoinMessageDeleted(message, taskManager);
+                return;
+            }
+
+
+            checkMessageForTask(message, taskManager);
         }
     };
 
@@ -163,10 +200,27 @@ public class ServiceChatTask extends Service {
     /**
      * @return true if user was muted
      */
-    private boolean checkUserIsMuted(UpdateNewMessage message, ChatTaskControl chatTasks){
+    private boolean checkUserIsMuted(UpdateNewMessage message, ChatTaskManager chatTasks) {
         final ChatTask task = chatTasks.getTask(ChatTask.TYPE.MutedUsers, false);
-        if (task != null && task.payload==null/*flag for task not checked yet*/) {
-            if (DBHelper.getInstance().isUserMuted(chatTasks.chatId, message.message.senderUserId)) {
+        if (task == null || !task.isEnabled) {
+            //if (task != null)
+            //    task.payload = true;// mark that we check this task
+            return false;
+        }
+        if (task.payload == null/* temporary flag for task not checked yet */) {
+            TdApi.Message msg = message.message;
+            boolean isAllUsersMuted = task.isRemoveMessage;
+            boolean isMuteJoined = task.isBanUser && TgUtils.isUserJoined(msg); //isBanUser== mute all joined users
+            if (isMuteJoined) { // Add all joined users to muted users list
+                if (msg.content.getConstructor() == TdApi.MessageChatJoinByLink.CONSTRUCTOR)
+                    DBHelper.getInstance().addMutedUser(msg.chatId, msg.senderUserId, TgUtils.getUser(msg.senderUserId).username);
+                else if (msg.content.getConstructor() == TdApi.MessageChatAddMembers.CONSTRUCTOR) {
+                    TdApi.MessageChatAddMembers addMembers = (TdApi.MessageChatAddMembers) msg.content;
+                    for (TdApi.User user : addMembers.members)
+                        DBHelper.getInstance().addMutedUser(msg.chatId, user.id, user.username);
+                }
+            }
+            if (!isMuteJoined /*skip remove invite message*/ && (isAllUsersMuted || DBHelper.getInstance().isUserMuted(chatTasks.chatId, msg.senderUserId))) {
                 new MuteUser(message, chatTasks);
                 return true;
             }
@@ -175,9 +229,9 @@ public class ServiceChatTask extends Service {
         return false;
     }
 
-    private void checkMessageForTask(UpdateNewMessage message, ChatTaskControl chatTasks) {
+    private void checkMessageForTask(UpdateNewMessage message, ChatTaskManager chatTasks) {
 
-        if(checkUserIsMuted(message,chatTasks))
+        if (checkUserIsMuted(message, chatTasks))
             return;
 
         if (chatTasks.hasFloodControl()) {
@@ -192,6 +246,7 @@ public class ServiceChatTask extends Service {
             final boolean allowStickersLinks = Sets.getBoolean(Const.ANTISPAM_ALLOW_STICKERS_LINKS, true); //TODO maybe make this option individually for each chats.
             final DBHelper db = DBHelper.getInstance();
             String link = null;
+            boolean isMention = false;
 
             if (message.message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
                 TdApi.MessageText msgContent = (TdApi.MessageText) message.message.content;
@@ -202,13 +257,14 @@ public class ServiceChatTask extends Service {
                     for (TdApi.MessageEntity e : msgContent.entities) {
                         if (e.getConstructor() != TdApi.MessageEntityUrl.CONSTRUCTOR) continue;
                         TdApi.MessageEntityUrl entityUrl = (TdApi.MessageEntityUrl) e;
-                        String url = msgContent.text.substring(entityUrl.offset, entityUrl.offset + entityUrl.length).toLowerCase();
+                        String oLink = msgContent.text.substring(entityUrl.offset, entityUrl.offset + entityUrl.length);
+                        String url = oLink.toLowerCase();
                         if (db.isLinkInWhiteList(url))
                             continue;
                         if (allowStickersLinks && url.contains("telegram.me/addstickers/"))
                             continue;
                         else {
-                            link = url;
+                            link = oLink;
                             break;
                         }
                     }
@@ -219,45 +275,30 @@ public class ServiceChatTask extends Service {
                         switch (me.getConstructor()) {
                             case TdApi.MessageEntityUrl.CONSTRUCTOR:
                                 TdApi.MessageEntityUrl mu = (TdApi.MessageEntityUrl) me;
-                                String url = msgContent.text.substring(mu.offset, mu.offset + mu.length).toLowerCase();
+                                String oLink = msgContent.text.substring(mu.offset, mu.offset + mu.length);
+                                String url = oLink.toLowerCase();
                                 if (db.isLinkInWhiteList(url))
                                     continue;
-                                if (allowStickersLinks && url.contains("telegram.me/addstickers/"))
+                                if (allowStickersLinks && (url.contains("telegram.me/addstickers/") || url.contains("t.me/addstickers/")))
                                     continue;
                                 else {
-                                    link = url;
+                                    link = oLink;
                                     break loop;
                                 }
                             case TdApi.MessageEntityMention.CONSTRUCTOR:
                                 if (isAllowMentions)
                                     continue;
                                 TdApi.MessageEntityMention mm = (TdApi.MessageEntityMention) me;
-                                String username = msgContent.text.substring(mm.offset, mm.offset + mm.length).toLowerCase();
-                                link = username; //TODO add @?
+                                String username = msgContent.text.substring(mm.offset, mm.offset + mm.length);
+                                link = username.substring(1);
+                                isMention = true;
                                 break loop;
                         }
                     }
                 }
-
-//                else {
-//                    String patternStr = "(?:\\s|\\A)[@]+([A-Za-z0-9-_]+)";
-//                    Pattern pattern = Pattern.compile(patternStr);
-//                    Matcher matcher = pattern.matcher(msgText.text);
-//                    String result = "";
-//                    while (matcher.find()) {
-//                        result = matcher.group();
-//                        result = result.replace(" ", "");
-//                        MyLog.log(result);
-//                        //String rawName = result.replace("@", "");
-//                        //String userHTML="<a href='http://twitter.com/${rawName}'>" + result + "</a>"
-//                        //tweetText = tweetText.replace(result,userHTML);
-//                    }
-//                    //return tweetText;
-//                }
-                //return;
             }
             if (link != null) {
-                new BanForLink(link, message, chatTasks);
+                new BanForLink(link, isMention, message, chatTasks);
                 return;
             }
         }
@@ -277,32 +318,32 @@ public class ServiceChatTask extends Service {
         }
 
         //Check voice flood:
-        if (chatTasks.hasAttachmentTask(ChatTask.TYPE.VOICE)&& message.message.content.getConstructor() == TdApi.MessageVoice.CONSTRUCTOR) {
+        if (chatTasks.hasAttachmentTask(ChatTask.TYPE.VOICE) && message.message.content.getConstructor() == TdApi.MessageVoice.CONSTRUCTOR) {
             new BanForAttachment(message, chatTasks, ChatTask.TYPE.VOICE);
         }
 
         //Check Images:
-        if (chatTasks.hasAttachmentTask(ChatTask.TYPE.IMAGES)&& message.message.content.getConstructor() == TdApi.MessagePhoto.CONSTRUCTOR) {
+        if (chatTasks.hasAttachmentTask(ChatTask.TYPE.IMAGES) && message.message.content.getConstructor() == TdApi.MessagePhoto.CONSTRUCTOR) {
             new BanForAttachment(message, chatTasks, ChatTask.TYPE.IMAGES);
         }
 
         //Check GIF:
-        if (chatTasks.hasAttachmentTask(ChatTask.TYPE.GIF)&& message.message.content.getConstructor() == TdApi.MessageAnimation.CONSTRUCTOR) {
+        if (chatTasks.hasAttachmentTask(ChatTask.TYPE.GIF) && message.message.content.getConstructor() == TdApi.MessageAnimation.CONSTRUCTOR) {
             new BanForAttachment(message, chatTasks, ChatTask.TYPE.GIF);
         }
 
         //Check Audio:
-        if (chatTasks.hasAttachmentTask(ChatTask.TYPE.AUDIO)&& message.message.content.getConstructor() == TdApi.MessageAudio.CONSTRUCTOR) {
+        if (chatTasks.hasAttachmentTask(ChatTask.TYPE.AUDIO) && message.message.content.getConstructor() == TdApi.MessageAudio.CONSTRUCTOR) {
             new BanForAttachment(message, chatTasks, ChatTask.TYPE.AUDIO);
         }
 
         //Check Docs:
-        if (chatTasks.hasAttachmentTask(ChatTask.TYPE.DOCS)&& message.message.content.getConstructor() == TdApi.MessageDocument.CONSTRUCTOR) {
+        if (chatTasks.hasAttachmentTask(ChatTask.TYPE.DOCS) && message.message.content.getConstructor() == TdApi.MessageDocument.CONSTRUCTOR) {
             new BanForAttachment(message, chatTasks, ChatTask.TYPE.DOCS);
         }
 
         //Check Audio Video:
-        if (chatTasks.hasAttachmentTask(ChatTask.TYPE.VIDEO)&&  message.message.content.getConstructor() == TdApi.MessageVideo.CONSTRUCTOR) {
+        if (chatTasks.hasAttachmentTask(ChatTask.TYPE.VIDEO) && message.message.content.getConstructor() == TdApi.MessageVideo.CONSTRUCTOR) {
             new BanForAttachment(message, chatTasks, ChatTask.TYPE.VIDEO);
         }
 
@@ -323,7 +364,8 @@ public class ServiceChatTask extends Service {
                     Matcher m = p.matcher(text);
                     //boolean contains = m.find();//text.matches(".*(?<!\\S)" + s + "(?!\\S).*"); /* \b means word boundary */
                     if (m.find()) {
-                        new BanForBlackWord(message, chatTasks, word); s.trim();
+                        new BanForBlackWord(message, chatTasks, word);
+                        s.trim();
                         return;
                     }
                 }
@@ -347,19 +389,24 @@ public class ServiceChatTask extends Service {
             user = TgUtils.getUser(message.message.senderUserId);
         }
 
-        FormattedTagText fText = replaceWarningsShortTags(welcomeText, null, user, 0);
+        FormattedTagText fText = CommonUtils.replaceCustomShortTags(welcomeText, null, user, 0);
         welcomeText = fText.resultText;
         if (fText.mention != null)
             entities.add(fText.mention);
-        //welcomeText = replaceWarningsShortTags(welcomeText, null, user, 0);
+
         TdApi.InputMessageText msg = new TdApi.InputMessageText(welcomeText, false, false, null, null);
         msg.entities = new TdApi.MessageEntity[entities.size()];
         for (int n = 0; n < entities.size(); n++)
             msg.entities[n] = entities.get(n);
 
-        TdApi.TLFunction f = new TdApi.SendMessage(message.message.chatId, message.message.id, false, true,
-                null, msg);
-        TgH.send(f);
+        String botToken = CommonUtils.useBotForAlert(message.message.chatId);
+        if (botToken != null) {
+            CommonUtils.sendMessageViaBot(botToken, message.message.chatId, welcomeText, false, true);
+        } else {
+            TdApi.TLFunction f = new TdApi.SendMessage(message.message.chatId, message.message.id, false, true,
+                    null, msg);
+            TgH.send(f);
+        }
     }
 
 
@@ -379,19 +426,19 @@ public class ServiceChatTask extends Service {
     }
 
     private abstract class TaskAction {
-        ChatTaskControl taskControl;
-        ChatTask task;
-        UpdateNewMessage message;
-        TdApi.Chat chat;
+        ChatTaskManager taskControl;
+        public ChatTask task;
+        public UpdateNewMessage message;
+        public TdApi.Chat mChat;
         LogUtil logUtil;
 
-        LogUtil getLog() {
+        public LogUtil getLog() {
             if (logUtil == null)
                 logUtil = new LogUtil(onLogCallback, taskControl);
             return logUtil;
         }
 
-        TaskAction(final TdApi.UpdateNewMessage message, ChatTaskControl chatTasks) {
+        TaskAction(final TdApi.UpdateNewMessage message, ChatTaskManager chatTasks) {
             this.taskControl = chatTasks;
             this.message = message;
         }
@@ -400,7 +447,7 @@ public class ServiceChatTask extends Service {
             loadChatInfo(message.message.chatId, new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
-                    chat = (TdApi.Chat) object;
+                    mChat = (TdApi.Chat) object;
                     onChatLoad();
                 }
             });
@@ -411,7 +458,7 @@ public class ServiceChatTask extends Service {
         }
 
         void onUserInPhoneBookChecked() {
-            AdminUtils.checkUserIsAdminInChat(chat, message.message.senderUserId, onCheckIsAdmin);
+            AdminUtils.checkUserIsAdminInChat(mChat.id, message.message.senderUserId, onCheckIsAdmin);
         }
 
         void onCheckIsAdmin(boolean isAdmin) {
@@ -470,10 +517,17 @@ public class ServiceChatTask extends Service {
                     if (object.getConstructor() != TdApi.User.CONSTRUCTOR) return;
                     TdApi.User user = (TdApi.User) object;
 
-                    String warnText = getAlertTitle() + "\n";
+                    String botToken = CommonUtils.useBotForAlert(task.chat_id);
+                    boolean isBot = botToken != null;
+
+                    String warnText = getAlertTitle();
+                    if (isBot) // Markdown format for Bot Message
+                        warnText = "`" + warnText + "`";
+                    warnText += "\n";
+
                     ArrayList<TdApi.MessageEntity> entities = new ArrayList<>(1); // Форматируем сообщение.
                     entities.add(new TdApi.MessageEntityCode(0, warnText.length())); // wrap title to highlited string
-                    //TODO send warn via bot if bot token passed.
+
 
                     int textType = task.selectWarningText(tryes);
                     String customText;
@@ -483,9 +537,9 @@ public class ServiceChatTask extends Service {
                         customText = textType == 1 ? task.mWarnTextFirst : task.mWarnTextLast;
 
                     if (customText == null) {
-                        if (!user.username.isEmpty())
+                        if (!user.username.isEmpty()) {
                             warnText += "@" + user.username + "\n";
-                        else {
+                        } else {
                             //name mention:
                             String uname = user.firstName + " " + user.lastName;
                             int start = warnText.length();
@@ -494,15 +548,14 @@ public class ServiceChatTask extends Service {
                         }
 
 
-                        int warnTextDefaultRes = TaskValues.getWarnText(task.mType, textType);
-                        customText = getString(warnTextDefaultRes);
+                        customText = TaskValues.getWarnText(task.mType, textType);
 
                     } else {
-                        FormattedTagText fText = replaceWarningsShortTags(customText, task, user, tryes);
+                        FormattedTagText fText = CommonUtils.replaceCustomShortTags(customText, task, user, tryes);
                         customText = fText.resultText;
                         if (fText.mention != null)
                             entities.add(fText.mention);
-                        //customText = replaceWarningsShortTags(customText, task, user, tryes);
+                        //customText = replaceCustomShortTags(customText, task, user, tryes);
                     }
 
                     int offset = warnText.length();
@@ -510,23 +563,26 @@ public class ServiceChatTask extends Service {
                     entities.add(new TdApi.MessageEntityCode(offset, length));
                     warnText += customText;
 
-                    TdApi.SendMessage msgSend = new TdApi.SendMessage();
-                    msgSend.chatId = message.message.chatId;
-                    msgSend.replyToMessageId = message.message.id;
-                    TdApi.InputMessageText msgText = new TdApi.InputMessageText();
-                    msgText.text = warnText;
+                    if (isBot) {
+                        CommonUtils.sendMessageViaBot(botToken, message.message.chatId, warnText, false, true);
+                    } else {
+                        TdApi.SendMessage msgSend = new TdApi.SendMessage();
+                        msgSend.chatId = message.message.chatId;
+                        msgSend.replyToMessageId = message.message.id;
+                        TdApi.InputMessageText msgText = new TdApi.InputMessageText();
+                        msgText.text = warnText;
 
-                    msgText.entities = new TdApi.MessageEntity[entities.size()];
-                    for (int n = 0; n < entities.size(); n++)
-                        msgText.entities[n] = entities.get(n);
-
-                    msgSend.inputMessageContent = msgText;
-                    TgH.send(msgSend, new Client.ResultHandler() {
-                        @Override
-                        public void onResult(TdApi.TLObject object) {
-                            MyLog.log(object.toString());
-                        }
-                    });
+                        msgText.entities = new TdApi.MessageEntity[entities.size()];
+                        for (int n = 0; n < entities.size(); n++)
+                            msgText.entities[n] = entities.get(n);
+                        msgSend.inputMessageContent = msgText;
+                        TgH.send(msgSend, new Client.ResultHandler() {
+                            @Override
+                            public void onResult(TdApi.TLObject object) {
+                                MyLog.log(object.toString());
+                            }
+                        });
+                    }
                 }
             });
 
@@ -538,18 +594,18 @@ public class ServiceChatTask extends Service {
                 public void onResult(TdApi.TLObject object) {
                     if (object.getConstructor() != TdApi.User.CONSTRUCTOR) return;
                     final TdApi.User user = (TdApi.User) object;
-                    String banReason = getString(TaskValues.getBanReason(task.mType));
+                    String banReason = TaskValues.getBanReason(task.mType);
 
-                    int localChatId = TgUtils.getChatRealId(chat);
+                    int localChatId = TgUtils.getChatRealId(mChat);
                     boolean isReturn = task.isReturnOnBanExpired;
                     final long banMsec = task.mBanTimeSec * 1000;
-                    DBHelper.getInstance().addToBanList(user, message.message.chatId, chat.type.getConstructor(), localChatId,
+                    DBHelper.getInstance().addToBanList(user, message.message.chatId, mChat.type.getConstructor(), localChatId,
                             banMsec, isReturn, banReason);
                     if (banMsec > 0)
                         ServiceUnbanTask.registerTask(getBaseContext());
 
-                    if (TgUtils.isGroup(chat.type.getConstructor())) {
-                        DBHelper.getInstance().addUserToAutoKick(chat.id, message.message.senderUserId);
+                    if (TgUtils.isGroup(mChat.type.getConstructor())) {
+                        DBHelper.getInstance().addUserToAutoKick(mChat.id, message.message.senderUserId);
                         ServiceAutoKicker.start(getBaseContext());
                     }
 
@@ -559,12 +615,48 @@ public class ServiceChatTask extends Service {
                             if (TgUtils.isOk(object)) {
                                 //Reset warns for this user:
                                 DBHelper.getInstance().deleteAntiSpamWarnCount(task.mType, message.message.chatId, message.message.senderUserId);
+                                if (task.isPublicToChat) {
+                                    publishBanReasonToChat();
+                                }
                                 onKickUserFromGroup.onResult(object);
+
                             }
                         }
                     });
                 }
             });
+        }
+
+        void publishBanReasonToChat() {
+            String title = TaskValues.getBanReason(task.mType);
+
+            TdApi.User user = TgUtils.getUser(message.message.senderUserId);
+            String username = "";
+            if (!TextUtils.isEmpty(user.username))
+                username = " @" + user.username;
+            String userFullName = ((user.firstName + " " + user.lastName).trim() + " " + username).trim();
+            String msg =
+                    "<b>" + TextUtils.htmlEncode(title) + "</b>\n" +
+                            "<b>" + TextUtils.htmlEncode(getString(R.string.log_title_username)) + "</b>: " +
+                            userFullName;
+            if (task.mBanTimeSec > 0) {
+                msg += "\n<b>" + TextUtils.htmlEncode(getString(R.string.log_title_bantime)) + "</b>: " +
+                        Utils.convertSecToReadableDate(task.mBanTimeSec);
+            }
+
+            String botToken = CommonUtils.useBotForAlert(message.message.chatId);
+            if (botToken != null) {
+                CommonUtils.sendMessageViaBot(botToken, message.message.chatId, msg, true, false);
+            } else {
+                TdApi.SendMessage msgSend = new TdApi.SendMessage();
+                msgSend.chatId = message.message.chatId;
+                msgSend.replyToMessageId = message.message.id;
+                TdApi.InputMessageText msgText = new TdApi.InputMessageText();
+                msgText.text = msg;
+                msgText.parseMode = new TdApi.TextParseModeHTML();
+                msgSend.inputMessageContent = msgText;
+                TgH.send(msgSend);
+            }
         }
 
 
@@ -580,13 +672,15 @@ public class ServiceChatTask extends Service {
     }
 
 
-    private class ChatCommandExecute extends TaskAction {
-        ChatCommand pCommand;
+    public class ChatCommandExecute extends TaskAction {
+        public ChatCommand pCommand;
+        public String[] params;
 
-        public ChatCommandExecute(UpdateNewMessage message, ChatTaskControl antiSpamRule, ChatCommand cmd) {
+        public ChatCommandExecute(UpdateNewMessage message, ChatTaskManager antiSpamRule, ChatCommand cmd, String[] params) {
             super(message, antiSpamRule);
             task = antiSpamRule.getTask(ChatTask.TYPE.COMMAND);
             pCommand = cmd;
+            this.params = params;
             getChat();
         }
 
@@ -594,7 +688,7 @@ public class ServiceChatTask extends Service {
         void onChatLoad() {
             //check if command only for admins
             if (pCommand.isAdmin) {
-                AdminUtils.checkUserIsAdminInChat(chat, message.message.senderUserId, onCheckIsAdmin);
+                AdminUtils.checkUserIsAdminInChat(mChat.id, message.message.senderUserId, onCheckIsAdmin);
             } else {
                 doAction();
             }
@@ -603,17 +697,21 @@ public class ServiceChatTask extends Service {
         @Override
         void onCheckIsAdmin(boolean isAdmin) {
             if (isAdmin) {
-                AdminUtils.checkIsCreator(chat, message.message.senderUserId, new Callback() {
-                    @Override
-                    public void onResult(Object data) {
-                        boolean isCreator = (boolean) data;
-                        if (!isCreator)
-                            doAction();
-                        else
-                            sendCreatorDeniedAnswer();
-                    }
-                });
-                doAction();
+                if (pCommand.type == ChatCommand.CMD_KICK_SENDER) {
+                    //Creator can't leave channel so not allow self to execute command
+                    AdminUtils.checkIsCreator(mChat.id, message.message.senderUserId, new Callback() {
+                        @Override
+                        public void onResult(Object data) {
+                            boolean isCreator = (boolean) data;
+                            if(isCreator)
+                                sendCreatorDeniedAnswer();
+                            else
+                                doAction();
+                        }
+                    });
+                } else {
+                    doAction();
+                }
             } else {
                 sendDeniedAnswer();
             }
@@ -622,71 +720,52 @@ public class ServiceChatTask extends Service {
 
         @Override
         void doAction() {
-            if (pCommand.type == ChatCommand.TYPE_TEXT) {
+            new CommandsExecutor(getBaseContext(), this).executeCommand();
+        }
+
+        void sendDeniedAnswer() {
+            String text = getString(R.string.text_command_execute_access_denied);
+
+            String botToken = CommonUtils.useBotForAlert(task.chat_id);
+            if (botToken != null) {
+                CommonUtils.sendMessageViaBot(botToken, message.message.chatId, text, false, false);
+            } else {
                 TdApi.SendMessage msgSend = new TdApi.SendMessage();
                 msgSend.chatId = message.message.chatId;
                 msgSend.replyToMessageId = message.message.id;
                 TdApi.InputMessageText msgText = new TdApi.InputMessageText();
-
-                TdApi.User user = TgUtils.getUser(message.message.senderUserId);
-                FormattedTagText formattedTagText = replaceWarningsShortTags(pCommand.answer, task, user, 0);
-                msgText.text = formattedTagText.resultText;
-                if (formattedTagText.mention != null) {
-                    msgText.entities = new TdApi.MessageEntity[1];
-                    msgText.entities[0] = formattedTagText.mention;
-                }
+                msgText.text = text;
 
                 msgSend.inputMessageContent = msgText;
-                msgText.parseMode = new TdApi.TextParseModeMarkdown();
                 TgH.send(msgSend, new Client.ResultHandler() {
                     @Override
                     public void onResult(TdApi.TLObject object) {
-                        if (TgUtils.isError(object)) {
-                            TdApi.Error error = (TdApi.Error) object;
-                            getLog().execCommandError(chat, pCommand.cmd, error.message, pCommand.answer);
-                        }
-                    }
-                });
-            } else {
-                AdminUtils.kickUser(message.message.chatId, message.message.senderUserId, new Client.ResultHandler() {
-                    @Override
-                    public void onResult(TdApi.TLObject object) {
-                        MyLog.log(object.toString());
+                        //MyLog.log(object.toString());
                     }
                 });
             }
         }
 
-        void sendDeniedAnswer() {
-            TdApi.SendMessage msgSend = new TdApi.SendMessage();
-            msgSend.chatId = message.message.chatId;
-            msgSend.replyToMessageId = message.message.id;
-            TdApi.InputMessageText msgText = new TdApi.InputMessageText();
-            msgText.text = getString(R.string.text_command_execute_access_denied);
-
-            msgSend.inputMessageContent = msgText;
-            TgH.send(msgSend, new Client.ResultHandler() {
-                @Override
-                public void onResult(TdApi.TLObject object) {
-                    //MyLog.log(object.toString());
-                }
-            });
-        }
-
         private void sendCreatorDeniedAnswer() {
-            TdApi.SendMessage msgSend = new TdApi.SendMessage();
-            msgSend.chatId = message.message.chatId;
-            msgSend.replyToMessageId = message.message.id;
-            TdApi.InputMessageText msgText = new TdApi.InputMessageText();
-            msgText.text = "Creator can't leave the channel";
+            String text = getString(R.string.text_command_leave_not_error_creator);
+            String botToken = CommonUtils.useBotForAlert(task.chat_id);
+            if (botToken != null) {
+                CommonUtils.sendMessageViaBot(botToken, message.message.chatId, text, false, false);
+            } else {
+                TdApi.SendMessage msgSend = new TdApi.SendMessage();
+                msgSend.chatId = message.message.chatId;
+                msgSend.replyToMessageId = message.message.id;
+                TdApi.InputMessageText msgText = new TdApi.InputMessageText();
+                msgText.text = text;
 
-            msgSend.inputMessageContent = msgText;
-            TgH.send(msgSend, new Client.ResultHandler() {
-                @Override
-                public void onResult(TdApi.TLObject object) {
-                    //MyLog.log(object.toString());
-                }
-            });
+                msgSend.inputMessageContent = msgText;
+                TgH.send(msgSend, new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.TLObject object) {
+                        //MyLog.log(object.toString());
+                    }
+                });
+            }
         }
 
     }
@@ -695,7 +774,7 @@ public class ServiceChatTask extends Service {
     private class BanForBlackWord extends TaskAction {
         private BannedWord bannedWord;
 
-        BanForBlackWord(UpdateNewMessage message, ChatTaskControl antiSpamRule, final BannedWord bannedWord) {
+        BanForBlackWord(UpdateNewMessage message, ChatTaskManager antiSpamRule, final BannedWord bannedWord) {
             super(message, antiSpamRule);
             task = antiSpamRule.getTask(ChatTask.TYPE.BANWORDS);
             this.bannedWord = bannedWord;
@@ -711,7 +790,7 @@ public class ServiceChatTask extends Service {
                 int warnCount = task.mAllowCountPerUser;
 
                 if (tryes < warnCount) {// Warn user to stop
-                    getLog().logWarningBeforeBan(task.mType, chat, message, tryes);
+                    getLog().logWarningBeforeBan(task.mType, mChat, message, tryes);
                     DBHelper.getInstance().setAntiSpamWarnCount(ChatTask.TYPE.BANWORDS, message.message.chatId, message.message.senderUserId, tryes + 1);
                     if (task.isWarnAvailable(tryes)) {
                         warnUser(tryes);
@@ -724,7 +803,7 @@ public class ServiceChatTask extends Service {
                             try {
                                 final long banMsec = task.mBanTimeSec * 1000;
                                 JSONObject payload = new JSONObject().put("word", bannedWord.word).put("text", msgContent.text).put("banAge", banMsec);
-                                getLog().logBanUser(LogUtil.Action.BanForBlackWord, chat, message, payload);
+                                getLog().logBanUser(LogUtil.Action.BanForBlackWord, mChat, message, payload);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -737,29 +816,74 @@ public class ServiceChatTask extends Service {
                 deleteMessage(new Client.ResultHandler() {
                     @Override
                     public void onResult(TdApi.TLObject object) {
-                        getLog().logDeleteMessage(LogUtil.Action.DeleteMsgBlackWord, chat, message, bannedWord.word);
+                        getLog().logDeleteMessage(LogUtil.Action.DeleteMsgBlackWord, mChat, message, bannedWord.word);
                     }
                 });
             }
         }
     }
 
-    Callback onLogCallback = new Callback() {
+    static Callback onLogCallback = new Callback() {
         @Override
         public void onResult(Object data) {
             LogUtil logUtil = (LogUtil) data;
-            LogUtil.LogEntity log = logUtil.logEntity;
-            ChatTaskControl chatTasks = (ChatTaskControl) logUtil.callbackPayload;
-            logToChat(chatTasks.chatId, log);
+            LogEntity log = logUtil.logEntity;
+            ChatTaskManager chatTasks = (ChatTaskManager) logUtil.callbackPayload;
+            CommonUtils.forwardLogEventToChat(chatTasks.chatId, log);
         }
     };
+
+    private void logLeaveUserMessageDeleted(final UpdateNewMessage message, final ChatTaskManager taskManager) {
+        TgH.send(new TdApi.GetChat(message.message.chatId), new Client.ResultHandler() {
+            @Override
+            public void onResult(TdApi.TLObject object) {
+                if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR) {
+                    TdApi.Chat chat = (TdApi.Chat) object;
+                    LogUtil logUtil = new LogUtil(onLogCallback, taskManager);
+
+                    logUtil.logDeleteMessage(LogUtil.Action.RemoveLeaveMessage, chat, message);
+                }
+            }
+        });
+
+    }
+
+    private void logJoinMessageDeleted(final UpdateNewMessage message, final ChatTaskManager taskManager) {
+        TgH.send(new TdApi.GetChat(message.message.chatId), new Client.ResultHandler() {
+            @Override
+            public void onResult(TdApi.TLObject object) {
+                if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR) {
+                    TdApi.Chat chat = (TdApi.Chat) object;
+                    LogUtil logUtil = new LogUtil(onLogCallback, taskManager);
+
+                    if (message.message.content.getConstructor() == TdApi.MessageChatAddMembers.CONSTRUCTOR) {
+                        try {
+                            TdApi.MessageChatAddMembers chatAddMembers = (TdApi.MessageChatAddMembers) message.message.content;
+                            JSONArray users = new JSONArray();
+                            for (TdApi.User u : chatAddMembers.members) {
+                                JSONObject ju = new JSONObject()
+                                        .put("id", u.id)
+                                        .put("name", (u.firstName + " " + u.lastName).trim())
+                                        .put("username", u.username);
+                                users.put(ju);
+                            }
+                            logUtil.logDeleteMessage(LogUtil.Action.RemoveJoinMessage, chat, message, users.toString());
+                        } catch (JSONException e) {
+
+                        }
+                    } else
+                        logUtil.logDeleteMessage(LogUtil.Action.RemoveJoinMessage, chat, message);
+                }
+            }
+        });
+    }
 
 
     /**
      * Attachments like Voice, Sticker, Gif, Video, Audio, Game Score
      */
     private class BanForAttachment extends TaskAction {
-        BanForAttachment(final TdApi.UpdateNewMessage message, ChatTaskControl antiSpamRule, ChatTask.TYPE pType) {
+        BanForAttachment(final TdApi.UpdateNewMessage message, ChatTaskManager antiSpamRule, ChatTask.TYPE pType) {
             super(message, antiSpamRule);
             task = antiSpamRule.getTask(pType);
             getChat();
@@ -772,7 +896,7 @@ public class ServiceChatTask extends Service {
                 final int tryes = DBHelper.getInstance().getAntiSpamWarnCount(task.mType, message.message.chatId, message.message.senderUserId, floodTimeLimit);
                 final int limit = task.mAllowCountPerUser;
                 if (tryes < limit) {
-                    getLog().logWarningBeforeBan(task.mType, chat, message, tryes);
+                    getLog().logWarningBeforeBan(task.mType, mChat, message, tryes);
                     DBHelper.getInstance().setAntiSpamWarnCount(task.mType, message.message.chatId, message.message.senderUserId, tryes + 1);
 
                     if (task.isWarnAvailable(tryes)) {
@@ -818,8 +942,7 @@ public class ServiceChatTask extends Service {
                                         action = LogUtil.Action.BanForVideo;
                                         break;
                                 }
-
-                                getLog().logBanUser(action, chat, message, payload);
+                                getLog().logBanUser(action, mChat, message, payload);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -860,7 +983,7 @@ public class ServiceChatTask extends Service {
                                 action = LogUtil.Action.RemoveVideo;
                                 break;
                         }
-                        getLog().logDeleteMessage(action, chat, message);
+                        getLog().logDeleteMessage(action, mChat, message);
                     }
                 });
             }
@@ -883,10 +1006,6 @@ public class ServiceChatTask extends Service {
     }
 
     static String getMessageText(TdApi.UpdateNewMessage message) {
-        //if (message.message.content.getConstructor() == TdApi.MessageWebPage.CONSTRUCTOR) {
-        ////    TdApi.MessageWebPage webPage = (TdApi.MessageWebPage) message.message.content;
-        //    return webPage.text;
-        //}
         if (message.message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
             TdApi.MessageText msgText = (TdApi.MessageText) message.message.content;
             return msgText.text;
@@ -896,93 +1015,135 @@ public class ServiceChatTask extends Service {
     }
 
     private class BanForLink extends TaskAction {
-        String mLink;
+        /**
+         * link or mention in lower case
+         */
+        String  mLink;
+        String originalLink;// original link as is case sensitive
+        boolean isMention;
 
-        BanForLink(String link, UpdateNewMessage message, ChatTaskControl antiSpamRule) {
+        BanForLink(String link, boolean isMention, UpdateNewMessage message, ChatTaskManager antiSpamRule) {
             super(message, antiSpamRule);
-            this.mLink = link;
+            this.originalLink = link;
+            this.mLink = link.toLowerCase();
+            this.isMention = isMention;
+            this.task = antiSpamRule.getTask(ChatTask.TYPE.LINKS);
             getChat();
         }
 
         //переопределяем чтоб проверить ссылку перед баном
         @Override
         public void onAction() {
-            loadChatInfo(message.message.chatId, new Client.ResultHandler() {
-                @Override
-                public void onResult(TdApi.TLObject object) {
-                    chat = (TdApi.Chat) object;
-                    checkLinkForAllow();
-                }
-            });
+            checkLinkForAllow();
         }
 
 
         void checkLinkForAllow() {
-            TgUtils.getChatFullInfo(chat, new Client.ResultHandler() {
-                @Override
-                public void onResult(TdApi.TLObject object) {
-                    if (object.getConstructor() == TdApi.ChannelFull.CONSTRUCTOR) { // суперчат
-                        TdApi.ChannelFull channelFull = (TdApi.ChannelFull) object;
-                        if (channelFull.inviteLink.toLowerCase().contains(mLink)) // это ссылка на сам чат
-                            return;
-                        if (!channelFull.channel.username.isEmpty() && ("@" + channelFull.channel.username.toLowerCase()).equals(mLink)) // логин группы //TODO проверить
-                            return;
-
-                    } else if (object.getConstructor() == TdApi.GroupFull.CONSTRUCTOR) { // группа
-                        TdApi.GroupFull groupFull = (TdApi.GroupFull) object;
-                        if (groupFull.inviteLink.toLowerCase().contains(mLink)) // это ссылка на текущий чат, скипаем.
-                            return;
-                    } else {
-
-                    }
-                    checkLinkIsChatMember();// проверим может это ссылка на юзера чата
-                }
-            });
-        }
-
-
-        /**
-         * если разрешены ссылки на участников чата то проверим, может это ссылка научастника чата.
-         */
-        private void checkLinkIsChatMember() {
-            boolean isIgnoreLinksForChatMembers = true;
-            if (!isIgnoreLinksForChatMembers) {// если выключено, переходим к слеждующему шагу
-                checkLinkIsChatAdmins();
+            if (!isMention && mLink.indexOf(".me/") == -1) { // this is not a telegram internal link (to group or chat member)
+                doAction();
                 return;
             }
 
-            TgUtils.getGroupLastMembers(chat, new Callback() {
+            boolean isChatLink = mLink.contains("joinchat");
+
+            if (!isMention && !isChatLink) {// не ссылка на чат
+                checkLinkIsChatMember();
+                return;
+            } else if (isMention) {// if it's mention then load user by this mention and check if it chat member
+                TgH.send(new TdApi.SearchPublicChat(mLink), new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.TLObject object) {
+                        if (TgUtils.isError(object)) {
+                            doAction();
+                            return;
+                        }
+
+                        TdApi.Chat pChat = (TdApi.Chat) object;
+                        if (pChat.id == mChat.id) //link to self chat
+                            return;
+
+                        if (pChat.type.getConstructor() == TdApi.PrivateChatInfo.CONSTRUCTOR) {
+                            TdApi.PrivateChatInfo chatInfo = (TdApi.PrivateChatInfo) pChat.type;
+                            boolean isIgnoreLinksForChatMembers = false;
+                            AdminUtils.checkUserIsChatMember(mChat.id, chatInfo.user.id, new Callback() {
+                                @Override
+                                public void onResult(Object data) {
+                                    boolean isMember = (boolean) data;
+                                    if (isMember)
+                                        return;
+                                    doAction();
+                                }
+                            });
+                        } else {
+                            doAction();
+                        }
+                    }
+                });
+            } else if (isChatLink) {
+                TgUtils.getChatFullInfo(mChat, new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.TLObject object) {
+                        if (object.getConstructor() == TdApi.ChannelFull.CONSTRUCTOR) { // суперчат
+                            TdApi.ChannelFull channelFull = (TdApi.ChannelFull) object;
+                            if (channelFull.inviteLink.toLowerCase().contains(mLink)) // это ссылка на сам чат
+                                return;
+                            //if (!channelFull.channel.username.isEmpty() && ("@" + channelFull.channel.username.toLowerCase()).equals(mLink)) // логин группы
+                            //    return;
+
+                        } else if (object.getConstructor() == TdApi.GroupFull.CONSTRUCTOR) { // группа
+                            TdApi.GroupFull groupFull = (TdApi.GroupFull) object;
+                            if (groupFull.inviteLink.toLowerCase().contains(mLink)) // это ссылка на текущий чат, скипаем.
+                                return;
+                        }
+                        doAction();// баним
+                    }
+                });
+            }
+        }
+
+        /**
+         * если разрешены ссылки на участников чата то проверим, может это ссылка на участника чата.
+         */
+        private void checkLinkIsChatMember() {
+            boolean isIgnoreLinksForChatMembers = BuildConfig.DEBUG ? false : true;
+            int pos = mLink.indexOf(".me/");
+            String mention = mLink.substring(pos + 4);
+
+            if (!isIgnoreLinksForChatMembers) {// если выключено, переходим к слеждующему шагу
+                checkLinkIsChatAdmins(mention);
+                return;
+            }
+
+            AdminUtils.checkUserIsChatMember(mChat.id, mention, new Callback() {
                 @Override
                 public void onResult(Object data) {
-                    TdApi.ChatMember[] participants = (TdApi.ChatMember[]) data;
-                    for (TdApi.ChatMember participant : participants) {
-                        TdApi.User user = TgUtils.getUser(participant);
-                        if (user.username.isEmpty()) continue;
-                        String mention = "@" + user.username.toLowerCase();
-                        String link = "telegram.me/" + user.username.toLowerCase();
-                        if (mLink.equals(mention) || mLink.contains(link))
-                            return;
-                    }
-
-                    checkLinkIsChatAdmins();
+                    boolean isMember = (boolean) data;
+                    if (!isMember)
+                        doAction();
                 }
             });
         }
 
-        private void checkLinkIsChatAdmins() {
-            AdminUtils.getChatAdmins(chat, new Client.ResultHandler() {
+        private void checkLinkIsChatAdmins(String username) {
+            TgH.send(new TdApi.SearchPublicChat(username), new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
-                    TdApi.ChatMembers admins = (TdApi.ChatMembers) object;
-                    for (TdApi.ChatMember chatMember : admins.members) {
-                        TdApi.User user = TgUtils.getUser(chatMember);
-                        if (user.username.isEmpty()) continue;
-                        String mention = "@" + user.username.toLowerCase();
-                        String link = "telegram.me/" + user.username;
-                        if (mLink.equals(mention) || mLink.contains(link))
-                            return;
+                    if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR) {
+                        TdApi.Chat pChat = (TdApi.Chat) object;
+                        if (pChat.type.getConstructor() == TdApi.PrivateChatInfo.CONSTRUCTOR) {
+                            TdApi.PrivateChatInfo pi = (TdApi.PrivateChatInfo) pChat.type;
+                            AdminUtils.checkUserIsAdminInChat(mChat.id, pi.user.id, new Callback() {
+                                @Override
+                                public void onResult(Object data) {
+                                    boolean isAdmin = (boolean) data;
+                                    if (!isAdmin)
+                                        doAction();
+                                }
+                            });
+                        }
+                    } else {
+                        doAction();
                     }
-                    doAction();
                 }
             });
         }
@@ -990,14 +1151,14 @@ public class ServiceChatTask extends Service {
         @Override
         void doAction() {
             final ChatTask task = taskControl.getTask(ChatTask.TYPE.LINKS);
-            if (taskControl.isBanForLinks()) {
+            if (task.isBanUser) {
                 final int tryes = DBHelper.getInstance().getAntiSpamWarnCount(ChatTask.TYPE.LINKS, message.message.chatId, message.message.senderUserId, task.mWarningsDuringTime);
                 final int limit = task.mAllowCountPerUser;
                 if (tryes < limit) {
                     DBHelper.getInstance().setAntiSpamWarnCount(ChatTask.TYPE.LINKS, message.message.chatId, message.message.senderUserId, tryes + 1);
-                    getLog().logWarningBeforeBanForLink(chat, message, tryes, mLink);
+                    getLog().logWarningBeforeBanForLink(mChat, message, tryes, originalLink);
 
-                    if (task.isWarnAvailable(tryes)) { // еслиртим при первой попытке спама и при последней.
+                    if (task.isWarnAvailable(tryes)) { // алертим при первой попытке спама и при последней.
                         warnUser(tryes);
                     }
                 } else {
@@ -1008,11 +1169,11 @@ public class ServiceChatTask extends Service {
                                 JSONObject payload;
                                 String msg = getMessageText(message);
                                 if (TgUtils.isOk(object)) {
-                                    payload = new JSONObject().put("link", mLink).put("text", msg).put("banAge", task.mBanTimeSec * 1000);
+                                    payload = new JSONObject().put("link", originalLink).put("text", msg).put("banAge", task.mBanTimeSec * 1000);
                                 } else {
                                     payload = new JSONObject().put("error", object.toString()).put("text", msg);
                                 }
-                                getLog().logBanUser(LogUtil.Action.BanForLink, chat, message, payload);
+                                getLog().logBanUser(LogUtil.Action.BanForLink, mChat, message, payload);
                             } catch (Exception e) {
                             }
                         }
@@ -1025,7 +1186,7 @@ public class ServiceChatTask extends Service {
                     @Override
                     public void onResult(TdApi.TLObject object) {
                         String msg = getMessageText(message);
-                        getLog().logDeleteMessage(LogUtil.Action.RemoveLink, chat, message, mLink + "\n" + msg);
+                        getLog().logDeleteMessage(LogUtil.Action.RemoveLink, mChat, message, originalLink + "\n" + msg);
                     }
                 });
             }
@@ -1033,7 +1194,7 @@ public class ServiceChatTask extends Service {
     }
 
     class MuteUser extends TaskAction {
-        MuteUser(UpdateNewMessage message, ChatTaskControl antiSpamRule) {
+        MuteUser(UpdateNewMessage message, ChatTaskManager antiSpamRule) {
             super(message, antiSpamRule);
             this.task = antiSpamRule.getTask(ChatTask.TYPE.MutedUsers);
             getChat();
@@ -1051,7 +1212,8 @@ public class ServiceChatTask extends Service {
                     } else {
                         msgText = "Type: " + message.message.content.getClass().getSimpleName();
                     }
-                    getLog().logDeleteMessage(LogUtil.Action.RemoveMuted, chat, message, msgText);
+
+                    getLog().logDeleteMessage(LogUtil.Action.RemoveMuted, mChat, message, msgText);
                 }
             });
         }
@@ -1060,7 +1222,7 @@ public class ServiceChatTask extends Service {
 
     class FloodControl extends TaskAction {
 
-        FloodControl(UpdateNewMessage message, ChatTaskControl antiSpamRule) {
+        FloodControl(UpdateNewMessage message, ChatTaskManager antiSpamRule) {
             super(message, antiSpamRule);
             this.task = antiSpamRule.getTask(ChatTask.TYPE.FLOOD);
             getChat();
@@ -1086,6 +1248,7 @@ public class ServiceChatTask extends Service {
                         @Override
                         public void onResult(TdApi.TLObject object) {
                             if (TgUtils.isOk(object)) {
+
                                 String messageText;
                                 if (message.message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
                                     TdApi.MessageText msg = (TdApi.MessageText) message.message.content;
@@ -1104,7 +1267,7 @@ public class ServiceChatTask extends Service {
                                 } catch (JSONException e) {
                                 }
 
-                                getLog().logDeleteMessage(LogUtil.Action.RemoveFlood, chat, message, j.toString());
+                                getLog().logDeleteMessage(LogUtil.Action.RemoveFlood, mChat, message, j.toString());
                             }
                         }
                     });
@@ -1117,16 +1280,16 @@ public class ServiceChatTask extends Service {
                                 TdApi.User user = (TdApi.User) object;
 
                                 String banReason = getString(R.string.logAction_banForFlood);
-                                int localchatid = TgUtils.getChatRealId(chat);
-                                DBHelper.getInstance().addToBanList(user, message.message.chatId, chat.type.getConstructor(), localchatid,
+                                int localchatid = TgUtils.getChatRealId(mChat);
+                                DBHelper.getInstance().addToBanList(user, message.message.chatId, mChat.type.getConstructor(), localchatid,
                                         task.mBanTimeSec * 1000, task.isReturnOnBanExpired, banReason);
                                 ServiceUnbanTask.registerTask(getBaseContext());
                             }
                         });
 
                         DBHelper.getInstance().deleteAntiSpamWarnCount(ChatTask.TYPE.STICKERS, message.message.chatId, message.message.senderUserId);
-                        if (TgUtils.isGroup(chat.type.getConstructor())) {
-                            DBHelper.getInstance().addUserToAutoKick(chat.id, message.message.senderUserId);
+                        if (TgUtils.isGroup(mChat.type.getConstructor())) {
+                            DBHelper.getInstance().addUserToAutoKick(mChat.id, message.message.senderUserId);
                             ServiceAutoKicker.start(getBaseContext());
                         }
 
@@ -1136,10 +1299,13 @@ public class ServiceChatTask extends Service {
                                 if (object.getConstructor() == TdApi.Ok.CONSTRUCTOR) {
                                     try {
                                         JSONObject payload = new JSONObject().put("banAge", task.mBanTimeSec * 1000);
-                                        getLog().logBanUser(LogUtil.Action.BanForFlood, chat, message, payload);
+                                        getLog().logBanUser(LogUtil.Action.BanForFlood, mChat, message, payload);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
+
+                                    if (task.isPublicToChat)
+                                        publishBanReasonToChat();
                                 }
                             }
                         });
@@ -1156,85 +1322,6 @@ public class ServiceChatTask extends Service {
         return title;
     }
 
-    private static class FormattedTagText {
-        String resultText;
-        TdApi.MessageEntityMentionName mention;
-    }
-
-    private static FormattedTagText replaceWarningsShortTags(String customText, @Nullable ChatTask task, TdApi.User user, int tryes) {
-        FormattedTagText formattedText = new FormattedTagText();
-
-        customText = customText.replace("%name%", user.firstName + " " + user.lastName);
-        customText = customText.replace("%u_id%", user.id + "");
-        if (task != null)
-            customText = customText.replace("%c_id%", task.chat_id + "");
-
-        customText = customText.replace("%count%", (tryes + 1) + "");
-        if (task != null) {
-            customText = customText.replace("%max%", task.mAllowCountPerUser + "");
-            customText = customText.replace("%left%", (task.mAllowCountPerUser - (tryes + 1)) + "");
-        }
-
-        if (!user.username.isEmpty())
-            customText = customText.replace("%username%", "@" + user.username);
-        else if (customText.contains("%username%")) {
-            int index = customText.indexOf("%username%");
-            customText = customText.replace("%username%", user.firstName);
-            formattedText.mention = new TdApi.MessageEntityMentionName(index, user.firstName.length(), user.id);
-        }
-
-        formattedText.resultText = customText;
-
-        return formattedText;
-    }
-
-    /**
-     * @return first link in text
-     */
-    static String getLink(final String text) {
-        ArrayList<String> links = new ArrayList<String>(2);
-        //boolean match_images = false;
-        //text ="https://pp.vk.me/c7007/v7007762/11672/4rgHVPWfCdc.jpg;
-        //text = "http://i58.fastpic.ru/big/2014/0205/6f/b0258e8556e17a17ea90bc49d498f06f.jpg";
-        String regex = "\\(?\\b(ftp://http://|https://|www[.]|@)?[-A-Za-zА-Яа-я0-9+&@#/%?=~_()|!:,.;]*[-A-ZА-Яа-яa-z0-9+&@#/%=~_()|]";
-        //if(match_images)
-        //    regex+=".(jpg|png|jpeg|bmp|gif)"; // add jpg filter
-
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(text);
-        final boolean allowStickers = Sets.getBoolean(Const.ANTISPAM_ALLOW_STICKERS_LINKS, true);
-        final DBHelper db = DBHelper.getInstance();
-        while (m.find()) {
-            String urlStr = m.group();
-            if (urlStr.indexOf('.') == -1) continue;
-            if (urlStr.indexOf("//") == -1 && urlStr.indexOf(".com") == -1 && urlStr.indexOf(".ru") == -1
-                    && urlStr.indexOf(".me") == -1
-                    && urlStr.indexOf(".рф") == -1 && urlStr.indexOf(".ua") == -1 && urlStr.indexOf(".org") == -1
-                    && !urlStr.startsWith("@"))
-                continue;
-            // MyLog.log("isLink exists: " + urlStr);
-            if (allowStickers && urlStr.contains("telegram.me/addstickers/")) continue;
-            if (!db.isLinkInWhiteList(urlStr))
-                return urlStr;
-            //char[] stringArray1 = urlStr.toCharArray();
-
-            // if (urlStr.startsWith("(") && urlStr.endsWith(")"))
-            // {
-
-            // char[] stringArray = urlStr.toCharArray();
-
-            // char[] newArray = new char[stringArray.length-2];
-            // System.arraycopy(stringArray, 1, newArray, 0, stringArray.length-2);
-            //  urlStr = new String(newArray);
-            // System.out.println("Finally Url ="+newArray.toString());
-
-            // }
-            //System.out.println("...Url..."+urlStr);
-            // links.add(urlStr);
-        }
-        //return links;
-        return null;
-    }
 
     public static void stop(Context c) {
         isStoppedByUser = true;
@@ -1247,32 +1334,11 @@ public class ServiceChatTask extends Service {
         MyLog.log("ServiceAntispam destroyed");
         TgH.removeUpdatesHandler(onUpdate);
         IS_RUNNING = false;
+        //handler.removeCallbacks(repeatingTask);
         if (!isStoppedByUser) {
             start(getBaseContext());
         }
         super.onDestroy();
-    }
-
-    public static void logToChat(long chatID, LogUtil.LogEntity log) {
-        // long chat_id=-1001065531625L;
-        ChatLogInfo chatLogInfo = DBHelper.getInstance().getChatLog(chatID, true);
-        if (chatLogInfo == null)
-            return;
-
-        TdApi.InputMessageText msg = new TdApi.InputMessageText();
-        String title = log.getTitle();
-        msg.text = title + "\n" + log.getLogText();
-
-        msg.entities = new TdApi.MessageEntity[1];
-        msg.entities[0] = new TdApi.MessageEntityBold(0, title.length());
-
-        TdApi.TLFunction f = new TdApi.SendMessage(chatLogInfo.chatLogID, 0, false, true, null, msg);
-        TgH.send(f, new Client.ResultHandler() {
-            @Override
-            public void onResult(TdApi.TLObject object) {
-                MyLog.log(object.toString());
-            }
-        });
     }
 
 

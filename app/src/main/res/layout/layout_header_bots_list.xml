@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tvHintBotToken"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hint_insert_bot_token" />
+
+    <EditText
+        android:id="@+id/edtNewBotToken"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall"
+        android:hint="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
+        android:lines="1"
+        android:maxLines="2"
+        android:singleLine="true" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView android:id="@+id/tvOpenBotfather"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="4dp"
+            android:text="@string/hint_botfather_for_createbot"
+            android:textColor="@color/md_teal_500"
+            android:layout_toLeftOf="@+id/btnInserBotToken"
+            android:layout_toStartOf="@+id/btnInserBotToken"
+
+            android:layout_centerVertical="true" />
+
+        <Button
+            android:id="@+id/btnInserBotToken"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="@string/btnAdd"
+            android:layout_alignParentRight="true" />
+
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/tvUseExistingBotHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hint_select_existing_bot_token" />
+
+</LinearLayout>

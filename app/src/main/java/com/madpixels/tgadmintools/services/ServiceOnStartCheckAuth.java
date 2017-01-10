@@ -30,6 +30,7 @@ public class ServiceOnStartCheckAuth extends Service{
                 }
 
                 onAuthorized();
+                stopSelf();
             }
         });
 

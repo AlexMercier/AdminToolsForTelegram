@@ -149,7 +149,7 @@
     <string name="selectBanForever">Ban permanente</string>
     <string name="selectBanTemporary">Ban temporal</string>
     <string name="textChatRole">Rol:</string>
-    <string name="textRoleAdmin">Administrador</string>
+    <string name="textRoleAdmin">Creador</string>
     <string name="textRoleModerator">Moderador</string>
     <string name="text_about_app">Tools for Telegram messenger te ayudara a administrar tus grupos.</string>
     <string name="text_all_are_admins_group">Todos los miembros son admins</string>
@@ -195,6 +195,7 @@
     <string name="crash_dialog_sendok">El reporte ha sido enviado, gracias</string>
     <string name="crash_dialog_text">"Disculpe, la app se ha cerrado!\nPor favor, envia el error para arreglarlo"</string>
     <string name="lang_code">es</string>
+    <string name="text_chat_title">Titley:</string>
     <!--
     <string name="about_translator">Ivan Lazcano</string>
      -->

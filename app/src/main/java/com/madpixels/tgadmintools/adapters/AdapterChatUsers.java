@@ -12,7 +12,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.madpixels.apphelpers.MyLog;
 import com.madpixels.apphelpers.UIUtils;
 import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.helper.TgH;
@@ -41,15 +40,9 @@ public class AdapterChatUsers extends BaseAdapter {
     public AdapterChatUsers(Context c) {
         mContext=c;
         inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        imageGetter=new TgImageGetter().setUpdateCallback(onImageRefresh).setRounded(true);
+        imageGetter=new TgImageGetter().setAdapter(this).setRounded(true);
     }
 
-    Runnable onImageRefresh=new Runnable() {
-        @Override
-        public void run() {
-            notifyDataSetChanged();
-        }
-    };
 
     @Override
     public int getCount() {
@@ -146,7 +139,6 @@ public class AdapterChatUsers extends BaseAdapter {
         TgH.TG().send(new TdApi.GetUser(inviterId), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                MyLog.log(object.toString());
                 if (object.getConstructor() == TdApi.User.CONSTRUCTOR) {
                     TdApi.User user = (TdApi.User) object;
                     String name = user.firstName + " " + user.lastName;

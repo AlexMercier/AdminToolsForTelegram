@@ -79,7 +79,7 @@ public class AdapterKickedUsers extends BaseAdapter{
 
         final EmojiconTextView tvUserName = UIUtils.getHolderView(view, R.id.tvUserName);
         final TextView tvUserInfo = UIUtils.getHolderView(view, R.id.tvUserInfo);
-        final ImageView avatar = UIUtils.getView(view, R.id.imageAvatar);
+        final ImageView avatar = UIUtils.getHolderView(view, R.id.imageAvatar);
         final TextView tvBanText = UIUtils.getHolderView(view, R.id.tvBanText);
         final TextView tvOther = UIUtils.getHolderView(view, R.id.tvOther);
         final TextView tvUserLogin = UIUtils.getHolderView(view, R.id.tvUserLogin);

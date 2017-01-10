@@ -126,7 +126,7 @@
     <string name="text_ban_permanently">Бан навсегда</string>
     <string name="text_ban_temporary">Временный бан. Дата разбана:</string>
     <string name="action_unban_all">Разбанить всех</string>
-    <string name="textRoleAdmin">Администратор</string>
+    <string name="textRoleAdmin">Создатель</string>
     <string name="textRoleModerator">Модератор</string>
 
     <string name="check_enabled">Включено</string>
@@ -206,7 +206,7 @@
     <string name="text_warn_on_first_last_warn">При первом и при последнем нарушении</string>
     <string name="text_warn_on_second_and_last_warn">При втором и при последнем нарушении</string>
     <string name="text_warn_always">Каждый раз</string>
-    <string name="tex_warn_count_for_user_before_ban">Сколько раз предупреждать юзера:</string>
+    <string name="text_warn_count_for_user_before_ban">Сколько раз предупреждать юзера:</string>
 
     <string name="log_title_group">Группа</string>
     <string name="log_title_username">Пользователь</string>
@@ -348,13 +348,54 @@
 
     <string name="dialog_recent_changes">
         Новое в v.%s
-        \nПереработано меню добавления правил к чату
-        \nОбработка фильтром всех типов вложений: Gif, Audio, Video, Game, Doc etc..
-        \nДобавлено меню Read-only - все сообщения выбранного юзера будут удаляться
-        \nДобавлен экспорта журнала событий правил в Телеграм
-        \nМелкие исправления в авторизации по смс/звонку
-        \nФиксы хештегов в фильтре чёрного списка слов
+        \n опция Режим рид-онли для всех
+        \n опция Режим рид-онли для новых юзеров
+        \n Уведомление в чат когда пользователь был забанен
+        \n Выбор бота для отправки уведомлений от имени бота
+        \n Мелкие фиксы и оптимизация
     </string>
+    <string name="btnSendNewSmsCode">Отправить код по SMS</string>
+    <string name="btnRequestAuthCall">Запросить звонок с кодом</string>
+    <string name="title_chat_in_readonly_mode">Уведомить пользователей что чат переведён в режим рид-онли:</string>
+    <string name="title_chat_no_in_readonly">Уведомить чат что он больше не в режиме рид-онли:</string>
+    <string name="text_chat_in_readonly_now">Чат переведён в режим только-чтение.</string>
+    <string name="text_chat_not_in_readonly">Чат больше не в режиме только-чтение.</string>
+    <string name="btnSend">Отправить</string>
+    <string name="chkMuteAllMembers">Все кроме админов</string>
+    <string name="chkMuteJoinedMembers">Все кто только что присоединился</string>
+    <string name="text_bot_not_selected">Бот не задан</string>
+    <string name="text_send_notifications_as_bot">Отправлять уведомления от имени бота</string>
+    <string name="text_select_bot_none">Выберите None чтобы отключить бота для этой группы</string>
+    <string name="option_remove_bot">Удалить бота из списка</string>
+    <string name="title_select_bot">Выберите бота</string>
+    <string name="hint_botfather_for_createbot">Используйте BotFather для создания бота</string>
+    <string name="hint_insert_bot_token">Вставьте токен вашего бота</string>
+    <string name="hint_select_existing_bot_token">или выберите бота из списка ниже</string>
+    <string name="action_mute_user">Приглушить юзера (Read-only)</string>
+    <string name="text_mute_user_now">Чтобы приглушить юзера нужно включить задачу в настройках чата.\nВключить сейчас?</string>
+    <string name="btnSkip">Пропустить</string>
+    <string name="text_chat_title">Название:</string>
+    <string name="text_hint_cmd_change_title">Пожалуйста укажине название группы после команды. Пример:</string>
+    <string name="text_confirm_select_group_for_logging">Отправлять журнал событий в выбранную группу?</string>
+    <string name="logAction_userTitleChanged">Пользователь изменил название группы</string>
+    <string name="logAction_gameFloodWarn">Предупреждение о флуде играми</string>
+    <string name="logAction_voiceFloodWarn">Предупреждение о флуде войсами</string>
+    <string name="log_title_oldChangedChatTitle">Предыдущее название</string>
+    <string name="title_backup_restore_settings">Бэкап настроек приложения</string>
+    <string name="text_backup_description">Сохранить настройки приложения на карту памяти и в Telegram Cloud Storage</string>
+    <string name="btn_backup_settings">Создать бэпак</string>
+    <string name="btn_backup_restore_settings">Восстановить из бэкапа</string>
+    <string name="text_backup_restore_description">Выберите файл для восстановления настроек. Все существующие правила для чатов будут перезаписаны!</string>
+    <string name="text_backup_saved">Бекап сохранён в \'%s\'.\n\nОтправить так же бекап в Telegram Cloud Storage?</string>
+    <string name="toast_user_was_removed">Пользователь был исключён из чата.\nОн сможет вернуться опять если захочет</string>
+    <string name="logAction_removedJoinMessage">Удалено сообщение о присоединении пользователя</string>
+    <string name="chtTitlePublicBan">Уведомить в чат о бане</string>
+    <string name="logAction_removeLeaveMessage">Удалено сообщение Юзер покину чат</string>
+    <string name="text_dozen_battery_white_list_api23" >
+        <b>Примечание:</b> <font color='#009688'>Если</font> приложение перестаёт работать в фоне, то вам нужно добавить его в исключения оптимизации батареи вашего Android, в
+        <b>Настройки-> Батарея -> Меню -> Экономия</b>
+        (или <b>Настройки -> Приложения -> Дополнительно -> Экономия батареи</b>) и исключить приложение из списка экономии, чтобы оно смогло корректно работать в фоне.</string>
+    <string name="text_note_battery_optimization"><b>Примечание:</b> <font color='#009688'>Battery Optimization</font></string>
 
 
     <string-array name="ban_times">
@@ -389,6 +430,7 @@
     <string-array name="command_types">
         <item>Простой ответ</item>
         <item>Команда KickMe</item>
+        <item>Изменить название чата</item>
     </string-array>
 
     <string-array name="commands_plural">

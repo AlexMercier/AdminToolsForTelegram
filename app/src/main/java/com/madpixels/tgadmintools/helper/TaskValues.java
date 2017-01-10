@@ -2,6 +2,8 @@ package com.madpixels.tgadmintools.helper;
 
 import android.support.annotation.StringRes;
 
+import com.madpixels.tgadmintools.App;
+import com.madpixels.tgadmintools.BuildConfig;
 import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.entities.ChatTask;
 import com.madpixels.tgadmintools.utils.LogUtil;
@@ -11,6 +13,23 @@ import com.madpixels.tgadmintools.utils.LogUtil;
  */
 
 public class TaskValues {
+
+    //static SparseArray<String> strings = new SparseArray<>();
+
+    public static String getString(@StringRes int resID) {
+        return getString(resID, "");
+    }
+
+    public static String getString(@StringRes int resID, String defaultVal) {
+        if (resID == 0)
+            return defaultVal;
+        try {
+            return App.getContext().getString(resID);
+        } catch (Exception e) {
+            return defaultVal;
+        }
+
+    }
 
     @StringRes
     public static Integer getTitleLogAction(LogUtil.Action action) {
@@ -66,6 +85,10 @@ public class TaskValues {
                 return R.string.logAction_removedVideo;
             case RemoveMuted:
                 return R.string.logAction_removedMutedMessage;
+            case RemoveJoinMessage:
+                return R.string.logAction_removedJoinMessage;
+            case RemoveLeaveMessage:
+                return R.string.logAction_removeLeaveMessage;
 
             /* Flood warning: */
             case DocsFloodWarn:
@@ -84,6 +107,10 @@ public class TaskValues {
                 return R.string.logAction_audioFloodWarn;
             case VideoFloodWarn:
                 return R.string.logAction_videoFloodWarn;
+            case GameFloodWarn:
+                return R.string.logAction_gameFloodWarn;
+            case VoiceFloodWarn:
+                return R.string.logAction_voiceFloodWarn;
 
             /*Other */
             case AutoUnbanByAdminInvite:
@@ -96,96 +123,156 @@ public class TaskValues {
                 return R.string.logAction_autokick;
             case CommandExecError:
                 return R.string.logAction_execCommandError;
+            case BOT_ERROR:
+                return R.string.logAction_sendViaBotError;
+            case CMDTitleChanged:
+                return R.string.logAction_userTitleChanged;
+
         }
 
-        throw new RuntimeException("String not found " + action);
+        if (BuildConfig.DEBUG && false)
+            throw new RuntimeException("String not found " + action);
+        else
+            return 0;
     }
 
-    @StringRes
-    public static Integer getTitleForAddTask(ChatTask.TYPE pType) {
+    public static String getTitleForAddTask(ChatTask.TYPE pType) {
+        int strRes = 0;
         switch (pType) {
             case STICKERS:
-                return R.string.title_task_add_stickers;
+                strRes = R.string.title_task_add_stickers;
+                break;
             case VOICE:
-                return R.string.title_task_add_voices;
+                strRes = R.string.title_task_add_voices;
+                break;
             case LINKS:
-                return R.string.title_task_add_link;
+                strRes = R.string.title_task_add_link;
+                break;
             case GAME:
-                return R.string.title_task_add_games;
+                strRes = R.string.title_task_add_games;
+                break;
             case IMAGES:
-                return R.string.title_task_add_photos;
+                strRes = R.string.title_task_add_photos;
+                break;
             case DOCS:
-                return R.string.title_task_add_documents;
+                strRes = R.string.title_task_add_documents;
+                break;
             case GIF:
-                return R.string.title_task_add_gif;
+                strRes = R.string.title_task_add_gif;
+                break;
             case AUDIO:
-                return R.string.title_task_audio;
+                strRes = R.string.title_task_audio;
+                break;
             case VIDEO:
-                return R.string.title_task_video;
+                strRes = R.string.title_task_video;
+                break;
         }
 
-        throw new RuntimeException("String not found " + pType);
+        if (strRes == 0) {
+            if (BuildConfig.DEBUG)
+                throw new RuntimeException("String not found " + pType);
+        }
+        return getString(strRes, pType.name());
+
     }
 
-    @StringRes
-    public static int getBanReason(ChatTask.TYPE mType) {
-        switch (mType) {
+    public static String getBanReason(ChatTask.TYPE pType) {
+        int strRes = 0;
+        switch (pType) {
             case BANWORDS:
-                return (R.string.logAction_banForBlackWord);
+                strRes = (R.string.logAction_banForBlackWord);
+                break;
             case STICKERS:
-                return (R.string.logAction_banForSticker);
+                strRes = (R.string.logAction_banForSticker);
+                break;
             case VOICE:
-                return (R.string.logAction_banForVoice);
+                strRes = (R.string.logAction_banForVoice);
+                break;
             case LINKS:
-                return (R.string.logAction_banForLink);
+                strRes = (R.string.logAction_banForLink);
+                break;
             case GAME:
-                return (R.string.logAction_banForGame);
+                strRes = (R.string.logAction_banForGame);
+                break;
             case IMAGES:
-                return R.string.logAction_banForPhotos;
+                strRes = R.string.logAction_banForPhotos;
+                break;
             case DOCS:
-                return R.string.logAction_banForDocs;
+                strRes = R.string.logAction_banForDocs;
+                break;
             case GIF:
-                return R.string.logAction_banForGifs;
+                strRes = R.string.logAction_banForGifs;
+                break;
             case AUDIO:
-                return R.string.logAction_banForAudio;
+                strRes = R.string.logAction_banForAudio;
+                break;
             case VIDEO:
-                return R.string.logAction_banForVideo;
-        }
-        throw new RuntimeException("String not found " + mType);
-    }
-
-    @StringRes
-    public static int getWarnText(ChatTask.TYPE mType, int textType) {
-        switch (mType) {
+                strRes = R.string.logAction_banForVideo;
+                break;
             case FLOOD:
-                return R.string.warntext_flood_default_last;
+                strRes = R.string.logAction_banForFlood;
+                break;
+        }
+
+        if (strRes == 0) {
+            if (BuildConfig.DEBUG)
+                throw new RuntimeException("String not found " + pType);
+        }
+        return getString(strRes, pType.name());
+    }
+
+
+    public static String getWarnText(ChatTask.TYPE pType, int textType) {
+        int strRes = 0;
+
+        switch (pType) {
+            case FLOOD:
+                strRes = R.string.warntext_flood_default_last;
+                break;
             case STICKERS:
-                return textType == 1 ? R.string.warntext_stickers_default_first : R.string.warntext_stickers_default_last;
+                strRes = textType == 1 ? R.string.warntext_stickers_default_first : R.string.warntext_stickers_default_last;
+                break;
 
             case LINKS:
-                return textType == 1 ? R.string.warntext_links_default_firts : R.string.warntext_links_default_last;
+                strRes = textType == 1 ? R.string.warntext_links_default_firts : R.string.warntext_links_default_last;
+                break;
 
             case VOICE:
-                return textType == 1 ? R.string.warntext_voice_default_first : R.string.warntext_voice_default_last;
+                strRes = textType == 1 ? R.string.warntext_voice_default_first : R.string.warntext_voice_default_last;
+                break;
 
             case BANWORDS:
-                return textType == 1 ? R.string.warntext_banword_first : R.string.warntext_banword_last;
+                strRes = textType == 1 ? R.string.warntext_banword_first : R.string.warntext_banword_last;
+                break;
 
             case GAME:
-                return textType == 1 ? R.string.warntext_bangame_first : R.string.warntext_bangame_last;
+                strRes = textType == 1 ? R.string.warntext_bangame_first : R.string.warntext_bangame_last;
+                break;
             case IMAGES:
-                return textType == 1 ? R.string.warntext_banphoto_first : R.string.warntext_banphoto_last;
+                strRes = textType == 1 ? R.string.warntext_banphoto_first : R.string.warntext_banphoto_last;
+                break;
             case DOCS:
-                return textType == 1 ? R.string.warntext_bandocs_first : R.string.warntext_bandocs_last;
+                strRes = textType == 1 ? R.string.warntext_bandocs_first : R.string.warntext_bandocs_last;
+                break;
             case GIF:
-                return textType == 1 ? R.string.warntext_bangifs_first : R.string.warntext_bangifs_last;
+                strRes = textType == 1 ? R.string.warntext_bangifs_first : R.string.warntext_bangifs_last;
+                break;
             case AUDIO:
-                return textType == 1 ? R.string.warntext_banAudio_first : R.string.warntext_banAudio_last;
+                strRes = textType == 1 ? R.string.warntext_banAudio_first : R.string.warntext_banAudio_last;
+                break;
             case VIDEO:
-                return textType == 1 ? R.string.warntext_banVideo_first : R.string.warntext_banVideo_last;
+                strRes = textType == 1 ? R.string.warntext_banVideo_first : R.string.warntext_banVideo_last;
+                break;
 
         }
-        throw new RuntimeException("String not found " + mType + " " + textType);
+
+        if (strRes == 0) {
+            if (BuildConfig.DEBUG)
+                throw new RuntimeException("String not found " + pType + " " + textType);
+        }
+        return getString(strRes, pType.name());
+
+
     }
 
     public static LogUtil.Action getWarningAction(ChatTask.TYPE type) {
@@ -216,6 +303,7 @@ public class TaskValues {
                 return LogUtil.Action.VideoFloodWarn;
 
         }
+
         throw new RuntimeException("String not found " + type);
     }
 }

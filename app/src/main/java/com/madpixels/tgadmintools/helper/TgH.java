@@ -3,6 +3,7 @@ package com.madpixels.tgadmintools.helper;
 import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.madpixels.apphelpers.FileUtils2;
@@ -18,6 +19,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 /**
  * Created by Snake on 16.01.2016.
@@ -38,31 +40,32 @@ public class TgH {
 
     public static void init(Context c) {
         TG.setFileLogEnabled(false);
+        TG.setLogVerbosity(Log.WARN);
         TG.setDir(c.getFilesDir().getAbsolutePath());
         TG.setFilesDir(getCacheDir(c) + "/files/");
 
         //if(!list.isEmpty())
-            startUpdatesHandler();
+        startUpdatesHandler();
     }
 
     /**
      * Init TDLib, check auth state, load profile info and then call resultCallback
+     *
      * @param onGetAuthHandler callback Ok or Error return.
      */
-    public static void init(Context c, final Client.ResultHandler onGetAuthHandler){
+    public static void init(Context c, final Client.ResultHandler onGetAuthHandler) {
         init(c);
         TgH.send(new TdApi.GetAuthState(), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                if(TgUtils.isAuthorized(object)) {
+                if (TgUtils.isAuthorized(object)) {
                     getProfile(new Client.ResultHandler() {
                         @Override
                         public void onResult(TdApi.TLObject object) {
                             onGetAuthHandler.onResult(new TdApi.Ok());
                         }
                     });
-                }
-                else
+                } else
                     onGetAuthHandler.onResult(new TdApi.Error());
             }
         });
@@ -72,13 +75,13 @@ public class TgH {
         return TG.getClientInstance();
     }
 
-    private final static Client.ResultHandler LoopUpdateHandler=new Client.ResultHandler() {
+    private final static Client.ResultHandler LoopUpdateHandler = new Client.ResultHandler() {
         @Override
         public void onResult(TdApi.TLObject object) {
-            if(object.getConstructor()== TdApi.UpdateUser.CONSTRUCTOR){
+            if (object.getConstructor() == TdApi.UpdateUser.CONSTRUCTOR) {
                 updateUser((TdApi.UpdateUser) object);
             }
-
+            // MyLog.log("LoopUpdateHandler");
             synchronized (LOCK) {
                 for (Client.ResultHandler r : list)
                     r.onResult(object);
@@ -98,48 +101,17 @@ public class TgH {
 
     public static void startUpdatesHandler() {
         TG.setUpdatesHandler(LoopUpdateHandler);
-//        TG.setUpdatesHandler(new Client.ResultHandler() {
-//            @Override
-//            public void onResult(TdApi.TLObject object) {
-//                //MyLog.log("onUpdate main handler");
-//                synchronized (LOCK) {
-//                    for (Client.ResultHandler r : list)
-//                        r.onResult(object);
-//                }
-//            }
-//        });
     }
 
     public static void setUpdatesHandler(Client.ResultHandler r) {
         list.add(r);
-        //if (list.size() == 1)
-            startUpdatesHandler();
+        startUpdatesHandler();
     }
 
     public static void removeUpdatesHandler(Client.ResultHandler r) {
         synchronized (LOCK) {
             list.remove(r);
         }
-        //if (list.isEmpty())
-        //    TG.stopClient();
-    }
-
-    public static void markMessageAsReaded(long fromId, int msg_id) {
-        TG().send(new TdApi.GetChatHistory(fromId, msg_id, 0, 1), new Client.ResultHandler() {
-            @Override
-            public void onResult(TdApi.TLObject object) {
-                MyLog.log("Mark as read result: " + object.toString());
-            }
-        });
-    }
-
-    public static void deleteMessage(long chatId, int msgId) {
-        TG().send(new TdApi.DeleteMessages(chatId, new int[]{msgId}), new Client.ResultHandler() {
-            @Override
-            public void onResult(TdApi.TLObject object) {
-                MyLog.log(object.toString());
-            }
-        });
     }
 
     public static void clearAppCache(final Context c, final FileUtils2.ClearCallback callback) {
@@ -194,13 +166,40 @@ public class TgH {
         return chatUser;
     }
 
-    public static void send(final TdApi.TLFunction function){
+    public static void send(final TdApi.TLFunction function) {
         send(function, TgUtils.emptyResultHandler());
     }
 
 
     public static void send(final TdApi.TLFunction function, @Nullable final Client.ResultHandler resultHandler) {
-        TG().send(function, resultHandler!=null ? resultHandler:TgUtils.emptyResultHandler());
+        TG().send(function, resultHandler != null ? resultHandler : TgUtils.emptyResultHandler());
+    }
+
+    /**
+     * Execute {@link TdApi.TLFunction} in current thread. <b>This method cannot be run under TdLib ResultHandler onResult method!</b>
+     * @return return result {@link TdApi.TLObject} or null if thread was interrupted
+     */
+    public static TdApi.TLObject execute(final TdApi.TLFunction f) {
+        final Semaphore semaphore = new Semaphore(0);
+
+        final TdApi.TLObject[] resultHandlers = new TdApi.TLObject[1];
+        final long ts = System.currentTimeMillis();
+        send(f, new Client.ResultHandler() {
+            @Override
+            public void onResult(TdApi.TLObject object) {
+                resultHandlers[0] = object;
+                // Utils.sleep(2000);
+                semaphore.release();
+            }
+        });
+
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+
+        }
+        MyLog.log(f.getClass().getSimpleName() + " executed in " + (System.currentTimeMillis() - ts));
+        return resultHandlers[0];
     }
 
     public static void sendOnUi(final TdApi.TLFunction f, final Client.ResultHandler resultHandler) {
@@ -222,16 +221,18 @@ public class TgH {
         getProfile(null);
     }
 
-    public static void getProfile(final Client.ResultHandler callback){
+    public static void getProfile(final Client.ResultHandler callback) {
         send(new TdApi.GetMe(), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                TdApi.User me = (TdApi.User) object;
-                selfProfileId = me.id;
-                selfProfileUsername = me.username;
-                Sets.set(Const.SETS_PROFILE_ID, selfProfileId); //save last know profile
-                if(callback!=null)
-                    callback.onResult(object);
+                if(object.getConstructor()== TdApi.User.CONSTRUCTOR) {
+                    TdApi.User me = (TdApi.User) object;
+                    selfProfileId = me.id;
+                    selfProfileUsername = me.username;
+                    Sets.set(Const.SETS_PROFILE_ID, selfProfileId); //save last know profile
+                    if (callback != null)
+                        callback.onResult(object);
+                }
             }
         });
     }

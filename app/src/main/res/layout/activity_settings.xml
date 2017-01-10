@@ -20,10 +20,10 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_below="@+id/toolbar"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/toolbar"
+        android:orientation="vertical">
 
 
         <LinearLayout
@@ -60,11 +60,19 @@
                     android:text="@string/check_show_icon_in_bar" />
 
                 <TextView
-                    android:text="@string/text_show_icon_in_system_bar"
+                    android:id="@+id/textView28"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textView28"
-                    android:layout_marginLeft="8dp" />
+                    android:layout_marginLeft="8dp"
+                    android:text="@string/text_show_icon_in_system_bar" />
+
+                <TextView
+                    android:id="@+id/tvNoteForDozeAndroid_API23"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:text="@string/text_note_battery_optimization" />
+
 
 
             </LinearLayout>
@@ -109,13 +117,12 @@
 
 
                 <EditText
-                    android:hint="@string/text_antispam_alert_title"
                     android:id="@+id/edtAntispamAlertTitle"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="@string/text_antispam_alert_title" />
 
             </LinearLayout>
-
 
 
             <LinearLayout
@@ -191,7 +198,7 @@
 
 
                 <TextView
-                    android:id="@+id/textView19"
+
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/titleLogLifetime"
@@ -202,6 +209,73 @@
                     android:id="@+id/spinnerLogLifeTime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:background="@color/md_white_1000"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_backup_restore_settings"
+                    android:textColor="@color/md_blue_600"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvBackupSettings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="8dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="8dp"
+                    android:text="@string/btn_backup_settings"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/md_teal_500" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="16dp"
+                    android:text="@string/text_backup_description"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/md_grey_500" />
+
+
+                <TextView
+                    android:id="@+id/tvRestoreBackup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="?attr/selectableItemBackground"
+
+                    android:padding="8dp"
+                    android:text="@string/btn_backup_restore_settings"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/md_teal_500" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="16dp"
+                    android:text="@string/text_backup_restore_description"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/md_grey_500" />
+
+
             </LinearLayout>
 
 

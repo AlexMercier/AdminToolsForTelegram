@@ -6,7 +6,7 @@ package com.madpixels.tgadmintools.entities;
 
 public class ChatCommand {
 
-    public static int TYPE_TEXT = 0, TYPE_KICK_SENDER = 1;
+    public static int CMD_TEXT = 0, CMD_KICK_SENDER = 1, CMD_CHANGE_TITLE = 2;
 
     public long id;
     public long chatId;

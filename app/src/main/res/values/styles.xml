@@ -22,6 +22,13 @@
         <item name="android:paddingRight">6dp</item>
     </style>
 
+    <style name="ClickableTextView" parent="@android:style/TextAppearance.Widget.TextView">
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textColor">@color/md_teal_500</item>
+    </style>
+
     <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorPrimary">@color/md_red_500</item>
         <item name="colorAccent">@color/colorAccent</item>

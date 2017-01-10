@@ -176,8 +176,10 @@ public class ActivityChatCommands extends ActivityExtended {
             chkIsAdmin.setChecked(commandEdit.isAdmin);
             chkEnable.setChecked(commandEdit.isEnabled);
 
-            if (commandEdit.type == ChatCommand.TYPE_KICK_SENDER)
+            if (commandEdit.type == ChatCommand.CMD_KICK_SENDER)
                 spinnerCommandType.setSelection(1);
+            else if(commandEdit.type==ChatCommand.CMD_CHANGE_TITLE)
+                spinnerCommandType.setSelection(2);
         }
 
         //Previous value if "empty" error was

@@ -4,6 +4,8 @@ package com.madpixels.apphelpers.ui;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Looper;
 
 /**
  * Created by Snake on 29.02.2016.
@@ -14,13 +16,14 @@ public class ProgressDialogBuilder {
     android.app.ProgressDialog prgDlg;
     private Context ctx;
     public boolean isCancelled = false;
+    Handler mHandler;
 
     public ProgressDialogBuilder(Context c) {
         prgDlg = new ProgressDialog(c);
-        //prgDlg.setTitle("");
-        //prgDlg.setMessage("");
         prgDlg.setIndeterminate(true);
         this.ctx = c;
+        if(Looper.myLooper()==Looper.getMainLooper())
+            mHandler = new Handler();
     }
 
     public ProgressDialogBuilder setTitle(int resId) {
@@ -105,5 +108,19 @@ public class ProgressDialogBuilder {
         prgDlg.setMax(max);
         prgDlg.setIndeterminate(false);
         return this;
+    }
+
+    public void dismiss(){
+        if(Looper.myLooper()==Looper.getMainLooper())
+            prgDlg.dismiss();
+        else{
+            if(mHandler!=null)
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        prgDlg.dismiss();
+                    }
+                });
+        }
     }
 }

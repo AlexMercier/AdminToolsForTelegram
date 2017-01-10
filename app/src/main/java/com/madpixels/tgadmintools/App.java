@@ -47,10 +47,10 @@ public class App extends Application{
 
     private void setupAcra(){
         ACRA.init(this);
-        ACRA.getErrorReporter().checkReportsOnApplicationStart();
+
         MyLog.setAcraListener(new MyLog.AcraListener() {
             @Override
-            public void onError(Exception e) {
+            public void onError(Throwable e) {
                 ACRA.getErrorReporter().handleSilentException(e);
             }
         });

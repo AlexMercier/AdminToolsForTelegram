@@ -49,7 +49,7 @@ public class MyLog {
             log("int value: " + msg);
     }
 
-    public static void log(final Exception e) {
+    public static void log(final Throwable e) {
         if (IS_ENABLED && e != null && e.getMessage() != null) {
             log(e.getMessage());
             e.printStackTrace();
@@ -64,6 +64,6 @@ public class MyLog {
 
 
     public static abstract class AcraListener {
-        public abstract void onError(Exception s);
+        public abstract void onError(Throwable s);
     }
 }

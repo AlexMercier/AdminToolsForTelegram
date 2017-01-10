@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.madpixels.apphelpers.UIUtils;
 import com.madpixels.tgadmintools.R;
-import com.madpixels.tgadmintools.utils.LogUtil;
+import com.madpixels.tgadmintools.entities.LogEntity;
 
 import java.util.ArrayList;
 
@@ -18,7 +18,7 @@ import java.util.ArrayList;
  */
 public class AdapterLog extends BaseAdapter{
 
-    public ArrayList<LogUtil.LogEntity> list=new ArrayList<>();
+    public ArrayList<LogEntity> list=new ArrayList<>();
     final LayoutInflater inflater;
 
     public AdapterLog(Context c) {
@@ -31,7 +31,7 @@ public class AdapterLog extends BaseAdapter{
     }
 
     @Override
-    public LogUtil.LogEntity getItem(int position) {
+    public LogEntity getItem(int position) {
         return list.get(position);
     }
 
@@ -47,7 +47,7 @@ public class AdapterLog extends BaseAdapter{
             view = inflater.inflate(R.layout.item_log_view, parent, false);
         }
 
-        LogUtil.LogEntity log = getItem(position);
+        LogEntity log = getItem(position);
 
         final TextView logTitle = UIUtils.getHolderView(view, R.id.logTitle);
         final TextView logText = UIUtils.getHolderView(view, R.id.logText);

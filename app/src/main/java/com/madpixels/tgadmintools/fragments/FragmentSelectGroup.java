@@ -1,8 +1,10 @@
 package com.madpixels.tgadmintools.fragments;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,9 +91,7 @@ public class FragmentSelectGroup extends DialogFragment {
         lvChats.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TdApi.Chat chat = mAdapter.getItem(position);
-                onChatSelected.onResult(chat);
-                dismiss();
+                confirmSelect(mAdapter.getItem(position));
             }
         });
 
@@ -160,6 +160,21 @@ public class FragmentSelectGroup extends DialogFragment {
             }
         });
 
+    }
+
+    void confirmSelect(final TdApi.Chat chat){
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Select group")
+                .setMessage(chat.title + "\n"+getString(R.string.text_confirm_select_group_for_logging))
+                .setPositiveButton(R.string.btnSave, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        onChatSelected.onResult(chat);
+                        dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.btnCancel, null)
+                .show();
     }
 
     public void setOnChatSelected(Callback onChatSelected) {

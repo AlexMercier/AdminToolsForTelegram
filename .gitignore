@@ -3,6 +3,7 @@ app/src/production/*
 files/*
 apks/*
 .gradle/*
+.idea/*
 .hg/*
 build/*
 app/build/*
@@ -14,3 +15,5 @@ app/*.apk
 .hgignore
 
 projectFilesBackup/*
+
+app/app.iml

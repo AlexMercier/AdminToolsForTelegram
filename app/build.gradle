@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "23.0.2"
-    def arch = "v7a" //x86 v7a
+    def arch = "x86" //x86 v7a all
 
     sourceSets.main {
         jniLibs.srcDir 'src/main/libs'
@@ -20,13 +20,13 @@ android {
         applicationId "com.madpixels.tgadmintools"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 70
+        versionCode 80
         if(arch=="v7a"){
             versionCode versionCode + 1
         }
-        versionName "1.0.5"
+        versionName "1.0.6"
 
-        def buildDate = "30.12.2016"
+        def buildDate = "10.01.2017"
         resValue "string", "buildDate", buildDate
     }
 
@@ -73,7 +73,11 @@ android {
         }
     }
 
+
+
+
     productFlavors {
+
         production {
             /**
              * production flavor use my ad library classes in AdHelper.java, so you can leave 'dev' flavor
@@ -86,6 +90,8 @@ android {
                 }
             }
             ndk {
+                if(arch == "all"){}
+                else
                 if (arch == "x86") {
                     abiFilter "x86"
                 } else {
@@ -106,13 +112,19 @@ android {
     }
 }
 
+repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+}
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // productionCompile fileTree(include: ['*.jar'], dir: 'libs\\appodeal')
+    compile 'com.github.turhanoz:reactivedirectorychooser:1.1.0'
     productionCompile 'com.google.android.gms:play-services-ads:7.3.0'
     compile project(':AppHelperLib')
     compile 'io.github.rockerhieu:emojicon:1.4.1'
-    compile 'com.android.support:appcompat-v7:23.0.2'
+    compile 'com.android.support:appcompat-v7:24.0.2'
     compile 'ch.acra:acra:4.9.0'
     compile 'com.yandex.android:mobmetricalib:2.51'
+
 }

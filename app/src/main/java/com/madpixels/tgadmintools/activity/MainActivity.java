@@ -1,6 +1,8 @@
 package com.madpixels.tgadmintools.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -55,6 +57,8 @@ public class MainActivity extends ActivityExtended {
     TextView tvAdditionalStatus;
     private boolean skipShowActivity = false;
 
+    private Button btnStop, btnGroups;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,8 +78,9 @@ public class MainActivity extends ActivityExtended {
 
         tvAdditionalStatus = (TextView) findViewById(R.id.tvAdditionalStatus);
 
-        Button btnClearCache = (Button) findViewById(R.id.btnClearCache);
-        final Button btnStop = (Button) findViewById(R.id.btnStop);
+        Button btnClearCache = getView(R.id.btnClearCache);
+        btnGroups = getView(R.id.btnGroups);
+        btnStop = getView(R.id.btnStop);
         final CheckBox checkBoxWriteLog = (CheckBox) findViewById(R.id.checkBoxWriteLog);
 
         if (!BuildConfig.DEBUG) {
@@ -85,7 +90,7 @@ public class MainActivity extends ActivityExtended {
         tvAdditionalStatus.setText("Checking auth...");
         final TextView textViewAppState = getView(R.id.textViewAppState);
 
-        findViewById(R.id.btnGroups).setOnClickListener(new View.OnClickListener() {
+        btnGroups.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(mContext, ActivityGroupsList.class));
@@ -114,15 +119,17 @@ public class MainActivity extends ActivityExtended {
             @Override
             public void onClick(View v) {
                 if (v.getTag() == null) {
-                    stopApplication();
+                    stopApplication(mContext);
                     btnStop.setText("Start");
                     btnStop.setTag("1");
                     textViewAppState.setText(R.string.text_appstate_stopped);
+                    btnGroups.setEnabled(false);
                 } else {
-                    startApplication();
+                    startApplication(mContext);
                     btnStop.setText("Stop");
                     textViewAppState.setText(R.string.text_appstate_enabled);
                     btnStop.setTag(null);
+                    btnGroups.setEnabled(true);
                 }
             }
         });
@@ -136,21 +143,22 @@ public class MainActivity extends ActivityExtended {
         }, 1300);
 
         if (BuildConfig.DEBUG) {// for debug write log only
-            checkStoragePermissions();
+            checkStoragePermissions(this);
         }
     }
 
-    private boolean checkStoragePermissions() {
+    public static boolean checkStoragePermissions(Activity a) {
         if (Build.VERSION.SDK_INT >= 23) {
-            int hasReadStorage = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+            int hasReadStorage = a.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
             if (hasReadStorage != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Const.ACTION_REQUEST_STORAGE_PERMISSION);
+                a.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Const.ACTION_REQUEST_STORAGE_PERMISSION);
                 return false;
             }
         }
         return true;
     }
 
+    @SuppressLint("NewApi")
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -244,10 +252,10 @@ public class MainActivity extends ActivityExtended {
     }
 
     private void changeAccount() {
-        TgH.sendOnUi(new TdApi.ResetAuth(true), new Client.ResultHandler() {
+        TgH.sendOnUi(new TdApi.ResetAuth(false), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                stopApplication();
+                stopApplication(mContext);
                 DBHelper.getInstance().dbClose();
                 Sets.removeSetting(Const.SETS_PROFILE_ID);
                 TgH.init(mContext);
@@ -284,6 +292,7 @@ public class MainActivity extends ActivityExtended {
                 default:
                     Analytics.sendReport("AuthError", e.message, e.toString());
                     showInstantErrorDialog(e);
+
                     break;
             }
             return;
@@ -321,63 +330,38 @@ public class MainActivity extends ActivityExtended {
     void onLoginSucces() {
         TgH.getProfile(new Client.ResultHandler() {
             @Override
-            public void onResult(TdApi.TLObject object) {
+            public void onResult(final TdApi.TLObject object) {
                 if (!skipShowActivity) /* if skipShowActivity then no show activity */
                     startActivity(new Intent(mContext, ActivityGroupsList.class));
                 ServiceUnbanTask.registerTask(mContext);
                 ServiceAutoKicker.registerTask(mContext);
                 ServiceChatTask.start(mContext);
                 ServiceGarbageCollector.start(mContext);
-                // test();
 
-
-//                int rulesCount = DBHelper.getInstance().getChatRulesCount(); // кол-во правил чата
-//                // int bannedCount = DBHelper.getInstance().getTotalBannedCount();
-//                final String text = "Active rules count: "+rulesCount;
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        tvAdditionalStatus.setText(tvAdditionalStatus.getText().toString()+"\n"+text);
-//                    }
-//                });
-            }
-        });
-    }
-
-    private void test() {
-        String username = "etozhechat";
-        TdApi.SearchPublicChat searchPublicChat = new TdApi.SearchPublicChat(username);
-        TG.getClientInstance().send(searchPublicChat, new Client.ResultHandler() {
-            @Override
-            public void onResult(TdApi.TLObject object) {
-                MyLog.log(object.toString());
-                TdApi.Chat chat = (TdApi.Chat) object;
-                TdApi.Message topMessage = chat.topMessage;
-
-                long chatId = chat.id;
-
-                TdApi.GetChatHistory getChatHistory = new TdApi.GetChatHistory(chatId, topMessage.id, 0, 15);
-                TG.getClientInstance().send(getChatHistory, new Client.ResultHandler() {
+                runOnUiThread(new Runnable() {
                     @Override
-                    public void onResult(TdApi.TLObject object) {
-                        MyLog.log(object.toString());
-                        TdApi.Messages messages = (TdApi.Messages) object;
+                    public void run() {
+                        TdApi.User me = (TdApi.User) object;
+                        tvAdditionalStatus.setText("Status: Authorized\n" +
+                                "Profile: "+me.firstName+" "+me.lastName+"\n" +
+                                "id: "+me.id +
+                                (me.username.isEmpty()?"":"\n@"+me.username));
                     }
                 });
             }
         });
     }
 
-    private void stopApplication() {
+    public static void stopApplication(Context c) {
         TG.stopClient();
-        ServiceChatTask.stop(this);
-        ServiceAutoKicker.stop(mContext);
-        ServiceUnbanTask.unregister(mContext);
-        ServiceBackgroundStarter.stop(mContext);
+        ServiceChatTask.stop(c);
+        ServiceAutoKicker.stop(c);
+        ServiceUnbanTask.unregister(c);
+        ServiceBackgroundStarter.stop(c);
     }
 
-    private void startApplication() {
-        TgH.init(MainActivity.this);
+    public static void startApplication(final Context mContext) {
+        TgH.init(mContext);
         TgH.sendOnUi(new TdApi.GetAuthState(), new Client.ResultHandler() {
             @Override
             public void onResult(final TdApi.TLObject object) {
@@ -435,10 +419,11 @@ public class MainActivity extends ActivityExtended {
         });
 
         if (nextAuthCodeType != null) {
-            if (nextAuthCodeType.getConstructor() == TdApi.AuthCodeTypeSms.CONSTRUCTOR)
-                tvResendSMS.setText("Resend SMS Code");
+            if (nextAuthCodeType.getConstructor() == TdApi.AuthCodeTypeSms.CONSTRUCTOR){
+                tvResendSMS.setText(R.string.btnSendNewSmsCode);
+            }
             else if (nextAuthCodeType.getConstructor() == TdApi.AuthCodeTypeCall.CONSTRUCTOR)
-                tvResendSMS.setText("Call auth code");
+                tvResendSMS.setText(R.string.btnRequestAuthCall);
 
             tvResendSMS.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -483,7 +468,6 @@ public class MainActivity extends ActivityExtended {
                 TgH.send(func, new Client.ResultHandler() {
                     @Override
                     public void onResult(final TdApi.TLObject object) {
-                        MyLog.log(object.toString());
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -578,4 +562,6 @@ public class MainActivity extends ActivityExtended {
                 .setNegativeButton(R.string.btnClose, null)
                 .show();
     }
+
+
 }

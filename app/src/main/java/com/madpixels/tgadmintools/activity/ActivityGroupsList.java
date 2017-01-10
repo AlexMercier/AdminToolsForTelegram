@@ -432,7 +432,6 @@ public class ActivityGroupsList extends ActivityExtended {
                     }
 
                 } else {
-                    MyLog.log(object.toString());
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

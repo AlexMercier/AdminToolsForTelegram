@@ -25,6 +25,7 @@ import com.madpixels.tgadmintools.Const;
 import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.adapters.AdapterLog;
 import com.madpixels.tgadmintools.db.DBHelper;
+import com.madpixels.tgadmintools.entities.LogEntity;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
 import com.madpixels.tgadmintools.utils.LogUtil;
@@ -123,7 +124,7 @@ public class ActivityLogView extends ActivityExtended {
         return false;
     }
 
-    private static boolean hasUserInfo(LogUtil.LogEntity log){
+    private static boolean hasUserInfo(LogEntity log){
         switch (log.action){
             case BanForBlackWord:case DeleteMsgBlackWord:case RemoveSticker:case RemoveLink:case LinksFloodAttempt:
             case StickersFloodWarn: case VoiceFloodWarn: case GameFloodWarn: case GifsFloodWarn: case ImagesFloodWarn:
@@ -137,7 +138,7 @@ public class ActivityLogView extends ActivityExtended {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         AdapterView.AdapterContextMenuInfo cInfo = (AdapterView.AdapterContextMenuInfo) menuInfo;
         int pos = cInfo.position - mListView.getHeaderViewsCount();
-        LogUtil.LogEntity log = mAdapter.getItem(pos);
+        LogEntity log = mAdapter.getItem(pos);
         if (log.hasChatId())
             menu.add(0, 1, 0, R.string.action_open_chat_info);
         if (canUnbanUser(log.action)) {
@@ -159,7 +160,7 @@ public class ActivityLogView extends ActivityExtended {
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo cInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int pos = cInfo.position - mListView.getHeaderViewsCount();
-        final LogUtil.LogEntity log = mAdapter.getItem(pos);
+        final LogEntity log = mAdapter.getItem(pos);
         log.setChat();
 
         switch (item.getItemId()) {
@@ -258,7 +259,7 @@ public class ActivityLogView extends ActivityExtended {
     public void onNewLogEvent() {
         if (!mAdapter.isEmpty()) {
             int id = mAdapter.getItem(0).item_id;
-            final ArrayList<LogUtil.LogEntity> logs = DBHelper.getInstance().getLogUpdate(id);
+            final ArrayList<LogEntity> logs = DBHelper.getInstance().getLogUpdate(id);
             if (logs != null) {
                 mAdapter.list.addAll(0, logs);
                 mListView.postDelayed(new Runnable() {
@@ -279,7 +280,7 @@ public class ActivityLogView extends ActivityExtended {
             @Override
             public void run() {
                 final int count = mAdapter.isEmpty()?5:50;
-                final ArrayList<LogUtil.LogEntity> logs = DBHelper.getInstance().getLog(offset, count);
+                final ArrayList<LogEntity> logs = DBHelper.getInstance().getLog(offset, count);
                 onUiThread(new Runnable() {
                     @Override
                     public void run() {

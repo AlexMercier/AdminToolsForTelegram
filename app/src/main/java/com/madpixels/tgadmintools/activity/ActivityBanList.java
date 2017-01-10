@@ -15,7 +15,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.madpixels.apphelpers.MyLog;
 import com.madpixels.apphelpers.MyToast;
 import com.madpixels.apphelpers.UIUtils;
 import com.madpixels.apphelpers.Utils;
@@ -118,7 +117,7 @@ public class ActivityBanList extends ActivityExtended {
 
         ChatParticipantBan user = mAdapter.getItem(pos);
 
-        if(!user.user.username.isEmpty())
+        if (!user.user.username.isEmpty())
             menu.add(0, 3, 0, R.string.action_open_userninfo);
 
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -135,12 +134,12 @@ public class ActivityBanList extends ActivityExtended {
                 removeFromBlacklist(itemPosition);
                 break;
             case 2:
-                restoreUserToChat(itemPosition);
+                returnUserToChat(itemPosition);
                 break;
             case 3:
                 // TdApi.ChatMember member = mAdapter.getItem(itemPosition).chatParticipant;
-                TdApi.User user =  mAdapter.getItem(itemPosition).user;
-                String link = "https://telegram.me/"+user.username;
+                TdApi.User user = mAdapter.getItem(itemPosition).user;
+                String link = "https://telegram.me/" + user.username;
                 Utils.openUrl(link, mContext);
                 break;
         }
@@ -164,8 +163,6 @@ public class ActivityBanList extends ActivityExtended {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
 
 
     final AbsListView.OnScrollListener onScrollListener = new AbsListView.OnScrollListener() {
@@ -272,34 +269,33 @@ public class ActivityBanList extends ActivityExtended {
     }
 
     private void unban(final TdApi.User user, final int index, @Nullable final Client.ResultHandler callback) {
-        TgH.TG().send(
-                new TdApi.ChangeChatMemberStatus(chat_id, user.id, new TdApi.ChatMemberStatusLeft()), new Client.ResultHandler() {
-                    @Override
-                    public void onResult(TdApi.TLObject object) {
-                       // MyLog.log(object.toString());
-                        if (object.getConstructor() == TdApi.Ok.CONSTRUCTOR) {
-                            DBHelper.getInstance().removeBannedUser(chat_id, user.id);
-                            if (index > -1) {
-                                MyToast.toast(mContext, R.string.toast_user_unblacklisted);
-                                mAdapter.getList().remove(index);
-                                onListUpdate(null);
-                                setTotal(mTotalKicked-1);
-                            }
-                        }
-                        if (callback != null)
-                            callback.onResult(object);
+        TdApi.TLFunction f = new TdApi.ChangeChatMemberStatus(chat_id, user.id, new TdApi.ChatMemberStatusLeft());
+        TgH.sendOnUi(f, new Client.ResultHandler() {
+            @Override
+            public void onResult(TdApi.TLObject object) {
+                if (object.getConstructor() == TdApi.Ok.CONSTRUCTOR) {
+                    DBHelper.getInstance().removeBannedUser(chat_id, user.id);
+                    if (index > -1) {
+                        MyToast.toast(mContext, R.string.toast_user_unblacklisted);
+                        mAdapter.getList().remove(index);
+                        mAdapter.notifyDataSetChanged();
+                        setTotal(mTotalKicked - 1);
                     }
-                });
+                }
+                if (callback != null)
+                    callback.onResult(object);
+            }
+        });
     }
 
     private void removeFromLocalBlackList(TdApi.User user) {
         DBHelper.getInstance().removeBannedUser(chat_id, user.id);
         DBHelper.getInstance().removeUserFromAutoKick(chat_id, user.id);
 
-        setTotal(mTotalKicked-1);
+        setTotal(mTotalKicked - 1);
     }
 
-    void restoreUserToChat(final int position) {
+    void returnUserToChat(final int position) {
         TdApi.User user = mAdapter.getItem(position).user;
         if (TgUtils.isGroup(chatType)) {
             removeFromLocalBlackList(user);
@@ -307,16 +303,14 @@ public class ActivityBanList extends ActivityExtended {
             DBHelper.getInstance().removeBannedUser(chat_id, user.id);
 
         // Invite user back to chat:
-        TgH.TG().send(new TdApi.AddChatMember(chat_id, user.id, 1), new Client.ResultHandler() {
+        TgH.sendOnUi(new TdApi.AddChatMember(chat_id, user.id, 1), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                MyLog.log(object.toString());
-
                 MyToast.toast(mContext, R.string.toast_user_was_restored_to_chat);
                 mAdapter.getList().remove(position);
-                onListUpdate(null);
-                if(TgUtils.isSuperGroup(chatType))
-                    setTotal(mTotalKicked-1);
+                mAdapter.notifyDataSetChanged();
+                if (TgUtils.isSuperGroup(chatType))
+                    setTotal(mTotalKicked - 1);
             }
         });
     }
@@ -331,7 +325,6 @@ public class ActivityBanList extends ActivityExtended {
         String msg = getString(R.string.msg_confirm_unban_all);
         if (TgUtils.isSuperGroup(chatType))
             msg += "\n" + getString(R.string.msg_unban_all_supergroup);
-
 
 
         new AlertDialog.Builder(mContext)
@@ -363,11 +356,11 @@ public class ActivityBanList extends ActivityExtended {
                         mUnBanAllProcess.cancel();
                     }
                 }).build();
-                pd.show();
+        pd.show();
 
 
-        if(TgUtils.isGroup(chatType)){
-            new Thread(){
+        if (TgUtils.isGroup(chatType)) {
+            new Thread() {
                 @Override
                 public void run() {
                     DBHelper.getInstance().clearBanList(chat_id);
@@ -403,7 +396,7 @@ public class ActivityBanList extends ActivityExtended {
                 mUnBanAllProcess.start();
             }
         };
-        if(TgUtils.isSuperGroup(chatType)) {
+        if (TgUtils.isSuperGroup(chatType)) {
             getBannedProcess.onLoadComplete = onGetAllComplete;
             getBannedProcess.get();
         }
@@ -422,7 +415,6 @@ public class ActivityBanList extends ActivityExtended {
             TgH.TG().send(new TdApi.GetChannelMembers(channel_id, new TdApi.ChannelMembersKicked(), offset, 200), new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
-                    MyLog.log(object.toString());
                     if (object.getConstructor() == TdApi.ChatMembers.CONSTRUCTOR) {
                         TdApi.ChatMembers users = (TdApi.ChatMembers) object;
 
@@ -474,7 +466,7 @@ public class ActivityBanList extends ActivityExtended {
             unban(TgUtils.getUser(member), -1, new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
-                    if (TgUtils.isError(object)){
+                    if (TgUtils.isError(object)) {
                         MyToast.toast(mContext, object.toString());
                     }
                     next();

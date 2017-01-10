@@ -84,14 +84,16 @@ public class MyNotification {
     private static String bigText="";
     public void appendBigText(String text){
         bigText = text+"\n"+bigText;
-        NotificationCompat.BigTextStyle bs = (NotificationCompat.BigTextStyle) bigTextStyle;
-        bs.bigText(bigText);
+        if(Build.VERSION.SDK_INT>=16) {
+            NotificationCompat.BigTextStyle bs = (NotificationCompat.BigTextStyle) bigTextStyle;
+            bs.bigText(bigText);
+        }
     }
 
     public void alert() {
         NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(mContext);
         mNotificationBuilder.setWhen(System.currentTimeMillis());
-        Notification n = mNotificationBuilder.getNotification();
+        Notification n = mNotificationBuilder.build();
         mNotificationManager.notify(ID, n);
     }
 

@@ -62,6 +62,13 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp">
 
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/check_return_after_bantime_expired"
+                android:id="@+id/chkBanReturnToChat"
+                android:checked="false" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -85,7 +92,7 @@
                         android:id="@+id/textView4"
                         android:layout_marginRight="4dp" />
 
-                    <Button style="@style/MyButton"
+                    <TextView style="@style/ClickableTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="1 час"
@@ -105,14 +112,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <Button style="@style/MyButton"
+                    <TextView style="@style/ClickableTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="12:12"
                         android:id="@+id/btnBanSelectTime"
                         android:layout_marginRight="6dp" />
 
-                    <Button style="@style/MyButton"
+                    <TextView style="@style/ClickableTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="12/12/2015"
@@ -120,13 +127,6 @@
                 </LinearLayout>
 
             </LinearLayout>
-
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/check_return_after_bantime_expired"
-                android:id="@+id/chkBanReturnToChat"
-                android:checked="false" />
 
             <TextView
                 android:layout_width="wrap_content"

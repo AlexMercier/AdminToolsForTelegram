@@ -24,7 +24,9 @@ public class Const {
     public static final String START_SERVICE_AS_FOREGROUND = "start_service_as_foreground";
 
     public static final int ACTION_REQUEST_STORAGE_PERMISSION = 100;
+    public static final int ACTION_REFRESH_COMMANDS = 102;
+    public static final int ACTION_PICK_BACKUP_TO_RESTORE = 104;
 
     public static final Boolean ANTISPAM_IGNORE_SHARED_CONTACTS_DEFAULT = false;
-    public static final int ACTION_REFRESH_COMMANDS = 102;
+    public static final String BAN_DEFAULT_IS_RETURN_TO_CHAT = "ban.default.return_to_chat";
 }

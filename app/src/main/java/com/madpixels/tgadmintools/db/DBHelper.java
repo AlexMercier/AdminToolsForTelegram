@@ -16,17 +16,19 @@ import com.madpixels.tgadmintools.Const;
 import com.madpixels.tgadmintools.adapters.AdapterChatUsersLocal;
 import com.madpixels.tgadmintools.entities.BanTask;
 import com.madpixels.tgadmintools.entities.BannedWord;
+import com.madpixels.tgadmintools.entities.BotToken;
 import com.madpixels.tgadmintools.entities.ChatCommand;
 import com.madpixels.tgadmintools.entities.ChatLogInfo;
 import com.madpixels.tgadmintools.entities.ChatParticipantBan;
 import com.madpixels.tgadmintools.entities.ChatTask;
+import com.madpixels.tgadmintools.entities.LogEntity;
+import com.madpixels.tgadmintools.helper.TelegramBot;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
 import com.madpixels.tgadmintools.services.ServiceAutoKicker;
 import com.madpixels.tgadmintools.utils.LogUtil;
 
 import org.drinkless.td.libcore.telegram.TdApi;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -485,12 +487,22 @@ public class DBHelper extends DB {
     }
 
     public ArrayList<ChatTask> getChatTasks(long chat_id, boolean onlyActiveTasks) {
-        String filterActiveTasks = " AND (is_ban=1 OR is_remove_msg=1 OR isEnabled=1) ";
+        String filterActiveTasks = " AND ( (type<>'MutedUsers' AND (is_ban=1 OR is_remove_msg=1 OR isEnabled=1)) " +
+                " OR (type='MutedUsers' AND isEnabled=1) )";
         String sql = "SELECT * FROM " + TABLE_CHAT_TASKS + " WHERE chat_id=? ";
         if (onlyActiveTasks)
             sql += filterActiveTasks;
         Cursor c = getTable(sql, String.valueOf(chat_id));
         return getChatTasks(c);
+    }
+
+    public ChatTask getChatTask(long chat_id, ChatTask.TYPE type) {
+        String sql = "SELECT * FROM " + TABLE_CHAT_TASKS + " WHERE chat_id=? AND type=?";
+        Cursor c = getTable(sql, String.valueOf(chat_id), type.name());
+        ArrayList<ChatTask> tasks = getChatTasks(c);
+        if(tasks!=null && tasks.size()>0)
+            return tasks.get(0);
+        return null;
     }
 
     private ArrayList<ChatTask> getChatTasks(Cursor c) {
@@ -516,6 +528,7 @@ public class DBHelper extends DB {
             task.isBanUser = c.getInt(c.getColumnIndex("is_ban")) == 1;
             task.isRemoveMessage = c.getInt(c.getColumnIndex("is_remove_msg")) == 1;
             task.isEnabled = c.getInt(c.getColumnIndex("isEnabled")) == 1;
+            task.isPublicToChat = c.getInt(c.getColumnIndex("is_public_alert")) == 1;
 
             tasks.add(task);
         } while (c.moveToNext());
@@ -539,6 +552,8 @@ public class DBHelper extends DB {
         cv.put("is_ban", task.isBanUser);
         cv.put("is_remove_msg", task.isRemoveMessage);
         cv.put("isEnabled", task.isEnabled);
+        cv.put("is_public_alert", task.isPublicToChat);
+
 
         try {
             long id = db.insertWithOnConflict(TABLE_CHAT_TASKS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
@@ -711,17 +726,17 @@ public class DBHelper extends DB {
         }
     }
 
-    public ArrayList<LogUtil.LogEntity> getLog(int offset, int count) {
+    public ArrayList<LogEntity> getLog(int offset, int count) {
         String sql = "SELECT * FROM " + TABLE_LOG_ACTIONS + " ORDER BY _id DESC LIMIT " + offset + ", " + count;
         Cursor c = getTable(sql);
 
         if (c != null) {
-            ArrayList<LogUtil.LogEntity> logs = new ArrayList<>(c.getCount());
+            ArrayList<LogEntity> logs = new ArrayList<>(c.getCount());
             do {
                 String action = c.getString(c.getColumnIndex("action"));
                 String jsonStr = c.getString(c.getColumnIndex("jsonData"));
 
-                LogUtil.LogEntity log = new LogUtil.LogEntity();
+                LogEntity log = new LogEntity();
                 log.action = LogUtil.Action.valueOf(action);
                 log.jsonData = jsonStr;
                 log.item_id = c.getInt(c.getColumnIndex("_id"));
@@ -735,17 +750,17 @@ public class DBHelper extends DB {
         return null;
     }
 
-    public ArrayList<LogUtil.LogEntity> getLogUpdate(int id) {
+    public ArrayList<LogEntity> getLogUpdate(int id) {
         String sql = "SELECT * FROM " + TABLE_LOG_ACTIONS + " WHERE _id > " + id + " ORDER BY _id DESC";
         Cursor c = getTable(sql);
 
         if (c != null) {
-            ArrayList<LogUtil.LogEntity> logs = new ArrayList<>(c.getCount());
+            ArrayList<LogEntity> logs = new ArrayList<>(c.getCount());
             do {
                 String action = c.getString(c.getColumnIndex("action"));
                 String jsonStr = c.getString(c.getColumnIndex("jsonData"));
 
-                LogUtil.LogEntity log = new LogUtil.LogEntity();
+                LogEntity log = new LogEntity();
                 log.action = LogUtil.Action.valueOf(action);
                 log.jsonData = jsonStr;
                 log.item_id = c.getInt(c.getColumnIndex("_id"));
@@ -1044,7 +1059,7 @@ public class DBHelper extends DB {
                 } while (c.moveToNext());
             }
             c.close();
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -1191,7 +1206,7 @@ public class DBHelper extends DB {
     }
 
 
-    public ChatLogInfo getChatLog(long chatID, boolean isReturnIfEnabbled) {
+    public ChatLogInfo getLogEventsToChat(long chatID, boolean isReturnIfEnabbled) {
         String WHERE = isReturnIfEnabbled ? " AND (isEnabled=1 and chat_id_log!=0)" : "";
         String sql = "SELECT * FROM " + TABLE_CHAT_LOG + " WHERE chat_id=? " + WHERE + " LIMIT 1";
         Cursor c = getTable(sql, chatID + "");
@@ -1277,6 +1292,88 @@ public class DBHelper extends DB {
             db.delete(TABLE_MUTED_USERS, "chat_id=? AND user_id=?", new String[]{chatId + "", userId + ""});
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public int addBotToke(TelegramBot bot) {
+        ContentValues cv = new ContentValues(4);
+        cv.put("username", bot.username);
+        cv.put("token", bot.mToken);
+        cv.put("bot_id", bot.id);
+        cv.put("first_name", bot.first_name);
+
+        try {
+            if(isRowExists(TABLE_BOTS_TOKEN, "username", bot.username)){
+                db.update(TABLE_BOTS_TOKEN, cv, "username=?", new String[]{bot.username});
+                Cursor c = getTable("SELECT _id FROM "+TABLE_BOTS_TOKEN+" WHERE username=?", bot.username);
+                if(c!=null){
+                    int id = c.getInt(0);
+                    c.close();
+                    return id;
+                }
+            }else{
+                long local_id =  db.insert(TABLE_BOTS_TOKEN, null, cv);
+                return (int) local_id;
+            }
+        } catch (Exception e) {
+            MyLog.log(e);
+        }
+        return 0;
+    }
+
+    public BotToken getBotToken(String token){
+        String sql = "SELECT * FROM "+TABLE_BOTS_TOKEN+" WHERE token=?";
+       return getBotToken(sql, token);
+    }
+
+    public BotToken getBotToken(int bot_db_id) {
+        String sql = "SELECT * FROM "+TABLE_BOTS_TOKEN+" WHERE _id=?";
+        return getBotToken(sql, bot_db_id+"");
+    }
+
+
+    public BotToken getBotToken(String query, String whereArgs) {
+        Cursor c = getTable(query, whereArgs);
+        if(c!=null){
+            BotToken botToken = new BotToken();
+            botToken.local_id = c.getInt(c.getColumnIndex("_id"));
+            botToken.mToken = c.getString(c.getColumnIndex("token"));
+            botToken.mUsername = c.getString(c.getColumnIndex("username"));
+            botToken.mFirstName = c.getString(c.getColumnIndex("first_name"));
+            botToken.bot_id = c.getInt(c.getColumnIndex("bot_id"));
+            c.close();
+
+            return botToken;
+        }
+        return null;
+    }
+
+    public ArrayList<BotToken> getBotsList(){
+        String sql = "SELECT * FROM "+TABLE_BOTS_TOKEN+" ORDER BY _id DESC";
+        Cursor c = getTable(sql);
+        if(c!=null){
+            ArrayList<BotToken> list = new ArrayList<>(c.getCount());
+            do {
+                BotToken botToken = new BotToken();
+                botToken.local_id = c.getInt(c.getColumnIndex("_id"));
+                botToken.mToken = c.getString(c.getColumnIndex("token"));
+                botToken.mUsername = c.getString(c.getColumnIndex("username"));
+                botToken.mFirstName = c.getString(c.getColumnIndex("first_name"));
+                botToken.bot_id = c.getInt(c.getColumnIndex("bot_id"));
+                list.add(botToken);
+            }while (c.moveToNext());
+            c.close();
+
+            return list;
+        }
+        return null;
+    }
+
+    public void removeBotToken(String mToken) {
+        try {
+            db.delete(TABLE_BOTS_TOKEN, "token=?", new String[]{mToken});
+        } catch (Exception e) {
+
         }
     }
 }

@@ -17,8 +17,8 @@ import java.util.ArrayList;
  * Created by Snake on 12.01.2016.
  */
 public class DB extends SQLiteOpenHelper {
-    final static int DATABASE_VERSION = 4;
-    SQLiteDatabase db;
+    final static int DATABASE_VERSION = 5;
+    public SQLiteDatabase db;
 
     public final static String BAN_INFO_TABLE = "bans_info", TABLE_AUTO_KICK = "auto_kick_users",
     /* TABLE_ANTISPAM = "antispam_rules",*/ TABLE_WHITE_LINKS = "whitelist_links",
@@ -26,7 +26,7 @@ public class DB extends SQLiteOpenHelper {
             /* TABLE_CHAT_WELCOME = "chat_welcome_text",*/ TABLE_BLACKLIST_WORDS = "blacklist_words",
             TABLE_CHAT_TASKS = "chat_tasks", TABLE_CHATS_LIST = "chats_list",
             TABLE_CHAT_COMMAND = "chat_commands", TABLE_CHAT_LOG="chat_log",
-            TABLE_MUTED_USERS="muted_users";
+            TABLE_MUTED_USERS="muted_users", TABLE_BOTS_TOKEN="table_bots";
 
     private final static String
             CREATE_TABLE_TEMPORARY_BANS = "CREATE TABLE " + BAN_INFO_TABLE + " (" +
@@ -44,7 +44,7 @@ public class DB extends SQLiteOpenHelper {
             "unban_errors INTEGER DEFAULT 0, " +
             "UNIQUE(chat_id, user_id)" +
             ");",
-            CREATE_TABLE_CHATS_LIST = "CREATE TABLE " + TABLE_CHATS_LIST + " (" +
+    CREATE_TABLE_CHATS_LIST = "CREATE TABLE " + TABLE_CHATS_LIST + " (" +
                     "chat_id INTEGER, " +
                     "json_chat_info TEXT, " +
                     "chat_order INTEGER" +
@@ -56,56 +56,7 @@ public class DB extends SQLiteOpenHelper {
             "user_id INTEGER, " +
             "UNIQUE(chat_id, user_id)" +
             ");",
-    /*
-            CREATE_TABLE_ANTISPAM = "CREATE TABLE " + TABLE_ANTISPAM + " (" +
-                    "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "chat_id INTEGER UNIQUE, " +
-                    "is_remove_links INTEGER, " +
-                    "is_ban_links INTEGER, " +
-                    "ban_links_allow_count INTEGER, " +
-                    "ban_link_warn_text TEXT, " +
-                    // "ban_link_watch_period_msec INTEGER," +
-                    "ban_link_age_msec INTEGER, " +
-                    // "is_link_unban_on_timeoff INTEGER," +
-                    "is_link_return_on_unban INTEGER, " +
 
-                    "is_remove_sticks INTEGER, " + //(запятая)
-                    "is_ban_sticks INTEGER, " +
-                    "ban_sticks_allow_count INTEGER," +
-
-                    "ban_stick_warn_text TEXT, " +
-                    // "ban_stick_watch_period_msec INTEGER," +
-                    "ban_stick_age_msec INTEGER, " +
-                    //"is_stick_unban_on_timeoff INTEGER," +
-                    "is_stick_return_on_unban INTEGER, " +
-                    "is_warn_before_stickers_ban INTEGER, " +
-                    "is_warn_before_links_ban INTEGER, " +
-
-                    "option_links_banage_value INTEGER," +
-                    "option_links_banage_multiplier INTEGER," +
-                    "option_sticks_banage_value INTEGER," +
-                    "option_sticks_banage_multiplier INTEGER, " +
-
-                    "isBanForBlackWords INTEGER," +
-                    "isDelMsgBlackWords INTEGER," +
-                    "option_blackword_banage_val INTEGER," +
-                    "option_blackword_banage_mp INTEGER," +
-                    "isBlackWordReturnOnBanExp INTEGER," +
-                    "ban_blackword_age_msec INTEGER," +
-                    "isAlertOnBanWord INTEGER, " +
-                    "isWarnBeforeBanForWord INTEGER, " +
-                    "ban_words_warn_text TEXT, " +
-                    "banWordsFloodLimit INTEGER, " +
-
-                    "is_remove_join_msg INTEGER," +
-                    "is_remove_leaved_msg INTEGER" +
-
-                    //  "is_image_flood_enabled INTEGER, " +
-                    //  "image_flood_limit INTEGER," +
-                    //  "option_images_banage_value INTEGER," +
-                    //  "option_images_banage_multiplier INTEGER," +
-                    //  "is_images_return_on_unban INTEGER" +
-                    ");", */
     CREATE_TABLE_WHITE_LINKS = "CREATE TABLE " + TABLE_WHITE_LINKS + " (" +
             "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
             "link TEXT UNIQUE" +
@@ -125,12 +76,6 @@ public class DB extends SQLiteOpenHelper {
                     "ts INTEGER," +
                     "UNIQUE(chatId, userId, action)" +
                     ");",
-            /*CREATE_TABLE_CHAT_WELCOMES = "CREATE TABLE " + TABLE_CHAT_WELCOME + " (" +
-                    "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "chatId INTEGER UNIQUE, " +
-                    "text TEXT, " +
-                    "isEnabled INTEGER" +
-                    ");", */
             CREATE_TABLE_BLACKLIST_WORDS = "CREATE TABLE " + TABLE_BLACKLIST_WORDS + " (" +
                     "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "chatId INTEGER, " +
@@ -146,16 +91,15 @@ public class DB extends SQLiteOpenHelper {
                     "isEnabled INTEGER, " +// using only for blackwords enabled.
                     "allow_count INTEGER, " +
                     "ban_age_sec INTEGER, " + //seconds
-                    // "ban_age_multiplier INTEGER, " +
                     "is_return_on_ban_expired INTEGER, " +
-                    // "is_warn_before_ban INTEGER, " +
                     "warn_text_first TEXT, " +
                     "warn_text_last TEXT," +
                     "text TEXT," + //some payload
                     "warn_freq INTEGER, " +
                     "within_time_sec INTEGER, " +
                     "is_ban INTEGER, " +
-                    "is_remove_msg INTEGER," +
+                    "is_remove_msg INTEGER, " +
+                    "is_public_alert INTEGER, " +//notify all chat users about ban
                     "UNIQUE(chat_id, type) " +
                     ");",
         CREATE_TABLE_CHAT_COMMANDS = "CREATE TABLE "+TABLE_CHAT_COMMAND+" (" +
@@ -181,6 +125,13 @@ public class DB extends SQLiteOpenHelper {
                 "user_id INTEGER, " +
                 "user_name TEXT, " +
                 "UNIQUE(chat_id, user_id)" +
+                ");",
+        CREATE_TABLE_BOTS_TOKEN="CREATE TABLE "+TABLE_BOTS_TOKEN+" (" +
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "bot_id INTEGER," +
+                "token TEXT, " +
+                "username TEXT UNIQUE," +
+                "first_name TEXT" +
                 ");";
 
 
@@ -210,6 +161,7 @@ public class DB extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_CHAT_COMMANDS);
         db.execSQL(CREATE_TABLE_CHAT_LOG);
         db.execSQL(CREATE_TABLE_MUTED_USERS);
+        db.execSQL(CREATE_TABLE_BOTS_TOKEN);
     }
 
     @Override
@@ -234,6 +186,10 @@ public class DB extends SQLiteOpenHelper {
                 db.execSQL(CREATE_TABLE_CHAT_LOG);
                 db.execSQL(CREATE_TABLE_MUTED_USERS);
                 db.execSQL("ALTER TABLE "+TABLE_CHAT_TASKS+" ADD COLUMN text TEXT;");
+            }
+            if(oldVersion<5){
+                db.execSQL(CREATE_TABLE_BOTS_TOKEN);
+                db.execSQL("ALTER TABLE "+TABLE_CHAT_TASKS+" ADD COLUMN is_public_alert INTEGER;");
             }
         } catch (SQLException e) {
             MyLog.log(e);
