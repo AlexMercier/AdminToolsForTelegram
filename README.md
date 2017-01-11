@@ -5,3 +5,5 @@ Based on Telegram official sdk android library [TDLib](https://core.telegram.org
 
 Help translate app at Transifex: https://www.transifex.com/madpixels-sotware/admintools-for-telegram/
 
+Page on telegraph: http://telegra.ph/Todo-Sobre-AdminTools-for-Telegram-01-11
+
