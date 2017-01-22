@@ -11,10 +11,10 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.madpixels.apphelpers.MyLog;
-import com.madpixels.apphelpers.Utils;
 import com.madpixels.tgadmintools.activity.MainActivity;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
+import com.madpixels.tgadmintools.utils.CommonUtils;
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -76,7 +76,7 @@ public class ServiceBackgroundStarter extends Service {
         AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
 
 
-        MyLog.log("ServiceBackgroundStarter next start at: "+Utils.TimestampToDate(registerAt/1000));
+        MyLog.log("ServiceBackgroundStarter next start at: "+ CommonUtils.tsToDate(registerAt/1000));
 
         boolean isPowerSafeMode_API23 = false;
         if (Build.VERSION.SDK_INT < 19) {

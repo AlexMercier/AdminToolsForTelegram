@@ -2,13 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="8dp"
     android:layout_marginBottom="16dp"
     android:background="@color/md_white_1000"
     android:clipToPadding="false"
     android:orientation="vertical"
     android:paddingLeft="8dp"
-    android:paddingRight="8dp">
+    android:paddingRight="8dp"
+    android:paddingTop="8dp">
 
     <TextView
         android:id="@+id/tvTypeTitle"
@@ -34,7 +34,6 @@
         android:text="@string/chtTitleBanForLinks" />
 
 
-
     <LinearLayout
         android:id="@+id/layerBanParams"
         android:layout_width="match_parent"
@@ -43,9 +42,19 @@
         android:paddingBottom="6dp">
 
         <CheckBox
+            android:id="@+id/chkMuteInsteadOfBan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:checked="false"
+            android:text="@string/chtTitleMuteInsteadBan" />
+
+
+        <CheckBox
             android:id="@+id/chkPublicBan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
             android:checked="false"
             android:text="@string/chtTitlePublicBan" />
 

@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -18,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
@@ -79,6 +81,9 @@ public class ActivityChatUsers extends ActivityExtended {
     boolean isAdmin = false;// main admin
     private String additionalType = null;
     TextView tvMembersCout;
+    View mHeaderSearch;
+    TextView tvSearchQuery;
+    ImageView ivCancelSearch;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -116,6 +121,13 @@ public class ActivityChatUsers extends ActivityExtended {
         }
 
         mListViewUsers = getView(R.id.listViewUsers);
+        View viewHeaderSearch = UIUtils.inflate(mContext, R.layout.header_list_search);
+        mListViewUsers.addHeaderView(viewHeaderSearch, null, false);
+        mHeaderSearch = UIUtils.getView(viewHeaderSearch, R.id.layerSearchResult);
+        ivCancelSearch = UIUtils.getView(mHeaderSearch, R.id.ivCancelSearch);
+        tvSearchQuery = UIUtils.getView(mHeaderSearch, R.id.tvSearchQuery);
+        mHeaderSearch.setVisibility(View.GONE);
+
         mListViewUsers.setOnScrollListener(onScrollListener);
         mAdapter = new AdapterChatUsers(mContext);
         mListViewUsers.setAdapter(mAdapter);
@@ -128,9 +140,10 @@ public class ActivityChatUsers extends ActivityExtended {
         tvMembersCout.setText("");
         progressBarLoadMore.setVisibility(View.GONE);
 
+        ivCancelSearch.setOnClickListener(onClickListener);
+
         // для начала еще раз считаем инфу о чате
         getChat();
-        // loadUsers();
     }
 
     private void getChat() {
@@ -156,7 +169,6 @@ public class ActivityChatUsers extends ActivityExtended {
                         isAdmin = true;
                 }
 
-                // MyLog.log(object.toString());
                 new LoadUsers().execute();
             }
         });
@@ -165,6 +177,11 @@ public class ActivityChatUsers extends ActivityExtended {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 101, 0, R.string.action_remove_deleted_users);
+
+        MenuItem item = menu.add(0, 102, 0, R.string.title_search);
+        item.setIcon(android.R.drawable.ic_menu_search);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -173,6 +190,9 @@ public class ActivityChatUsers extends ActivityExtended {
         switch (item.getItemId()) {
             case 101:
                 dialogAcceptRemoveUsers();
+                break;
+            case 102:
+                dialogSearch();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -209,6 +229,8 @@ public class ActivityChatUsers extends ActivityExtended {
 
         super.onCreateContextMenu(menu, v, menuInfo);
     }
+
+    String searchQuery = null;
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
@@ -343,12 +365,32 @@ public class ActivityChatUsers extends ActivityExtended {
         }
     };
 
+    View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.ivCancelSearch:
+                    mHeaderSearch.setVisibility(View.GONE);
+                    searchQuery = null;
+                    offset = 0;
+                    isListEnd = false;
+                    isLoading = true;
+                    prgLoading.setVisibility(View.VISIBLE);
+                    mAdapter.getList().clear();
+                    mAdapter.notifyDataSetChanged();
+                    mTotalCount = 0;
+                    new LoadUsers().execute();
+                    break;
+            }
+        }
+    };
+
     private final Runnable updateCount = new Runnable() {
         @Override
         public void run() {
             String pos = String.valueOf(mCurrentPosition);
-            if(mTotalCount>0)
-                pos+="/"+mTotalCount;
+            if (mTotalCount > 0)
+                pos += "/" + mTotalCount;
 
             tvMembersCout.setText(pos);
             MyLog.log("TextView update count");
@@ -358,16 +400,16 @@ public class ActivityChatUsers extends ActivityExtended {
     AbsListView.OnScrollListener onScrollListener = new AbsListView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
-           mListViewUsers.post(updateCount);
+            mListViewUsers.post(updateCount);
         }
 
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             int headersCount = mListViewUsers.getHeaderViewsCount();
-            if(firstVisibleItem+visibleItemCount==totalItemCount)
-                mCurrentPosition = totalItemCount;
+            if (firstVisibleItem + visibleItemCount == totalItemCount)
+                mCurrentPosition = totalItemCount - headersCount;
             else
-                mCurrentPosition = firstVisibleItem;
+                mCurrentPosition = firstVisibleItem - headersCount;
             if (!isListEnd && !isLoading && totalItemCount > headersCount && firstVisibleItem + visibleItemCount == totalItemCount) {
                 if (TgUtils.isSuperGroup(chatType)) {
                     progressBarLoadMore.setVisibility(View.VISIBLE);
@@ -408,9 +450,24 @@ public class ActivityChatUsers extends ActivityExtended {
                     prgLoading.setVisibility(View.INVISIBLE);
                     progressBarLoadMore.setVisibility(View.GONE);
                     isLoading = false;
+                    //Repeat search until list not end or result not found
+                    if (!isListEnd && searchQuery != null && usersList.isEmpty()) {
+                        isLoading = true;
+                        new LoadUsers().execute();
+                    }
                 }
             };
             runOnUiThread(runnable);
+        }
+
+        private boolean isUserSearchQueryMatch(TdApi.ChatMember member) {
+            TdApi.User u = TgUtils.getUser(member.userId);
+            if (u.username.toLowerCase().contains(searchQuery) || u.firstName.toLowerCase().contains(searchQuery) ||
+                    u.lastName.toLowerCase().contains(searchQuery) ||
+                    String.valueOf(member.userId).contains(searchQuery)) {
+                return true;
+            }
+            return false;
         }
 
         private void getGroupUsers() {
@@ -423,11 +480,19 @@ public class ActivityChatUsers extends ActivityExtended {
                         mTotalCount = group.group.memberCount;
 
                         if (additionalType == null) {
-                            usersList = Arrays.asList(group.members);
+                            if (searchQuery == null) {
+                                usersList = Arrays.asList(group.members);
+                            } else {
+                                for (TdApi.ChatMember member : group.members) {
+                                    if (isUserSearchQueryMatch(member)) {
+                                        usersList.add(member);
+                                    }
+                                }
+                            }
                         } else {
                             usersList = new ArrayList<>();
                             for (TdApi.ChatMember cm : group.members) {
-                                if (TgUtils.isUserPrivileged(cm.status.getConstructor()))
+                                if (TgUtils.isUserPrivileged(cm.status.getConstructor()) && (searchQuery == null || isUserSearchQueryMatch(cm)))
                                     usersList.add(cm);
                             }
                         }
@@ -442,7 +507,7 @@ public class ActivityChatUsers extends ActivityExtended {
 
 
         private void getSupergroupUsers() {
-            final int getCount = mAdapter.isEmpty() ? 25 : 200;
+            final int getCount = offset == 0 ? 25 : 200;
             TdApi.ChannelMembersFilter f;
             if (additionalType == null)
                 f = new TdApi.ChannelMembersRecent();
@@ -456,10 +521,19 @@ public class ActivityChatUsers extends ActivityExtended {
                         TdApi.ChatMembers users = (TdApi.ChatMembers) object;
 
                         offset += users.members.length;
-                        if (users.members.length < getCount)
+                        if (users.members.length == 0)
                             isListEnd = true;
 
-                        usersList = Arrays.asList(users.members);
+                        if (searchQuery == null)
+                            usersList = Arrays.asList(users.members);
+                        else {
+                            usersList = new ArrayList<>(5);
+                            for (TdApi.ChatMember member : users.members) {
+                                if (isUserSearchQueryMatch(member)) {
+                                    usersList.add(member);
+                                }
+                            }
+                        }
                         onUpdate();
                     } else {
                         MyToast.toast(mContext, "Error loading chat members");
@@ -467,7 +541,7 @@ public class ActivityChatUsers extends ActivityExtended {
                 }
             });
 
-            if(mTotalCount==0){
+            if (mTotalCount == 0 || searchQuery!=null) {
                 TgH.send(new TdApi.GetChannelFull(channel_id), new Client.ResultHandler() {
                     @Override
                     public void onResult(TdApi.TLObject object) {
@@ -491,7 +565,7 @@ public class ActivityChatUsers extends ActivityExtended {
                     @Override
                     public void onResult(TdApi.TLObject object) {
                         MyToast.toastL(mContext, TgUtils.isOk(object) ? R.string.toast_user_was_removed : R.string.toast_error_remove_user);
-                        if(TgUtils.isOk(object)){
+                        if (TgUtils.isOk(object)) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -693,8 +767,8 @@ public class ActivityChatUsers extends ActivityExtended {
                             });
 
                             saveLocalBanList(chatMember, ban_age, isPublishBanReason, isReturnOnUnban, banText);
-                            if (isPublishBanReason && !banText.isEmpty())
-                                publishBanReason(chatMember, banText);
+                            if (isPublishBanReason)
+                                publishBanReason(chatMember, banText, ban_age);
 
                             TdApi.User chatUser = TgUtils.getUser(chatMember);
                             LogUtil.logBanUserManually(chat_id, chatType, chatTitle, chatUser, banText, ban_age);
@@ -712,27 +786,30 @@ public class ActivityChatUsers extends ActivityExtended {
     private void saveLocalBanList(TdApi.ChatMember chatMember, long ban_age, boolean isPublishBanReason, boolean isReturnOnUnban, final String banText) {
         int from_id = chatType == TdApi.ChannelChatInfo.CONSTRUCTOR ? channel_id : group_id; // группа или супергруппа id.
         TdApi.User user = TgUtils.getUser(chatMember);
-        DBHelper.getInstance().addToBanList(user, chat_id, chatType, from_id, ban_age, isReturnOnUnban, banText);
+        DBHelper.getInstance().addToBanList(user, chat_id, chatType, from_id, ban_age, isReturnOnUnban, banText, false);
         if (ban_age > 0) //TODO проверить почему если >0 мб всегда надо?
             ServiceUnbanTask.registerTask(mContext);
     }
 
-    private void publishBanReason(TdApi.ChatMember chatMember, String banText) {
+    private void publishBanReason(TdApi.ChatMember chatMember, String banText, long ban_age) {
         TdApi.User user = TgUtils.getUser(chatMember);
 
         ArrayList<TdApi.MessageEntity> entities;
         TdApi.InputMessageText inputMessage = new TdApi.InputMessageText();
 
         String strText = getString(R.string.text_publish_banreason);
+        if(ban_age>0)
+            strText+="\n"+getString(R.string.log_title_banuntil)+": "+
+                    CommonUtils.tsToDate( (System.currentTimeMillis()+ban_age)/1000 );
 
-        String botToken = CommonUtils.useBotForAlert(chat_id);
+        String botToken = CommonUtils.getBotForChatAlerts(chat_id);
         boolean useBot = botToken != null; //send alert via bot
         if (useBot) {
             String username = user.firstName + " " + user.lastName;
             if (!TextUtils.isEmpty(user.username))
                 username += " @" + user.username;
             strText = strText.replace("%username%", "<b>" + TextUtils.htmlEncode(username.trim()) + "</b>");
-            strText = strText.replace("%reason%", "\n <pre>" + TextUtils.htmlEncode(banText) + "</pre>");//code block
+            strText = strText.replace("%reason%", "<pre>" + TextUtils.htmlEncode(banText) + "</pre>");//code block
             TelegramBot bot = new TelegramBot(botToken);
             bot.sendMessageHtml(chat_id + "", strText);
         } else {
@@ -1001,6 +1078,44 @@ public class ActivityChatUsers extends ActivityExtended {
                     .setNegativeButton(R.string.btnSkip, null)
                     .show();
     }
+
+    void dialogSearch() {
+        View view = UIUtils.inflate(mContext, R.layout.dialog_input_text);
+        view.findViewById(R.id.tvDescription).setVisibility(View.GONE);
+        view.findViewById(R.id.edtInviteUsername).setVisibility(View.GONE);
+        TextView tvHint = UIUtils.getView(view, R.id.tvHint);
+        final EditText editInputText = UIUtils.getView(view, R.id.editInputText);
+        tvHint.setText(R.string.hint_search);
+        editInputText.setHint(R.string.title_search);
+
+        new AlertDialog.Builder(mContext)
+                .setTitle(R.string.title_search)
+                .setView(view)
+                .setNegativeButton(R.string.btnCancel, null)
+                .setPositiveButton(R.string.title_search, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        searchQuery = editInputText.getText().toString().toLowerCase().trim();
+                        if (searchQuery.isEmpty()) {
+                            searchQuery = null;
+                            MyToast.toast(mContext, R.string.toast_word_is_empty);
+                            dialogSearch();
+                            return;
+                        }
+                        tvSearchQuery.setText(searchQuery);
+                        mHeaderSearch.setVisibility(View.VISIBLE);
+                        isLoading = true;
+                        mAdapter.getList().clear();
+                        mAdapter.notifyDataSetChanged();
+                        offset = 0;
+                        isListEnd = false;
+                        prgLoading.setVisibility(View.VISIBLE);
+                        new LoadUsers().execute();
+                    }
+                })
+                .show();
+    }
+
 
     @Override
     public void close() {

@@ -94,7 +94,7 @@ public class ActivityGroupInfo extends ActivityExtended {
             tvBtnWarnBanFloodFreq, tvChatCommandsCount;
     EmojiconTextView tvTitle, tvChatDescription, tvChatAdmin;
     View viewContent, viewLoading, layerBanForBlackWord,
-            layerFloodControl, layerClickOpenCommand;
+            layerFloodControl, layerClickOpenCommand, layer_flood_control;
     Button btnConvertToSuper;
     CheckBox chkAnyoneInviteFriendsSuper, chkAnyoneManageGroup, chkEnableMuteUsers, chkPublicBanWords,
             chkWelcomeText, chkReturnOnBannedWordsExpired, chkBlackListedWordsEnabled, chkPublicBanForFlood,
@@ -235,7 +235,7 @@ public class ActivityGroupInfo extends ActivityExtended {
         edtBannedWordBanTimesVal = getView(R.id.edtBannedWordBanTimesVal);
         chkFloodControlEnabled = getView(R.id.chkFloodControlEnabled);
         tvFloodMsgAllowCount = getView(R.id.tvFloodMsgAllowCount);
-
+        layer_flood_control = getView(R.id.layer_flood_control);
 
         edtFloodControlTimeVal = getView(R.id.edtFloodControlTimeVal);
         spinnerFloodControlTime = getView(R.id.spinnerFloodControlTime);
@@ -293,6 +293,7 @@ public class ActivityGroupInfo extends ActivityExtended {
         chatTasks = new ChatTaskManager(chatId);
 
 
+        addTask(ChatTask.TYPE.FLOOD, false);
         addTask(ChatTask.TYPE.LINKS, false);
         addTask(ChatTask.TYPE.STICKERS, false);
         addTask(ChatTask.TYPE.VOICE, false);
@@ -382,8 +383,6 @@ public class ActivityGroupInfo extends ActivityExtended {
                 }
 
                 setWarnFrequencyText(tvBtnWarnBanFloodFreq, taskFlood.mWarnFrequency);
-
-
             } else {
                 setDefaultFloodValues();
             }
@@ -432,12 +431,12 @@ public class ActivityGroupInfo extends ActivityExtended {
             if (taskCommands != null) {
                 chkCommandsEnable.setChecked(taskCommands.isEnabled);
                 if (!taskCommands.isEnabled) {
-                    // layerClickOpenCommand.setEnabled(false);
+                    UIUtils.setTextColotRes(tvChatCommandsCount, R.color.md_grey_500);
                 }
 
                 updateCommandsCount();
             } else {
-                // layerClickOpenCommand.setEnabled(false);
+                UIUtils.setTextColotRes(tvChatCommandsCount, R.color.md_blue_grey_500);
             }
 
             ChatTask welcomeText = chatTasks.getTask(ChatTask.TYPE.WELCOME_USER, false);
@@ -450,6 +449,7 @@ public class ActivityGroupInfo extends ActivityExtended {
         } else {
             setDefaultBannedWordsValues();
             setDefaultFloodValues();
+            UIUtils.setTextColotRes(tvChatCommandsCount, R.color.md_blue_grey_500);
         }
 
         int blackWordsCount = DBHelper.getInstance().getWordsBlackListCount(chatId);
@@ -532,66 +532,6 @@ public class ActivityGroupInfo extends ActivityExtended {
         });
 
     }
-    /*
-    void setEditTextChangeListenerToSaveBanTimeValueOld(final ChatTask.TYPE pType) {
-        final Spinner spinnerTimeMultiplier;
-        final EditText edit;
-        final CheckBox chkReturnOnBanExired;
-
-        switch (pType) {
-            case BANWORDS:
-                edit = edtBannedWordBanTimesVal;
-                chkReturnOnBanExired = chkReturnOnBannedWordsExpired;
-                spinnerTimeMultiplier = spinnerBannedWordBanTimes;
-                break;
-
-            case FLOOD:
-                edit = edtFloodBanTimeVal;
-                chkReturnOnBanExired = chkReturnOnBanFloodExpired;
-                spinnerTimeMultiplier = spinnerBanFloodTime;
-                break;
-            default:
-                edit = null;
-                spinnerTimeMultiplier = null;
-                chkReturnOnBanExired = null;
-                break;
-        }
-
-        edit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (edit.getTag() != null && edit.getTag().toString().equals("1"))// ignore when set default value
-                    edit.setTag(null);
-                else
-                    edit.setTag(System.currentTimeMillis());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                edit.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (edit.getTag() == null)
-                            return;
-
-                        long ts = Long.valueOf(edit.getTag().toString());
-                        if (System.currentTimeMillis() - ts < 900)
-                            return;
-
-                        long val = setBanAgeForTask(pType, spinnerTimeMultiplier.getSelectedItemPosition(), edit.getText().toString());
-                        if (val > -1)
-                            chkReturnOnBanExired.setEnabled(val > 0);
-                    }
-                }, 1000);
-            }
-        });
-
-    }
-    */
 
     private void setWarnFrequencyText(TextView textView, int warnFrequency) {
         int resIDWarnText = 0;
@@ -940,6 +880,22 @@ public class ActivityGroupInfo extends ActivityExtended {
                     SeekBar seekBarAllowCount = (SeekBar) v.getTag(R.id.tag_id_view);
                     setTaskWarnCountDialog(pType, seekBarAllowCount, (TextView) v);
                     break;
+                case R.id.chkMuteInsteadOfBan:
+                    pType = (ChatTask.TYPE) v.getTag(R.id.tag_id_type);
+                    cbox = (CheckBox) v;
+                    if (TgUtils.isGroup(chatType)) {
+                        MyToast.toast(mContext, R.string.toast_deletion_not_avail);
+                        cbox.setChecked(false);
+                        return;
+                    }
+                    task = chatTasks.getTask(pType);
+                    task.isMuteInsteadBan = cbox.isChecked();
+                    chatTasks.saveTask(task);
+
+                    View view = (View) task.payload;
+                    CheckBox chkReturnOnBanExpired = UIUtils.getView(view, R.id.chkReturnOnBanExpired);
+                    chkReturnOnBanExpired.setEnabled(!task.isMuteInsteadBan);
+                    break;
                 /** ================================== **/
 
 
@@ -1265,14 +1221,6 @@ public class ActivityGroupInfo extends ActivityExtended {
                 break;
         }
     }
-    /*
-    void setBanEnabledForTask(ChatTask.TYPE pType, boolean isBan) { //TODO выпилить так как будет единый метод в онклике
-        ChatTask task = chatTasks.getTask(pType);
-        task.isBanUser = isBan;
-        chatTasks.saveTask(task);
-    }
-    */
-
 
     private void showPopupForFrequencyTask(final ChatTask.TYPE pType, final TextView tvPressedTextView) {
         View popupView = UIUtils.inflate(mContext, R.layout.popup_warnuser_frequency);
@@ -1420,26 +1368,28 @@ public class ActivityGroupInfo extends ActivityExtended {
 
                         break;
                     case R.id.tvHelpWarnFormat:
-                        View view = UIUtils.inflate(mContext, R.layout.layout_dialog_help_warning_formattin);
-                        TextView tvHelpText = UIUtils.getView(view, R.id.tvHelpText);
-
-                        String text = getString(R.string.text_help_formatting);
-
-                        tvHelpText.setText(Html.fromHtml(text.replaceAll("(\r\n|\n)", "<br />")));
-
-                        new AlertDialog.Builder(mContext)
-                                .setTitle("Formattin help")
-                                .setView(view)
-                                //"\nFormatting:\n" +
-                                //"You can user tilda ` symbol for highlite text")
-                                .setPositiveButton("Ok", null)
-                                .show();
+                        dialogHelpFormatting();
                         break;
 
                 }
             }
         };
         UIUtils.setBatchClickListener(onclick, btnSave, btnClose, tvHelpWarnFormat);
+    }
+
+    private void dialogHelpFormatting() {
+        View view = UIUtils.inflate(mContext, R.layout.layout_dialog_help_warning_formattin);
+        TextView tvHelpText = UIUtils.getView(view, R.id.tvHelpText);
+
+        String text = getString(R.string.text_help_formatting);
+
+        tvHelpText.setText(Html.fromHtml(text.replaceAll("(\r\n|\n)", "<br />")));
+
+        new AlertDialog.Builder(mContext)
+                .setTitle(R.string.dialog_title_help_formatting)
+                .setView(view)
+                .setPositiveButton(R.string.btnOk, null)
+                .show();
     }
 
     void setEditWarnTextWatcher(final EditText editText, final ChatTask.TYPE pType, final boolean isFirstWarn) {
@@ -1682,6 +1632,7 @@ public class ActivityGroupInfo extends ActivityExtended {
             layout.addView(lv);
 
             final ArrayList<TypeItem> list = new ArrayList<>();
+            list.add(new TypeItem(ChatTask.TYPE.FLOOD));
             list.add(new TypeItem(ChatTask.TYPE.LINKS));
             list.add(new TypeItem(ChatTask.TYPE.STICKERS));
             list.add(new TypeItem(ChatTask.TYPE.VOICE));
@@ -1714,7 +1665,6 @@ public class ActivityGroupInfo extends ActivityExtended {
                     } else {
                         item.isEnabled = false;
                         addTask(item.mType, true);
-                        // adapter.notifyDataSetChanged();
                         dialog.dismiss();
                     }
 
@@ -1734,13 +1684,17 @@ public class ActivityGroupInfo extends ActivityExtended {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     ChatTask task = chatTasks.getTask(item.mType, false);
-                                    ViewGroup view = (ViewGroup) task.payload;
-                                    ViewGroup vg = (ViewGroup) view.getParent();
-                                    vg.removeView(view);
-
+                                    if (item.mType == ChatTask.TYPE.FLOOD) {
+                                        layer_flood_control.setVisibility(View.GONE);
+                                    } else {
+                                        ViewGroup view = (ViewGroup) task.payload;
+                                        ViewGroup vg = (ViewGroup) view.getParent();
+                                        vg.removeView(view);
+                                    }
                                     chatTasks.remove(task);
                                     item.isEnabled = true;
                                     DBHelper.getInstance().removeChatTask(task.id);
+                                    DBHelper.getInstance().clearWarnsCountForChatTask(chatId, item.mType);
                                     adapter.notifyDataSetChanged();
                                 }
                             })
@@ -1758,8 +1712,24 @@ public class ActivityGroupInfo extends ActivityExtended {
     void addTask(ChatTask.TYPE pType, boolean canCreateNewTask) {
 
         ChatTask task = chatTasks.getTask(pType, false);
-        if (task == null && !canCreateNewTask)
+        if (task == null && !canCreateNewTask) {
+            if (pType == ChatTask.TYPE.FLOOD)
+                layer_flood_control.setVisibility(View.GONE);
             return;
+        }
+
+        if (pType == ChatTask.TYPE.FLOOD) {
+            layer_flood_control.setVisibility(View.VISIBLE);
+            if(canCreateNewTask) {
+                chatTasks.getTask(pType, true);
+                ScrollView scrollViewMainContent = getView(R.id.scrollViewMainContent);
+                LinearLayout layerTasksParent = getView(R.id.layerTasksParent);
+                scrollViewMainContent.smoothScrollTo(0, layer_flood_control.getBottom() + layerTasksParent.getTop());
+
+                animateAddTask(layer_flood_control.findViewById(R.id.layer_flood_control_view));
+            }
+            return;
+        }
 
         String title = null, titleRemoveMessages = null, titleBanCheck = null;
 
@@ -1829,9 +1799,12 @@ public class ActivityGroupInfo extends ActivityExtended {
         SeekBar seekBarAllowCount = UIUtils.getView(view, R.id.seekBarAllowCount);
         TextView tvBanAllowCount = UIUtils.getView(view, R.id.tvBanAllowCount);
         CheckBox chkPublicBan = UIUtils.getView(view, R.id.chkPublicBan);
+        CheckBox chkMuteInsteadOfBan = UIUtils.getView(view, R.id.chkMuteInsteadOfBan);
 
-        if (TgUtils.isGroup(chatType))
-            chkRemoveMessage.setTextColor(getResources().getColor(R.color.md_grey_500));
+        if (TgUtils.isGroup(chatType)) {
+            UIUtils.setTextColotRes(chkRemoveMessage, R.color.md_grey_500);
+            UIUtils.setTextColotRes(chkMuteInsteadOfBan, R.color.md_grey_500);
+        }
 
         tvTypeTitle.setText(title);
         chkRemoveMessage.setText(titleRemoveMessages);
@@ -1843,15 +1816,17 @@ public class ActivityGroupInfo extends ActivityExtended {
         chkBanForMessage.setTag(R.id.tag_id_view, layerBanParams);
         tvBtnWarnFreq.setTag(R.id.tag_id_type, pType);
         chkPublicBan.setTag(R.id.tag_id_type, pType);
+        chkMuteInsteadOfBan.setTag(R.id.tag_id_type, pType);
 
         seekBarAllowCount.setTag(R.id.tag_id_type, pType);
         seekBarAllowCount.setTag(R.id.tag_id_view, tvBanAllowCount);
         seekBarAllowCount.setOnSeekBarChangeListener(onSeekBarBanCountListener);
         tvBanAllowCount.setTag(R.id.tag_id_type, pType);
         tvBanAllowCount.setTag(R.id.tag_id_view, seekBarAllowCount);
+        // chkMuteInsteadOfBan.setTag(R.id.tag_id_view, seekBarAllowCount);
 
         UIUtils.setBatchClickListener(onClickListener, chkBanForMessage, chkRemoveMessage, tvBtnWarnFreq,
-                chkReturnOnBanExpired, tvBanAllowCount, chkPublicBan);
+                chkReturnOnBanExpired, tvBanAllowCount, chkPublicBan, chkMuteInsteadOfBan);
 
         setSpinnerBanTimesListener(pType, spinnerBanTime, edtBanTimeVal, chkReturnOnBanExpired);
         setSpinnerFloodSelectorListener(pType, spinnerBanFloodTime, edtBanFloodTimeVal);
@@ -1860,6 +1835,7 @@ public class ActivityGroupInfo extends ActivityExtended {
         if (task != null) {
             chkRemoveMessage.setChecked(task.isRemoveMessage);
             chkBanForMessage.setChecked(task.isBanUser);
+            chkMuteInsteadOfBan.setChecked(task.isMuteInsteadBan);
             if (!task.isBanUser)
                 layerBanParams.setVisibility(View.GONE);
             chkReturnOnBanExpired.setChecked(task.isReturnOnBanExpired);
@@ -1867,6 +1843,10 @@ public class ActivityGroupInfo extends ActivityExtended {
             setWarnFrequencyText(tvBtnWarnFreq, task.mWarnFrequency);
             seekBarAllowCount.setProgress(task.mAllowCountPerUser);
             chkPublicBan.setChecked(task.isPublicToChat);
+
+            if (task.isMuteInsteadBan) {
+                chkReturnOnBanExpired.setEnabled(false);
+            }
 
             if (task.mBanTimeSec > 0)
                 setSecondsFormatToSpinner(task.mBanTimeSec, edtBanTimeVal, spinnerBanTime);
@@ -1915,21 +1895,25 @@ public class ActivityGroupInfo extends ActivityExtended {
             ScrollView scrollViewMainContent = getView(R.id.scrollViewMainContent);
             LinearLayout layerTasksParent = getView(R.id.layerTasksParent);
             scrollViewMainContent.smoothScrollTo(0, layout.getBottom() + layerTasksParent.getTop());
+            animateAddTask(view);
 
-            int fromColor = getResources().getColor(R.color.md_green_200);
-            ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), fromColor, Color.WHITE);
-            colorAnimation.setDuration(1000); // milliseconds
-            colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-
-                @Override
-                public void onAnimationUpdate(ValueAnimator animator) {
-                    view.setBackgroundColor((int) animator.getAnimatedValue());
-                }
-
-            });
-            colorAnimation.start();
         }
         task.payload = view;
+    }
+
+    private void animateAddTask(final View view){
+        int fromColor = getResources().getColor(R.color.md_green_200);
+        ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), fromColor, Color.WHITE);
+        colorAnimation.setDuration(1000); // milliseconds
+        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                view.setBackgroundColor((int) animator.getAnimatedValue());
+            }
+
+        });
+        colorAnimation.start();
     }
 
     @Override
@@ -2120,7 +2104,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                         if (TgUtils.isUserPrivileged(member.status.getConstructor()))
                             adminsCount++;
                         TdApi.User user = TgUtils.getUser(adminId);
-                        adminName = user.firstName + " " + user.lastName;
+                        adminName = user.username.isEmpty()? user.firstName+" "+user.lastName:user.username;
                     }
                 }
 
@@ -2228,7 +2212,8 @@ public class ActivityGroupInfo extends ActivityExtended {
                         superAanyoneCanInvite = channelFull.channel.anyoneCanInvite;
                         if (isAdmin) {
                             adminId = TgH.selfProfileId;
-                            adminName = "@" + TgH.selfProfileUsername;
+                            TdApi.User me = TgUtils.getUser(TgH.selfProfileId);
+                            adminName = me.username.isEmpty()? me.firstName+" "+me.lastName : "@" + me.username;
                             onSuperGroupInfoLoaded();
                         } else
                             getSuperAdmins();
@@ -2273,7 +2258,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                                 @Override
                                 public void onResult(TdApi.TLObject object) {
                                     TdApi.User admin = TgUtils.getUser(chatMember);
-                                    adminName = admin.firstName + " " + admin.lastName;
+                                    adminName =  admin.username.isEmpty()? admin.firstName+" "+admin.lastName : "@" + admin.username;
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -2593,17 +2578,29 @@ public class ActivityGroupInfo extends ActivityExtended {
     void dialogEditWelcomeText() {
         View dv = UIUtils.inflate(mContext, R.layout.dialog_input_text);
         dv.findViewById(R.id.edtInviteUsername).setVisibility(View.GONE);
-        dv.findViewById(R.id.tvDescription).setVisibility(View.GONE);
+        //dv.findViewById(R.id.tvDescription).setVisibility(View.GONE);
         TextView tvHint = UIUtils.getView(dv, R.id.tvHint);
+        TextView tvDescription = UIUtils.getView(dv, R.id.tvDescription);
         final EmojiconEditText edtText = UIUtils.getView(dv, R.id.editInputText);
+
         tvHint.setText(R.string.hint_enter_welcome_text);
         edtText.setMaxLines(6);
+        tvDescription.setText(R.string.title_warn_help);
+        UIUtils.setTextColotRes(tvDescription, R.color.md_teal_500);
+
         ChatTask welcomeTask = chatTasks.getTask(ChatTask.TYPE.WELCOME_USER, false);
         if (welcomeTask != null && !TextUtils.isEmpty(welcomeTask.mText))
             edtText.setText(welcomeTask.mText);
 
+        tvDescription.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogHelpFormatting();
+            }
+        });
+
         new AlertDialog.Builder(mContext)
-                .setTitle("Welcome message")
+                .setTitle(R.string.title_dialog_welcome_message)
                 .setView(dv)
                 .setCancelable(false)
                 .setPositiveButton(R.string.btnSave, new DialogInterface.OnClickListener() {
@@ -2642,7 +2639,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                 DBHelper.getInstance().setChatLogTargetChat(chatId, chat.id);
 
                 //Invite bot for selected group in specified:
-                String token = CommonUtils.useBotForAlert(chatId);
+                String token = CommonUtils.getBotForChatAlerts(chatId);
                 if (token == null) return;//bot is not specified  for chat
                 BotToken botToken = DBHelper.getInstance().getBotToken(token);
                 if (botToken != null) {

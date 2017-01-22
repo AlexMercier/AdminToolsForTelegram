@@ -11,9 +11,9 @@
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="28px"
-            android:layout_height="28px"
-            android:layout_gravity="center_vertical">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_width="28px">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -21,6 +21,10 @@
                 android:id="@+id/ivIsAdmin"
                 android:src="@drawable/user_admin"
                 android:paddingRight="4dp" />
+
+
+
+
         </LinearLayout>
 
         <ImageView

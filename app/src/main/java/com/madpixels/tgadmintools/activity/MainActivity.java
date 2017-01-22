@@ -71,11 +71,6 @@ public class MainActivity extends ActivityExtended {
             onAppUpgrade();
         }
 
-
-//        if (BuildConfig.DEBUG) {
-//            dialogRecentChanges();
-//        }
-
         tvAdditionalStatus = (TextView) findViewById(R.id.tvAdditionalStatus);
 
         Button btnClearCache = getView(R.id.btnClearCache);
@@ -120,13 +115,13 @@ public class MainActivity extends ActivityExtended {
             public void onClick(View v) {
                 if (v.getTag() == null) {
                     stopApplication(mContext);
-                    btnStop.setText("Start");
+                    btnStop.setText(R.string.btn_main_run_app);
                     btnStop.setTag("1");
                     textViewAppState.setText(R.string.text_appstate_stopped);
                     btnGroups.setEnabled(false);
                 } else {
                     startApplication(mContext);
-                    btnStop.setText("Stop");
+                    btnStop.setText(R.string.btn_main_stop_app);
                     textViewAppState.setText(R.string.text_appstate_enabled);
                     btnStop.setTag(null);
                     btnGroups.setEnabled(true);

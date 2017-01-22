@@ -121,19 +121,16 @@ public class Utils {
     /**
      * vk time to date
      */
-    public static String TimestampToDate(String ts){
-      return TimestampToDate(Long.valueOf(ts));
+    public static String TimestampToDate(String ts, String format){
+      return TimestampToDateFormat(Long.valueOf(ts), format);
     }
 
-    /**
-     * @param ts В секундах, не милисекунды(!)
-     */
-    public static String TimestampToDate(long ts){
-        //Calendar c = Calendar.getInstance();
-        //c.setTimeInMillis(ts*1000);
-        //SimpleDateFormat format = new SimpleDateFormat("d MMMM, yyyy, HH:mm:ss");
-        return TimestampToDateFormat(ts, "d MMMM, yyyy, HH:mm:ss");
-    }
+//    /**
+//     * @param ts В секундах, не милисекунды(!)
+//     */
+//    public static String TimestampToDate(long ts, String format){
+//        return TimestampToDateFormat(ts, format);
+//    }
 
     public static boolean isDateToday(long seconds) {
         Calendar calendar = Calendar.getInstance();
@@ -152,6 +149,9 @@ public class Utils {
 
     }
 
+    /**
+     * @param ts time in seconds (!)
+     */
     public static String TimestampToDateFormat(long ts, String sFormat){
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(ts*1000);
@@ -443,5 +443,17 @@ public class Utils {
 
     public static int getMinutesFromTimestamp(long timestamp) {
         return (int) (timestamp / 1000 / 60);
+    }
+
+    public static String capitalizeString(String string) {
+
+        if (string == null || string.trim().isEmpty()) {
+            return string;
+        }
+        char c[] = string.trim().toLowerCase().toCharArray();
+        c[0] = Character.toUpperCase(c[0]);
+
+        return new String(c);
+
     }
 }

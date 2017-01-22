@@ -17,19 +17,19 @@ import java.util.ArrayList;
  * Created by Snake on 12.01.2016.
  */
 public class DB extends SQLiteOpenHelper {
-    final static int DATABASE_VERSION = 5;
+    final static int DATABASE_VERSION = 6;
     public SQLiteDatabase db;
 
-    public final static String BAN_INFO_TABLE = "bans_info", TABLE_AUTO_KICK = "auto_kick_users",
-    /* TABLE_ANTISPAM = "antispam_rules",*/ TABLE_WHITE_LINKS = "whitelist_links",
-            TABLE_LOG_ACTIONS = "log", TABLE_ANTISPAM_WARNS = "antispam_warns",
-            /* TABLE_CHAT_WELCOME = "chat_welcome_text",*/ TABLE_BLACKLIST_WORDS = "blacklist_words",
+    public final static String TABLE_BAN_INFO = "bans_info", TABLE_AUTO_KICK = "auto_kick_users",
+            TABLE_WHITE_LINKS = "whitelist_links",
+            TABLE_LOG_ACTIONS = "log", TABLE_TASK_WARNS = "antispam_warns",
+            TABLE_BLACKLIST_WORDS = "blacklist_words",
             TABLE_CHAT_TASKS = "chat_tasks", TABLE_CHATS_LIST = "chats_list",
-            TABLE_CHAT_COMMAND = "chat_commands", TABLE_CHAT_LOG="chat_log",
-            TABLE_MUTED_USERS="muted_users", TABLE_BOTS_TOKEN="table_bots";
+            TABLE_CHAT_COMMAND = "chat_commands", TABLE_CHAT_LOG = "chat_log",
+            TABLE_MUTED_USERS = "muted_users", TABLE_BOTS_TOKEN = "table_bots";
 
     private final static String
-            CREATE_TABLE_TEMPORARY_BANS = "CREATE TABLE " + BAN_INFO_TABLE + " (" +
+            CREATE_TABLE_TEMPORARY_BANS = "CREATE TABLE " + TABLE_BAN_INFO + " (" +
             "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             "chat_id INTEGER, " +
             "user_id INTEGER," +
@@ -42,9 +42,10 @@ public class DB extends SQLiteOpenHelper {
             "ban_age_msec INTEGER," +
             "is_return_on_unban INTEGER, " +
             "unban_errors INTEGER DEFAULT 0, " +
+            "is_mute_ban INTEGER DEFAULT 0, " +// mute instead ban (delete all user messages)
             "UNIQUE(chat_id, user_id)" +
             ");",
-    CREATE_TABLE_CHATS_LIST = "CREATE TABLE " + TABLE_CHATS_LIST + " (" +
+            CREATE_TABLE_CHATS_LIST = "CREATE TABLE " + TABLE_CHATS_LIST + " (" +
                     "chat_id INTEGER, " +
                     "json_chat_info TEXT, " +
                     "chat_order INTEGER" +
@@ -67,7 +68,7 @@ public class DB extends SQLiteOpenHelper {
                     "jsonData TEXT, " +
                     "ts INTEGER" +
                     ");",
-            CREATE_TABLE_ANTISPAM_WARNS = "CREATE TABLE " + TABLE_ANTISPAM_WARNS + " (" +
+            CREATE_TABLE_TASK_WARNS = "CREATE TABLE " + TABLE_TASK_WARNS + " (" +
                     "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "chatId INTEGER," +
                     "userId INTEGER," +
@@ -99,40 +100,41 @@ public class DB extends SQLiteOpenHelper {
                     "within_time_sec INTEGER, " +
                     "is_ban INTEGER, " +
                     "is_remove_msg INTEGER, " +
-                    "is_public_alert INTEGER, " +//notify all chat users about ban
+                    "is_public_alert INTEGER, " +
+                    "is_mute_on_ban INTEGER DEFAULT 0," +//notify all chat users about ban
                     "UNIQUE(chat_id, type) " +
                     ");",
-        CREATE_TABLE_CHAT_COMMANDS = "CREATE TABLE "+TABLE_CHAT_COMMAND+" (" +
-                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "chat_id INTEGER, " +
-                "command TEXT, " +
-                "type INTEGER, " +
-                "is_enabled INTEGER, " +
-                "is_admin INTEGER, " +
-                "answer TEXT, " +
-                "UNIQUE(chat_id, command) " +
-                ");",
-        CREATE_TABLE_CHAT_LOG = "CREATE TABLE "+TABLE_CHAT_LOG+" (" +
-                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "chat_id INTEGER, " +
-                "chat_id_log INTEGER," +
-                "isEnabled INTEGER" +
-                "" +
-                ");",
-        CREATE_TABLE_MUTED_USERS="CREATE TABLE "+TABLE_MUTED_USERS+" (" +
-                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "chat_id INTEGER, " +
-                "user_id INTEGER, " +
-                "user_name TEXT, " +
-                "UNIQUE(chat_id, user_id)" +
-                ");",
-        CREATE_TABLE_BOTS_TOKEN="CREATE TABLE "+TABLE_BOTS_TOKEN+" (" +
-                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "bot_id INTEGER," +
-                "token TEXT, " +
-                "username TEXT UNIQUE," +
-                "first_name TEXT" +
-                ");";
+            CREATE_TABLE_CHAT_COMMANDS = "CREATE TABLE " + TABLE_CHAT_COMMAND + " (" +
+                    "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "chat_id INTEGER, " +
+                    "command TEXT, " +
+                    "type INTEGER, " +
+                    "is_enabled INTEGER, " +
+                    "is_admin INTEGER, " +
+                    "answer TEXT, " +
+                    "UNIQUE(chat_id, command) " +
+                    ");",
+            CREATE_TABLE_CHAT_LOG = "CREATE TABLE " + TABLE_CHAT_LOG + " (" +
+                    "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "chat_id INTEGER, " +
+                    "chat_id_log INTEGER," +
+                    "isEnabled INTEGER" +
+                    "" +
+                    ");",
+            CREATE_TABLE_MUTED_USERS = "CREATE TABLE " + TABLE_MUTED_USERS + " (" +
+                    "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "chat_id INTEGER, " +
+                    "user_id INTEGER, " +
+                    "user_name TEXT, " +
+                    "UNIQUE(chat_id, user_id)" +
+                    ");",
+            CREATE_TABLE_BOTS_TOKEN = "CREATE TABLE " + TABLE_BOTS_TOKEN + " (" +
+                    "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "bot_id INTEGER," +
+                    "token TEXT, " +
+                    "username TEXT UNIQUE," +
+                    "first_name TEXT" +
+                    ");";
 
 
     public DB(Context context) {
@@ -149,11 +151,9 @@ public class DB extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_TEMPORARY_BANS);
         db.execSQL(CREATE_TABLE_AUTO_KICK_USERS);
-        // db.execSQL(CREATE_TABLE_ANTISPAM);
         db.execSQL(CREATE_TABLE_WHITE_LINKS);
         db.execSQL(CREATE_TABLE_LOG);
-        db.execSQL(CREATE_TABLE_ANTISPAM_WARNS);
-        // db.execSQL(CREATE_TABLE_CHAT_WELCOMES);
+        db.execSQL(CREATE_TABLE_TASK_WARNS);
         db.execSQL(CREATE_TABLE_BLACKLIST_WORDS);
 
         db.execSQL(CREATE_TABLE_CHAT_TASKS);
@@ -167,10 +167,12 @@ public class DB extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         try {
+            boolean table_tasks_created = false;
             if (oldVersion < 2) {
+                table_tasks_created = true;
                 db.execSQL(CREATE_TABLE_CHAT_TASKS);
                 db.execSQL(CREATE_TABLE_CHATS_LIST);
-                db.delete(TABLE_ANTISPAM_WARNS, null, null); // cleare table coz we rename some `action` types
+                db.delete(TABLE_TASK_WARNS, null, null); // cleare table coz we rename some `action` types
 
                 // change blackwords table unique index and add 2 new colums.
                 db.execSQL(CREATE_TABLE_BLACKLIST_WORDS.replace(TABLE_BLACKLIST_WORDS, "table_tmp"));
@@ -179,17 +181,24 @@ public class DB extends SQLiteOpenHelper {
                 db.execSQL("ALTER TABLE table_tmp RENAME TO " + TABLE_BLACKLIST_WORDS);
             }
 
-            if(oldVersion<3){
+            if (oldVersion < 3) {
                 db.execSQL(CREATE_TABLE_CHAT_COMMANDS);
             }
-            if(oldVersion<4){
+            if (oldVersion < 4) {
                 db.execSQL(CREATE_TABLE_CHAT_LOG);
                 db.execSQL(CREATE_TABLE_MUTED_USERS);
-                db.execSQL("ALTER TABLE "+TABLE_CHAT_TASKS+" ADD COLUMN text TEXT;");
+                if (!table_tasks_created) //coz on upgrade to 2 we create tablechat_tasks
+                    db.execSQL("ALTER TABLE " + TABLE_CHAT_TASKS + " ADD COLUMN text TEXT;");
             }
-            if(oldVersion<5){
+            if (oldVersion < 5) {
                 db.execSQL(CREATE_TABLE_BOTS_TOKEN);
-                db.execSQL("ALTER TABLE "+TABLE_CHAT_TASKS+" ADD COLUMN is_public_alert INTEGER;");
+                if (!table_tasks_created) //coz on upgrade to 2 we create tablechat_tasks
+                    db.execSQL("ALTER TABLE " + TABLE_CHAT_TASKS + " ADD COLUMN is_public_alert INTEGER;");
+            }
+            if (oldVersion < 6) {
+                db.execSQL("ALTER TABLE " + TABLE_BAN_INFO + " ADD COLUMN is_mute_ban INTEGER DEFAULT 0;");
+                if (!table_tasks_created)
+                    db.execSQL("ALTER TABLE " + TABLE_CHAT_TASKS + " ADD COLUMN is_mute_on_ban INTEGER DEFAULT 0;");
             }
         } catch (SQLException e) {
             MyLog.log(e);
@@ -232,7 +241,5 @@ public class DB extends SQLiteOpenHelper {
             db.endTransaction();
         }
     }
-
-
 }
 

@@ -4,6 +4,7 @@ import com.madpixels.apphelpers.MyLog;
 import com.madpixels.apphelpers.Utils;
 import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.helper.TaskValues;
+import com.madpixels.tgadmintools.utils.CommonUtils;
 import com.madpixels.tgadmintools.utils.LogUtil;
 
 import org.json.JSONArray;
@@ -63,8 +64,10 @@ public class LogEntity {
     public void compileLog() {
         if (logText != null)// already compiled
             return;
-        logText = jsonData;
+
         String actionTitle = "";
+        String logMsg = null;
+
         try {
             JSONObject json = new JSONObject(jsonData);
             if (json.has("userId"))
@@ -85,54 +88,65 @@ public class LogEntity {
             if (json.has("userFullname"))
                 userFullName = String.format(String.format("%s: %s%s\n", TaskValues.getString(R.string.log_title_username), json.getString("userFullname"), username));
             if (json.has("ts"))
-                logTime = String.format("%s: %s", TaskValues.getString(R.string.log_title_time), Utils.TimestampToDate(json.optLong("ts") / 1000));
+                logTime = String.format("%s: %s", TaskValues.getString(R.string.log_title_time),
+                        CommonUtils.tsToDate(json.optLong("ts") / 1000));
             if (userId != 0)
                 userIdText = String.format("User id: %s\n", userId);
 
-
             actionTitle = TaskValues.getString(TaskValues.getTitleLogAction(action), action.name());
+
             switch (action) {
                 //NOTE add new type here when new type implemented
                 case AutoKickFromGroup:
                     long ts;
-                    String s = chatTitle + userIdText + userFullName + logTime;
-                    logText = s;
+                    logMsg = chatTitle + userIdText + userFullName + logTime;
+
 
                     break;
                 case AutoReturnToChat:
                     if (json.has("error")) {
-                        s = json.getString("error") + "\n";
-                        s += "User id: " + json.getInt("userId") + "\n";
+                        logMsg = json.getString("error") + "\n";
+                        logMsg += "User id: " + json.getInt("userId") + "\n";
                     } else
-                        s = chatTitle + userFullName;
-                    s += logTime;
-                    logText = s;
+                        logMsg = chatTitle + userFullName;
+                    logMsg += logTime;
 
                     break;
+                case USER_MUTED:
+                    logMsg = chatTitle + userFullName + logTime;
+                    String msgText = json.optString("payload");
+                    logMsg += String.format("\n%s: %s\n", TaskValues.getString(R.string.log_title_message), msgText);
+
+                    break;
+
+                case USER_UNMUTED:
+                    logMsg = chatTitle + userFullName + logTime;
+                    break;
+
                 case AutoUnban:
                     if (json.has("error")) {
-                        s = json.getString("error") + "\n" +
+                        logMsg = json.getString("error") + "\n" +
                                 chatTitle + userFullName;
                         actionTitle = "Error on unban user";
                     } else
-                        s = chatTitle + userFullName;
-                    s += logTime;
-                    logText = s;
+                        logMsg = chatTitle + userFullName;
+                    logMsg += logTime;
+
                     break;
                 case BanForLink:
                     // actionTitle = getString(R.string.logAction_banForLink);
-                    s = chatTitle + userFullName + logTime;
+                    logMsg = chatTitle + userFullName + logTime;
                     JSONObject payload = json.getJSONObject("payload");
                     if (payload.has("error"))
-                        s += "\nOperation error: " + payload.getString("error");
+                        logMsg += "\nOperation error: " + payload.getString("error");
                     else {
                         long banTime = payload.getLong("banAge");
                         linkUrl = payload.getString("link");
-                        s += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_banurl), linkUrl);
-                        s += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banTime / 1000));//ban length
+                        logMsg += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_banurl), linkUrl);
+                        logMsg += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banTime / 1000));//ban length
                     }
-                    s += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_message), payload.getString("text"));
-                    logText = s;
+                    logMsg += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_message), payload.getString("text"));
+
                     break;
 
                 //Ban for attachments:
@@ -145,29 +159,30 @@ public class LogEntity {
                 case BanForAudio:
                 case BanForVideo:
                     ts = json.getLong("ts");
-                    s = chatTitle + userIdText + userFullName + logTime;
+                    logMsg = chatTitle + userIdText + userFullName + logTime;
 
                     payload = json.getJSONObject("payload");
                     long banAge = payload.getLong("banAge");
                     if (banAge > 0) {
-                        s += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banAge / 1000));//ban length
-                        s += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_banuntil), Utils.TimestampToDate((ts + banAge) / 1000));// ban until
+                        logMsg += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banAge / 1000));//ban length
+                        logMsg += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_banuntil),
+                                CommonUtils.tsToDate((ts + banAge) / 1000));// ban until
                     }
 
-                    logText = s;
+
                     break;
 
                     /* Remove messaage: */
                 case RemoveLink:
-                    s = chatTitle + userIdText + userFullName +
+                    logMsg = chatTitle + userIdText + userFullName +
                             String.format("%s: %s\n", TaskValues.getString(R.string.log_title_banurl), json.getString("payload")) +//banned url
                             logTime;
-                    logText = s;
+
                     break;
                 case DeleteMsgBlackWord:
-                    s = chatTitle + userIdText + userFullName + logTime +
+                    logMsg = chatTitle + userIdText + userFullName + logTime +
                             String.format("\n%s: %s", TaskValues.getString(R.string.log_title_bannedword), json.getString("payload"));
-                    logText = s;
+
                     break;
                 case RemoveFlood:
                     payload = new JSONObject(json.getString("payload"));
@@ -175,10 +190,10 @@ public class LogEntity {
                     int limit = payload.optInt("limit");
                     int floodCount = payload.optInt("flood");
 
-                    s = chatTitle + userIdText + userFullName + logTime;
-                    s += String.format("\nFlood: %s/%s", floodCount, limit);
-                    s += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_message), messageText);
-                    logText = s;
+                    logMsg = chatTitle + userIdText + userFullName + logTime;
+                    logMsg += String.format("\nFlood: %s/%s", floodCount, limit);
+                    logMsg += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_message), messageText);
+
                     break;
                 case RemoveVoice:
                 case RemoveDocs:
@@ -188,20 +203,20 @@ public class LogEntity {
                 case RemoveSticker:
                 case RemoveAudio:
                 case RemoveVideo:
-                    s = chatTitle + userIdText + userFullName + logTime;
-                    logText = s;
+                    logMsg = chatTitle + userIdText + userFullName + logTime;
+
                     break;
                 case RemoveMuted:
                     String message = json.optString("payload");
-                    s = chatTitle + userIdText + "Message: " + message + "\n" + userFullName + logTime;
-                    logText = s;
+                    logMsg = chatTitle + userIdText + "Message: " + message + "\n" + userFullName + logTime;
+
                     break;
 
                 case RemoveJoinMessage:
-                    s = chatTitle + userFullName + userIdText + logTime + "\n";
+                    logMsg = chatTitle + userFullName + userIdText + logTime + "\n";
                     if (json.has("payload")) {
                         JSONArray invited_users = new JSONArray(json.getString("payload"));
-                        String users = "Invited members ("+invited_users.length()+"):\n";
+                        String users = "Invited members (" + invited_users.length() + "):\n";
                         for (int n = 0; n < invited_users.length(); n++) {
                             JSONObject ju = invited_users.getJSONObject(n);
                             String member_username = ju.optString("username");
@@ -211,25 +226,25 @@ public class LogEntity {
                             users += String.format(" id: %s\n name: %s\n%s", ju.optString("id"),
                                     ju.optString("name"), member_username);
                         }
-                        s+=users;
+                        logMsg += users;
                     }
 
-                    logText = s;
+
                     break;
 
                 case RemoveLeaveMessage:
-                    s = chatTitle + userFullName + userIdText + logTime;
-                    logText = s;
+                    logMsg = chatTitle + userFullName + userIdText + logTime;
+
                     break;
 
                     /* Other */
                 case CommandExecError:
                     payload = json.getJSONObject("payload");
-                    s = chatTitle + logTime + "\n" +
+                    logMsg = chatTitle + logTime + "\n" +
                             String.format("Command: %s\n", payload.getString("cmd")) +
                             String.format("Error: %s\n", payload.getString("error")) +
                             String.format("Body: %s\n", payload.getString("answer"));
-                    logText = s;
+
                     break;
 
                 //Warning for attachments:
@@ -242,87 +257,91 @@ public class LogEntity {
                 case StickersFloodWarn:
                 case VideoFloodWarn:
 
-                    s = chatTitle + userIdText + userFullName + logTime;
-                    logText = s;
+                    logMsg = chatTitle + userIdText + userFullName + logTime;
+
                     break;
 
                 case BanWordsFloodWarn:
-                    s = chatTitle + userIdText + userFullName + logTime;
-                    logText = s;
+                    logMsg = chatTitle + userIdText + userFullName + logTime;
+
                     break;
                 case LinksFloodAttempt:
                     payload = json.getJSONObject("payload");
-                    s = chatTitle + userIdText + userFullName +
+                    logMsg = chatTitle + userIdText + userFullName +
                             String.format("%s: %s\n", TaskValues.getString(R.string.log_title_banurl), payload.getString("link")) +
                             // "Link: " + payload.getString("link") + "\n" +
                             logTime;
-                    logText = s;
+
                     break;
                 case AutoUnbanByAdminInvite:
                     payload = json.getJSONObject("payload");
-                    s = chatTitle + userIdText + userFullName +
+                    logMsg = chatTitle + userIdText + userFullName +
                             String.format("%s: %s\n", TaskValues.getString(R.string.log_title_admin), payload.getString("adminName")) +
                             // "Admin: " + payload.getString("adminName") + "\n" +
                             logTime;
-                    logText = s;
+
                     break;
 
                 case BanForBlackWord:
-                    s = chatTitle + userIdText + userFullName + logTime;
+                    logMsg = chatTitle + userIdText + userFullName + logTime;
                     payload = json.getJSONObject("payload");
                     long banTime = payload.getLong("banAge") / 1000;
-                    s += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banTime)) +
+                    logMsg += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banTime)) +
                             String.format("\n%s: %s", TaskValues.getString(R.string.log_title_bannedword), payload.getString("word")) +
                             String.format("\n%s: %s", TaskValues.getString(R.string.log_title_message), payload.getString("text"));
-                    logText = s;
+
                     break;
 
 
                 case BanManually:
                     payload = json.getJSONObject("payload");
                     banTime = payload.getLong("banAge") / 1000;
-                    s = chatTitle + userFullName + logTime +
+                    logMsg = chatTitle + userFullName + logTime +
                             String.format("\n%s: %s", TaskValues.getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banTime));
 
                     String r = payload.getString("banText");
                     if (!r.isEmpty())
-                        s += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_ban_reason), r);
-                    logText = s;
+                        logMsg += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_ban_reason), r);
+
                     break;
 
 
                 case BanForFlood:
-                    s = chatTitle + userIdText + userFullName + logTime;
+                    logMsg = chatTitle + userIdText + userFullName + logTime;
                     payload = json.getJSONObject("payload");
                     banTime = payload.getLong("banAge") / 1000;
-                    s += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banTime));
-                    logText = s;
+                    logMsg += String.format("\n%s: %s", TaskValues.getString(R.string.log_title_bantime), Utils.convertSecToReadableDate(banTime));
+
                     break;
 
                 case BOT_ERROR:
-                    s = "Error code: " + json.optInt("error_code") + "\n" +
-                            "Error: " + json.optString("description") + "\n" +
-                            "Chat id: " + json.optLong("chatId") + "\n" +
-                            logTime;
-                    logText = s;
+                    logMsg ="Chat id: " + json.optLong("chatId") + "\n" +
+                            "Error code: " + json.optInt("error_code") + "\n" +
+                            logTime+
+                            "Error: " + json.optString("description");
+                    if(json.has("payload"))
+                        logMsg+="\nMessage body:\n"+json.optString("payload")+"\n";
+
                     break;
 
                 case CMDTitleChanged:
-                    s = chatTitle + userIdText + userFullName +
+                    logMsg = chatTitle + userIdText + userFullName +
                             String.format("%s: %s\n", TaskValues.getString(R.string.log_title_oldChangedChatTitle), json.optString("oldTitle")) +
                             logTime;
-                    logText = s;
                     break;
 
                 default:
                     actionTitle = action.name();
+                    logMsg = jsonData;
                     break;
             }
         } catch (JSONException e) {
             MyLog.log(e);
+            logMsg = jsonData;// on parsing error show raw data
         }
-        this.actionTitle = actionTitle;
 
+        logText = logMsg;
+        this.actionTitle = actionTitle;
     }
 
     public boolean hasChatId() {

@@ -127,7 +127,10 @@ public class TaskValues {
                 return R.string.logAction_sendViaBotError;
             case CMDTitleChanged:
                 return R.string.logAction_userTitleChanged;
-
+            case USER_MUTED:
+                return R.string.logAction_userWasMuted;
+            case USER_UNMUTED:
+                return R.string.logAction_userWasUnMuted;
         }
 
         if (BuildConfig.DEBUG && false)
@@ -139,6 +142,9 @@ public class TaskValues {
     public static String getTitleForAddTask(ChatTask.TYPE pType) {
         int strRes = 0;
         switch (pType) {
+            case FLOOD:
+                strRes = R.string.title_flood_control;
+                break;
             case STICKERS:
                 strRes = R.string.title_task_add_stickers;
                 break;

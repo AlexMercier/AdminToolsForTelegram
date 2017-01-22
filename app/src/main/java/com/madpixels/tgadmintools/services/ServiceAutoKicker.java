@@ -35,9 +35,9 @@ public class ServiceAutoKicker extends Service {
         TgH.init(this, new ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                if(TgUtils.isOk(object)) // if initialization ok
+                if (TgUtils.isOk(object)) // if initialization ok
                     TgH.setUpdatesHandler(updatesHandler);
-                else{
+                else {
                     // show auth error to the user ?
                     stopSelf();
                 }
@@ -50,7 +50,6 @@ public class ServiceAutoKicker extends Service {
     final private ResultHandler updatesHandler = new ResultHandler() {
         @Override
         public void onResult(TdApi.TLObject object) {
-            // MyLog.log(object.toString());
             if (object.getConstructor() == TdApi.UpdateNewMessage.CONSTRUCTOR) {
                 TdApi.UpdateNewMessage umsg = (TdApi.UpdateNewMessage) object;
                 if (!umsg.message.canBeDeleted) return;
@@ -85,34 +84,35 @@ public class ServiceAutoKicker extends Service {
 
 
     void checkUserCanBeInvited(final long chatId, final int fromId, final TdApi.User user) {
-        if (DBHelper.getInstance().isUserKicked(chatId, user.id)) {
-            TgH.send(new TdApi.GetChat(chatId), new ResultHandler() {
-                @Override
-                public void onResult(TdApi.TLObject object) {
-                    if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR) {
-                        final TdApi.Chat chat = (TdApi.Chat) object;
-                        AdminUtils.checkUserIsAdminInChat(((TdApi.Chat) object).id, fromId, new Callback() {
-                            @Override
-                            public void onResult(Object data) {
-                                boolean isAdmin = (boolean) data;
-                                if (isAdmin) {
-                                    unbanUserOnInvitedByAdmin(chat, user, fromId);
-                                } else {
-                                    AdminUtils.kickUser(chatId, user.id, new ResultHandler() {
-                                        @Override
-                                        public void onResult(TdApi.TLObject object) {
-                                            if (TgUtils.isOk(object)) {
-                                                logKickAction(chat, user.id);
-                                            }
-                                        }
-                                    });
+        if (!DBHelper.getInstance().isUserKicked(chatId, user.id))
+            return;
+        TgH.send(new TdApi.GetChat(chatId), new ResultHandler() {
+            @Override
+            public void onResult(TdApi.TLObject object) {
+                if (object.getConstructor() != TdApi.Chat.CONSTRUCTOR)
+                    return;
+                final TdApi.Chat chat = (TdApi.Chat) object;
+                AdminUtils.checkUserIsAdminInChat(((TdApi.Chat) object).id, fromId, new Callback() {
+                    @Override
+                    public void onResult(Object data) {
+                        boolean isAdmin = (boolean) data;
+                        if (isAdmin) {
+                            unbanUserOnInvitedByAdmin(chat, user, fromId);
+                        } else {
+                            AdminUtils.kickUser(chatId, user.id, new ResultHandler() {
+                                @Override
+                                public void onResult(TdApi.TLObject object) {
+                                    if (TgUtils.isOk(object)) {
+                                        logKickAction(chat, user.id);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
-                }
-            });
-        }
+                });
+
+            }
+        });
     }
 
     public void loadChatAndLogAction(final long chat_id, final int user_id) {
@@ -135,7 +135,7 @@ public class ServiceAutoKicker extends Service {
         new LogUtil(onLogCallback, chat).logUserUnbannedByInvite(chat, user, adminId);
     }
 
-    Callback onLogCallback = new Callback() {
+    public static Callback onLogCallback = new Callback() {
         @Override
         public void onResult(Object data) {
             LogUtil log = (LogUtil) data;
@@ -176,7 +176,6 @@ public class ServiceAutoKicker extends Service {
                 LogUtil.showLogNotification("Service AutoKick started");
         }
     }
-
 
 
     public static void stop(Context context) {

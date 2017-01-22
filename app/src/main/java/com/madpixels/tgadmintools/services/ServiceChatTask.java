@@ -19,6 +19,7 @@ import com.madpixels.tgadmintools.Const;
 import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.activity.MainActivity;
 import com.madpixels.tgadmintools.db.DBHelper;
+import com.madpixels.tgadmintools.entities.BanTask;
 import com.madpixels.tgadmintools.entities.BannedWord;
 import com.madpixels.tgadmintools.entities.Callback;
 import com.madpixels.tgadmintools.entities.ChatCommand;
@@ -147,11 +148,17 @@ public class ServiceChatTask extends Service {
             if (taskManager.isEmpty())
                 return;
 
-            if (TgUtils.isUserJoined(message.message) && taskManager.hasWelcomeText()) {
-                String welcomeText = taskManager.getTask(ChatTask.TYPE.WELCOME_USER, false).mText;
-                if (!TextUtils.isEmpty(welcomeText)) {
-                    sendWelcomeText(message, welcomeText);
+            if (TgUtils.isUserJoined(message.message)) {
+                if (taskManager.hasWelcomeText()) {
+                    long diffSeconds = (System.currentTimeMillis() / 1000) - message.message.date;
+                    if (diffSeconds < 60) {// No welcome if this old update by internet connection
+                        String welcomeText = taskManager.getTask(ChatTask.TYPE.WELCOME_USER, false).mText;
+                        if (!TextUtils.isEmpty(welcomeText)) {
+                            new SendWelcomeMessage(message, welcomeText);
+                        }
+                    }
                 }
+                checkUserForInviteByAdmin(message);
             }
 
             //Check for command execute:
@@ -195,7 +202,6 @@ public class ServiceChatTask extends Service {
             checkMessageForTask(message, taskManager);
         }
     };
-
 
     /**
      * @return true if user was muted
@@ -261,7 +267,7 @@ public class ServiceChatTask extends Service {
                         String url = oLink.toLowerCase();
                         if (db.isLinkInWhiteList(url))
                             continue;
-                        if (allowStickersLinks && url.contains("telegram.me/addstickers/"))
+                        if (allowStickersLinks && url.contains(".me/addstickers/"))
                             continue;
                         else {
                             link = oLink;
@@ -279,7 +285,7 @@ public class ServiceChatTask extends Service {
                                 String url = oLink.toLowerCase();
                                 if (db.isLinkInWhiteList(url))
                                     continue;
-                                if (allowStickersLinks && (url.contains("telegram.me/addstickers/") || url.contains("t.me/addstickers/")))
+                                if (allowStickersLinks && url.contains(".me/addstickers/"))
                                     continue;
                                 else {
                                     link = oLink;
@@ -357,7 +363,7 @@ public class ServiceChatTask extends Service {
             do {
                 ChatTask task = chatTasks.getTask(ChatTask.TYPE.BANWORDS);
                 ArrayList<BannedWord> words = DBHelper.getInstance().getWordsBlackList(task.chat_id, offset, 200, true);
-                //DONE When word starts with # like #hashtag
+
                 for (BannedWord word : words) {
                     final String s = Pattern.quote(word.word.toLowerCase());
                     Pattern p = Pattern.compile("(?<!\\S)" + s + "(?!\\S)");
@@ -379,36 +385,104 @@ public class ServiceChatTask extends Service {
         }
     }
 
-    private void sendWelcomeText(UpdateNewMessage message, String welcomeText) {
-        ArrayList<TdApi.MessageEntity> entities = new ArrayList<>(1);
-        TdApi.User user;
-        if (message.message.content.getConstructor() == TdApi.MessageChatAddMembers.CONSTRUCTOR) {
-            TdApi.MessageChatAddMembers msgAddMember = (TdApi.MessageChatAddMembers) message.message.content;
-            user = msgAddMember.members[0];
-        } else {
-            user = TgUtils.getUser(message.message.senderUserId);
+    /**
+     * Remove user from local banList when invited by admins
+     *
+     * @param message
+     */
+    private void checkUserForInviteByAdmin(final TdApi.UpdateNewMessage message) {
+        if (message.message.content.getConstructor() != TdApi.MessageChatAddMembers.CONSTRUCTOR)
+            return;
+
+        final TdApi.MessageChatAddMembers chatAddMembers = (TdApi.MessageChatAddMembers) message.message.content;
+        boolean hasBanned = false;
+        DBHelper db = DBHelper.getInstance();
+        for (final TdApi.User user : chatAddMembers.members) {
+            if (db.isBannedById(message.message.chatId, user.id)) {
+                hasBanned = true;
+                break;
+            }
         }
+        if (!hasBanned)
+            return;
 
-        FormattedTagText fText = CommonUtils.replaceCustomShortTags(welcomeText, null, user, 0);
-        welcomeText = fText.resultText;
-        if (fText.mention != null)
-            entities.add(fText.mention);
+        AdminUtils.checkUserIsAdminInChat(message.message.chatId, message.message.senderUserId, new Callback() {
+            @Override
+            public void onResult(Object data) {
+                boolean isAdmin = (boolean) data;
+                if (!isAdmin)
+                    return;
 
-        TdApi.InputMessageText msg = new TdApi.InputMessageText(welcomeText, false, false, null, null);
-        msg.entities = new TdApi.MessageEntity[entities.size()];
-        for (int n = 0; n < entities.size(); n++)
-            msg.entities[n] = entities.get(n);
+                TgH.send(new TdApi.GetChat(message.message.chatId), new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.TLObject object) {
+                        if (object.getConstructor() != TdApi.Chat.CONSTRUCTOR)
+                            return;
+                        TdApi.Chat chat = (TdApi.Chat) object;
+                        TdApi.Message msg = message.message;
 
-        String botToken = CommonUtils.useBotForAlert(message.message.chatId);
-        if (botToken != null) {
-            CommonUtils.sendMessageViaBot(botToken, message.message.chatId, welcomeText, false, true);
-        } else {
-            TdApi.TLFunction f = new TdApi.SendMessage(message.message.chatId, message.message.id, false, true,
-                    null, msg);
-            TgH.send(f);
-        }
+                        for (final TdApi.User user : chatAddMembers.members) {
+                            DBHelper.getInstance().removeUserFromAutoKick(msg.chatId, user.id);
+                            DBHelper.getInstance().removeBanTask(msg.chatId, user.id);
+                            new LogUtil(ServiceAutoKicker.onLogCallback, object).logUserUnbannedByInvite(chat, user, msg.senderUserId);
+                        }
+                    }
+                });
+            }
+        });
     }
 
+    private class SendWelcomeMessage {
+        UpdateNewMessage message;
+        String welcomeText;
+        TdApi.Chat chat;
+
+        SendWelcomeMessage(UpdateNewMessage message, String welcomeText) {
+            this.message = message;
+            this.welcomeText = welcomeText;
+            TgH.send(new TdApi.GetChat(message.message.chatId), new Client.ResultHandler() {
+                @Override
+                public void onResult(TdApi.TLObject object) {
+                    if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR)
+                        chat = (TdApi.Chat) object;
+                    sendWelcomeText();
+                }
+            });
+        }
+
+        private void sendWelcomeText() {
+            ArrayList<TdApi.MessageEntity> entities = new ArrayList<>(1);
+            TdApi.User user;
+            if (message.message.content.getConstructor() == TdApi.MessageChatAddMembers.CONSTRUCTOR) {
+                TdApi.MessageChatAddMembers msgAddMember = (TdApi.MessageChatAddMembers) message.message.content;
+                user = msgAddMember.members[0];
+            } else {
+                user = TgUtils.getUser(message.message.senderUserId);
+            }
+
+            String botToken = CommonUtils.getBotForChatAlerts(message.message.chatId);
+            boolean isBOt = botToken!=null;
+
+            FormattedTagText fText = CommonUtils.replaceCustomShortTags(welcomeText, null, user, -1, chat, isBOt); //TODO check html format
+            welcomeText = fText.resultText;
+            if (fText.mention != null)
+                entities.add(fText.mention);
+
+            TdApi.InputMessageText msg = new TdApi.InputMessageText(welcomeText, false, false, null, null);
+            msg.entities = new TdApi.MessageEntity[entities.size()];
+            for (int n = 0; n < entities.size(); n++)
+                msg.entities[n] = entities.get(n);
+
+
+            if (isBOt) {
+                CommonUtils.sendMessageViaBot(botToken, message.message.chatId, welcomeText, true, false);
+            } else {
+                TdApi.TLFunction f = new TdApi.SendMessage(message.message.chatId, message.message.id, false, true,
+                        null, msg);
+                TgH.send(f);
+            }
+        }
+    }
 
     private void sendPing(TdApi.Message message) {
         TdApi.SendMessage msgSend = new TdApi.SendMessage();
@@ -517,12 +591,12 @@ public class ServiceChatTask extends Service {
                     if (object.getConstructor() != TdApi.User.CONSTRUCTOR) return;
                     TdApi.User user = (TdApi.User) object;
 
-                    String botToken = CommonUtils.useBotForAlert(task.chat_id);
+                    String botToken = CommonUtils.getBotForChatAlerts(task.chat_id);
                     boolean isBot = botToken != null;
 
                     String warnText = getAlertTitle();
-                    if (isBot) // Markdown format for Bot Message
-                        warnText = "`" + warnText + "`";
+                    if (isBot) // Wrap title to Markdown format for Bot Message
+                        warnText = "<code>" + TextUtils.htmlEncode(warnText) + "</code>";
                     warnText += "\n";
 
                     ArrayList<TdApi.MessageEntity> entities = new ArrayList<>(1); // Форматируем сообщение.
@@ -541,7 +615,7 @@ public class ServiceChatTask extends Service {
                             warnText += "@" + user.username + "\n";
                         } else {
                             //name mention:
-                            String uname = user.firstName + " " + user.lastName;
+                            String uname = CommonUtils.safeHtml(user.firstName + " " + user.lastName, isBot);
                             int start = warnText.length();
                             warnText += uname + "\n";
                             entities.add(new TdApi.MessageEntityMentionName(start, uname.length(), user.id));
@@ -551,11 +625,10 @@ public class ServiceChatTask extends Service {
                         customText = TaskValues.getWarnText(task.mType, textType);
 
                     } else {
-                        FormattedTagText fText = CommonUtils.replaceCustomShortTags(customText, task, user, tryes);
+                        FormattedTagText fText = CommonUtils.replaceCustomShortTags(customText, task, user, tryes, mChat, isBot);
                         customText = fText.resultText;
                         if (fText.mention != null)
                             entities.add(fText.mention);
-                        //customText = replaceCustomShortTags(customText, task, user, tryes);
                     }
 
                     int offset = warnText.length();
@@ -564,7 +637,7 @@ public class ServiceChatTask extends Service {
                     warnText += customText;
 
                     if (isBot) {
-                        CommonUtils.sendMessageViaBot(botToken, message.message.chatId, warnText, false, true);
+                        CommonUtils.sendMessageViaBot(botToken, message.message.chatId, warnText, true, false);
                     } else {
                         TdApi.SendMessage msgSend = new TdApi.SendMessage();
                         msgSend.chatId = message.message.chatId;
@@ -600,7 +673,7 @@ public class ServiceChatTask extends Service {
                     boolean isReturn = task.isReturnOnBanExpired;
                     final long banMsec = task.mBanTimeSec * 1000;
                     DBHelper.getInstance().addToBanList(user, message.message.chatId, mChat.type.getConstructor(), localChatId,
-                            banMsec, isReturn, banReason);
+                            banMsec, isReturn, banReason, task.isMuteInsteadBan);
                     if (banMsec > 0)
                         ServiceUnbanTask.registerTask(getBaseContext());
 
@@ -609,26 +682,62 @@ public class ServiceChatTask extends Service {
                         ServiceAutoKicker.start(getBaseContext());
                     }
 
-                    AdminUtils.kickUser(message.message.chatId, message.message.senderUserId, new Client.ResultHandler() {
-                        @Override
-                        public void onResult(TdApi.TLObject object) {
-                            if (TgUtils.isOk(object)) {
-                                //Reset warns for this user:
-                                DBHelper.getInstance().deleteAntiSpamWarnCount(task.mType, message.message.chatId, message.message.senderUserId);
-                                if (task.isPublicToChat) {
-                                    publishBanReasonToChat();
-                                }
-                                onKickUserFromGroup.onResult(object);
-
-                            }
+                    if (task.isMuteInsteadBan) {
+                        getLog().logUserWasMuted(mChat, message);
+                        isMessageRemoveByTaskMuted();
+                        if (task.isPublicToChat) {
+                            publishBanReasonToChat();
                         }
-                    });
+                    } else
+                        AdminUtils.kickUser(message.message.chatId, message.message.senderUserId, new Client.ResultHandler() {
+                            @Override
+                            public void onResult(TdApi.TLObject object) {
+                                if (TgUtils.isOk(object)) {
+                                    //Reset warns for this user:
+                                    DBHelper.getInstance().deleteAntiSpamWarnCount(task.mType, message.message.chatId, message.message.senderUserId);
+                                    if (task.isPublicToChat) {
+                                        publishBanReasonToChat();
+                                    }
+                                    onKickUserFromGroup.onResult(object);
+                                }
+                            }
+                        });
                 }
             });
         }
 
+        /**
+         * If bantask with isMutedBan exists means that user already muted by task settings
+         */
+        boolean isMessageRemoveByTaskMuted() {
+            BanTask banTask = DBHelper.getInstance().getBanTask(task.chat_id, message.message.senderUserId);
+            if (banTask != null && banTask.isMutedBan) {
+                deleteMessage(new Client.ResultHandler() {
+                    @Override
+                    public void onResult(TdApi.TLObject object) {
+                        String msgText;
+                        if (message.message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
+                            TdApi.MessageText msg = (TdApi.MessageText) message.message.content;
+                            msgText = msg.text;
+                        } else {
+                            msgText = "Type: " + message.message.content.getClass().getSimpleName();
+                        }
+                        getLog().logDeleteMessage(LogUtil.Action.RemoveMuted, mChat, message, msgText);
+                        MyLog.log("");
+                    }
+                });
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Send to chat for all users notifications that user was banned/muted
+         */
         void publishBanReasonToChat() {
-            String title = TaskValues.getBanReason(task.mType);
+            String title = task.isMuteInsteadBan ?
+                    getString(R.string.logAction_userWasMuted) + ": " + Utils.capitalizeString(task.mType.toString()) :
+                    TaskValues.getBanReason(task.mType);
 
             TdApi.User user = TgUtils.getUser(message.message.senderUserId);
             String username = "";
@@ -640,11 +749,11 @@ public class ServiceChatTask extends Service {
                             "<b>" + TextUtils.htmlEncode(getString(R.string.log_title_username)) + "</b>: " +
                             userFullName;
             if (task.mBanTimeSec > 0) {
-                msg += "\n<b>" + TextUtils.htmlEncode(getString(R.string.log_title_bantime)) + "</b>: " +
-                        Utils.convertSecToReadableDate(task.mBanTimeSec);
+                msg += "\n<b>" + TextUtils.htmlEncode(getString(R.string.log_title_banuntil)) + "</b>: " +
+                        CommonUtils.tsToDate(System.currentTimeMillis() / 1000 + (task.mBanTimeSec));
             }
 
-            String botToken = CommonUtils.useBotForAlert(message.message.chatId);
+            String botToken = CommonUtils.getBotForChatAlerts(message.message.chatId);
             if (botToken != null) {
                 CommonUtils.sendMessageViaBot(botToken, message.message.chatId, msg, true, false);
             } else {
@@ -703,7 +812,7 @@ public class ServiceChatTask extends Service {
                         @Override
                         public void onResult(Object data) {
                             boolean isCreator = (boolean) data;
-                            if(isCreator)
+                            if (isCreator)
                                 sendCreatorDeniedAnswer();
                             else
                                 doAction();
@@ -726,7 +835,7 @@ public class ServiceChatTask extends Service {
         void sendDeniedAnswer() {
             String text = getString(R.string.text_command_execute_access_denied);
 
-            String botToken = CommonUtils.useBotForAlert(task.chat_id);
+            String botToken = CommonUtils.getBotForChatAlerts(task.chat_id);
             if (botToken != null) {
                 CommonUtils.sendMessageViaBot(botToken, message.message.chatId, text, false, false);
             } else {
@@ -748,7 +857,7 @@ public class ServiceChatTask extends Service {
 
         private void sendCreatorDeniedAnswer() {
             String text = getString(R.string.text_command_leave_not_error_creator);
-            String botToken = CommonUtils.useBotForAlert(task.chat_id);
+            String botToken = CommonUtils.getBotForChatAlerts(task.chat_id);
             if (botToken != null) {
                 CommonUtils.sendMessageViaBot(botToken, message.message.chatId, text, false, false);
             } else {
@@ -785,17 +894,18 @@ public class ServiceChatTask extends Service {
         @Override
         void doAction() {
             if (bannedWord.isBanUser) {
-                final int tryes = DBHelper.getInstance().getAntiSpamWarnCount(ChatTask.TYPE.BANWORDS,
+                final int tryes = DBHelper.getInstance().getTaskWarnedCount(ChatTask.TYPE.BANWORDS,
                         message.message.chatId, message.message.senderUserId, task.mWarningsDuringTime);
                 int warnCount = task.mAllowCountPerUser;
 
                 if (tryes < warnCount) {// Warn user to stop
-                    getLog().logWarningBeforeBan(task.mType, mChat, message, tryes);
                     DBHelper.getInstance().setAntiSpamWarnCount(ChatTask.TYPE.BANWORDS, message.message.chatId, message.message.senderUserId, tryes + 1);
                     if (task.isWarnAvailable(tryes)) {
+                        getLog().logWarningBeforeBan(task.mType, mChat, message, tryes);
                         warnUser(tryes);
                     }
                 } else {// Remove prohibited message and ban user if checked.
+
                     banForMessage(new Client.ResultHandler() {
                         @Override
                         public void onResult(TdApi.TLObject object) {
@@ -878,7 +988,6 @@ public class ServiceChatTask extends Service {
         });
     }
 
-
     /**
      * Attachments like Voice, Sticker, Gif, Video, Audio, Game Score
      */
@@ -893,13 +1002,19 @@ public class ServiceChatTask extends Service {
         void doAction() {
             if (task.isBanUser) {
                 long floodTimeLimit = task.mWarningsDuringTime;
-                final int tryes = DBHelper.getInstance().getAntiSpamWarnCount(task.mType, message.message.chatId, message.message.senderUserId, floodTimeLimit);
+                final int tryes = DBHelper.getInstance().getTaskWarnedCount(task.mType, message.message.chatId, message.message.senderUserId, floodTimeLimit);
                 final int limit = task.mAllowCountPerUser;
+
+                if (isMessageRemoveByTaskMuted()) {
+                    DBHelper.getInstance().deleteAntiSpamWarnCount(task.mType, message.message.chatId, message.message.senderUserId);
+                    return;
+                }
+
                 if (tryes < limit) {
-                    getLog().logWarningBeforeBan(task.mType, mChat, message, tryes);
                     DBHelper.getInstance().setAntiSpamWarnCount(task.mType, message.message.chatId, message.message.senderUserId, tryes + 1);
 
                     if (task.isWarnAvailable(tryes)) {
+                        getLog().logWarningBeforeBan(task.mType, mChat, message, tryes);
                         warnUser(tryes);
                     }
 
@@ -1018,7 +1133,7 @@ public class ServiceChatTask extends Service {
         /**
          * link or mention in lower case
          */
-        String  mLink;
+        String mLink;
         String originalLink;// original link as is case sensitive
         boolean isMention;
 
@@ -1152,13 +1267,18 @@ public class ServiceChatTask extends Service {
         void doAction() {
             final ChatTask task = taskControl.getTask(ChatTask.TYPE.LINKS);
             if (task.isBanUser) {
-                final int tryes = DBHelper.getInstance().getAntiSpamWarnCount(ChatTask.TYPE.LINKS, message.message.chatId, message.message.senderUserId, task.mWarningsDuringTime);
+                final int tryes = DBHelper.getInstance().getTaskWarnedCount(ChatTask.TYPE.LINKS, message.message.chatId, message.message.senderUserId, task.mWarningsDuringTime);
                 final int limit = task.mAllowCountPerUser;
+
+                // If bantask exists means that user already banned or muted
+                if (isMessageRemoveByTaskMuted())
+                    return;
+
                 if (tryes < limit) {
                     DBHelper.getInstance().setAntiSpamWarnCount(ChatTask.TYPE.LINKS, message.message.chatId, message.message.senderUserId, tryes + 1);
-                    getLog().logWarningBeforeBanForLink(mChat, message, tryes, originalLink);
 
                     if (task.isWarnAvailable(tryes)) { // алертим при первой попытке спама и при последней.
+                        getLog().logWarningBeforeBanForLink(mChat, message, tryes, originalLink);
                         warnUser(tryes);
                     }
                 } else {
@@ -1232,13 +1352,14 @@ public class ServiceChatTask extends Service {
         void doAction() {
             if (task.isEnabled) {
                 long floodTimeLimit = task.mWarningsDuringTime;
-                final int tryes = DBHelper.getInstance().getAntiSpamWarnCount(task.mType, message.message.chatId, message.message.senderUserId, floodTimeLimit);
+                final int tryes = DBHelper.getInstance().getTaskWarnedCount(task.mType, message.message.chatId, message.message.senderUserId, floodTimeLimit);
                 final int limit = task.mAllowCountPerUser;
                 if (tryes < limit) {
                     // LogUtil.logBanForFloodAttempt(chat, message, tryes);
                     DBHelper.getInstance().setAntiSpamWarnCount(task.mType, message.message.chatId, message.message.senderUserId, tryes + 1);
 
                     if (task.isWarnAvailable(tryes)) {
+                        // getLog().logBanForFloodAttempt(chat, message, tryes);
                         warnUser(tryes);
                     }
 
@@ -1282,7 +1403,7 @@ public class ServiceChatTask extends Service {
                                 String banReason = getString(R.string.logAction_banForFlood);
                                 int localchatid = TgUtils.getChatRealId(mChat);
                                 DBHelper.getInstance().addToBanList(user, message.message.chatId, mChat.type.getConstructor(), localchatid,
-                                        task.mBanTimeSec * 1000, task.isReturnOnBanExpired, banReason);
+                                        task.mBanTimeSec * 1000, task.isReturnOnBanExpired, banReason, task.isMuteInsteadBan);
                                 ServiceUnbanTask.registerTask(getBaseContext());
                             }
                         });

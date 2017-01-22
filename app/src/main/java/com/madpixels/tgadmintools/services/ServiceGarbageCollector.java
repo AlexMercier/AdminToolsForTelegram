@@ -39,6 +39,7 @@ public class ServiceGarbageCollector extends Service{
 
         DBHelper.getInstance().clearOldLog();
 
+
         TgH.clearAppCache(getBaseContext(), new FileUtils2.ClearCallback() {
             @Override
             public void onCallback() {

@@ -6,6 +6,7 @@
     android:layout_marginBottom="16dp"
     android:background="@color/md_white_1000"
     android:orientation="vertical"
+    android:id="@+id/layer_flood_control_view"
     android:padding="8dp">
 
     <TextView
@@ -20,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checked="false"
-        android:text="Flood control enabled" />
+        android:text="@string/check_enabled" />
 
     <LinearLayout
         android:id="@+id/layerFloodControl"

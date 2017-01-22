@@ -196,8 +196,11 @@ public class ActivityGroupsList extends ActivityExtended {
         int pos = info.position - mListViewChats.getHeaderViewsCount();
 
         TdApi.Chat chat = lastClickedChat = mAdapter.getItem(pos);
-
         menu.setHeaderTitle(chat.title);
+
+        menu.add(0, 1, 0, (TgUtils.isChannel(chat) ? R.string.action_manage_channel : R.string.action_manage_group));
+        menu.add(0, 2, 0, R.string.action_manage_chat_users);
+        menu.add(0, 3, 0, R.string.action_banlist);
 
         if (TgUtils.isSuperGroup(chat.type.getConstructor())) {
             TdApi.ChannelChatInfo channel = (TdApi.ChannelChatInfo) chat.type;
@@ -205,16 +208,6 @@ public class ActivityGroupsList extends ActivityExtended {
                 menu.add(0, 4, 0, R.string.action_open_group_link);
             }
         }
-
-        menu.add(0, 1, 0, (TgUtils.isChannel(chat) ? R.string.action_manage_channel : R.string.action_manage_group));
-        menu.add(0, 2, 0, R.string.action_manage_chat_users);
-        menu.add(0, 3, 0, R.string.action_banlist);
-
-
-        //if(BuildConfig.DEBUG)
-        //    menu.add(0, 444, 0, "ToggleChannelInvites");
-
-
         super.onCreateContextMenu(menu, v, menuInfo);
     }
 

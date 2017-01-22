@@ -30,6 +30,7 @@ import org.json.JSONObject;
  */
 public class LogUtil {
 
+
     public enum Action {
         StickersFloodWarn, LinksFloodAttempt, RemoveSticker, BanForSticker, RemoveLink, BanForLink,
         AutoKickFromGroup, AutoUnban, AutoUnbanByAdminInvite, AutoReturnToChat, BanWordsFloodWarn,
@@ -37,7 +38,7 @@ public class LogUtil {
         RemoveVoice, VoiceFloodWarn, BanForFlood, BanForGame, RemoveGame, CommandExecError, RemoveImage,
         GameFloodWarn, BanForDocs, RemoveDocs, DocsFloodWarn, GifsFloodWarn, BanForGif, RemoveGif,
         BanForAudio, RemoveAudio, AudioFloodWarn, VideoFloodWarn, RemoveVideo, BanForVideo, RemoveFlood,
-        BOT_ERROR, CMDTitleChanged, RemoveJoinMessage, RemoveLeaveMessage, RemoveMuted
+        BOT_ERROR, CMDTitleChanged, RemoveJoinMessage, RemoveLeaveMessage, USER_MUTED, USER_UNMUTED, RemoveMuted
     }
 
     Callback onLogCallback;
@@ -60,13 +61,27 @@ public class LogUtil {
                     .put("type", Action.AutoKickFromGroup)
                     .put("chatType", chatType)
                     .put("chatId", chat_id)
-                    .put("chatTitle", chatTitle)
-                    .put("userId", user_id);
+                    .put("chatTitle", chatTitle);
+                    //.put("userId", user_id);
             logWithUserInfo(Action.AutoKickFromGroup, user_id, logData);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
+    public void logUnmuteBannedUser(BanTask ban) {
+        try {
+            JSONObject logData = new JSONObject()
+                    .put("type", Action.USER_UNMUTED)
+                    .put("chatId", ban.chat_id)
+                    .put("chatType", ban.chatType);
+
+            logWithUserInfo(Action.USER_UNMUTED, ban.user_id, logData);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void logAutoUnbanAndReturnError(BanTask ban, String error) {
         try {
@@ -75,8 +90,8 @@ public class LogUtil {
                     .put("chatId", ban.chat_id)
                     .put("chatType", ban.chatType)
                     .put("chatTitle", "")
-                    .put("error", error)
-                    .put("userId", ban.user_id);
+                    .put("error", error);
+                    //.put("userId", ban.user_id);
 
             logWithUserInfo(Action.AutoReturnToChat, ban.user_id, logData);
         } catch (JSONException e) {
@@ -91,8 +106,8 @@ public class LogUtil {
                     .put("type", Action.AutoReturnToChat)
                     .put("chatId", ban.chat_id)
                     .put("chatType", ban.chatType)
-                    .put("chatTitle", "")
-                    .put("userId", ban.user_id);
+                    .put("chatTitle", "");
+                    //.put("userId", ban.user_id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -150,7 +165,7 @@ public class LogUtil {
         n.alert();
     }
 
-    void logWithUserInfo(final Action action, int userId, final JSONObject logData) {
+    void logWithUserInfo(final Action action, final int userId, final JSONObject logData) {
         TgH.send(new TdApi.GetUser(userId), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
@@ -164,7 +179,7 @@ public class LogUtil {
                     userName = "";
                 }
                 try {
-                    logData.put("userFullname", userFullName.trim()).put("username", userName);
+                    logData.put("userId", userId).put("userFullname", userFullName.trim()).put("username", userName);
                     logAction(action, logData);
                 } catch (Exception e) {
                 }
@@ -193,8 +208,8 @@ public class LogUtil {
                     .put("type", action)
                     .put("chatId", chatId)
                     .put("chatType", chat.type.getConstructor())
-                    .put("chatTitle", chatTitle)
-                    .put("userId", user_id);
+                    .put("chatTitle", chatTitle);
+                    // .put("userId", user_id);
             if(!TextUtils.isEmpty(chatUsername))
                 logData.put("chatUsername", chatUsername);
             if (payload != null)
@@ -220,8 +235,8 @@ public class LogUtil {
                     .put("type", action)
                     .put("chatId", chatId)
                     .put("chatType", chat.type.getConstructor())
-                    .put("chatTitle", chatTitle)
-                    .put("userId", user_id);
+                    .put("chatTitle", chatTitle);
+                    //put("userId", user_id);
             if(!TextUtils.isEmpty(chatUsername))
                 logData.put("chatUsername", chatUsername);
             if (payload != null)
@@ -240,7 +255,7 @@ public class LogUtil {
         try {
             JSONObject logData = new JSONObject()
                     .put("type", Action.LinksFloodAttempt)
-                    .put("chatId", chatId)
+                    // .put("chatId", chatId)
                     .put("chatTitle", chatTitle)
                     .put("chatType", chat.type.getConstructor())
                     .put("userId", user_id);
@@ -267,7 +282,7 @@ public class LogUtil {
                     JSONObject j = new JSONObject()
                             .put("chatTitle", chatTitle)
                             .put("chatId", ban.chat_id)
-                            .put("userId", ban.user_id)
+                            // .put("userId", ban.user_id)
                             .put("error", error)
                             .put("chatType", ban.chatType);
                     logWithUserInfo(Action.AutoUnban, ban.user_id, j);
@@ -287,7 +302,7 @@ public class LogUtil {
                     JSONObject j = new JSONObject()
                             .put("chatTitle", chat.title)
                             .put("chatId", chat.id)
-                            .put("userId", ban.user_id)
+                            //.put("userId", ban.user_id)
                             .put("chatType", ban.chatType);
                     logWithUserInfo(Action.AutoUnban, ban.user_id, j);
                     // logAction(Action.AutoUnban, j);
@@ -334,7 +349,7 @@ public class LogUtil {
                     .put("chatTitle", newTitle)
                     .put("oldTitle", chat.title)
                     .put("chatId", chat.id)
-                    .put("userId",userId)
+                    //.put("userId",userId)
                     .put("chatType", chat.type.getConstructor());
             logWithUserInfo(action,userId, j);
         } catch (JSONException e) {
@@ -378,8 +393,8 @@ public class LogUtil {
                     .put("type", action)
                     .put("chatId", chatId)
                     .put("chatType", chat.type.getConstructor())
-                    .put("chatTitle", chatTitle)
-                    .put("userId", user_id);
+                    .put("chatTitle", chatTitle);
+                    //.put("userId", user_id);
             if(!TextUtils.isEmpty(chatUsername))
                 logData.put("chatUsername", chatUsername);
             logData.put("payload", tryes);
@@ -389,7 +404,7 @@ public class LogUtil {
         }
     }
 
-    public void logBotError(int error_code, String description, long chatID) {
+    public void logBotError(int error_code, String description, long chatID, String payload) {
         final JSONObject logData = new JSONObject();
         try {
             logData
@@ -397,6 +412,7 @@ public class LogUtil {
                     .put("error_code", error_code)
                     .put("description", description)
                     .put("chatId", chatID);
+            logData.put("payload", payload);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -421,5 +437,27 @@ public class LogUtil {
             e.printStackTrace();
         }
     }
+
+    public void logUserWasMuted(TdApi.Chat mChat, TdApi.UpdateNewMessage message) {
+        try {
+            JSONObject j = new JSONObject()
+                    .put("chatTitle", mChat.title)
+                    .put("chatId", mChat.id)
+                    .put("chatType", mChat.type.getConstructor());
+
+            String msgText;
+            if (message.message.content.getConstructor() == TdApi.MessageText.CONSTRUCTOR) {
+                TdApi.MessageText msg = (TdApi.MessageText) message.message.content;
+                msgText = msg.text;
+            } else {
+                msgText = "Type: " + message.message.content.getClass().getSimpleName();
+            }
+            j.put("payload", msgText); // log message or attachment type for reason
+            logWithUserInfo(Action.USER_MUTED, message.message.senderUserId, j);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

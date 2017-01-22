@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 24
     buildToolsVersion "23.0.2"
-    def arch = "x86" //x86 v7a all
+    def arch = "all" //x86 v7a all
 
     sourceSets.main {
         jniLibs.srcDir 'src/main/libs'
@@ -20,13 +20,13 @@ android {
         applicationId "com.madpixels.tgadmintools"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 80
-        if(arch=="v7a"){
+        versionCode 84
+        if(arch=="v7a" || arch=="all"){
             versionCode versionCode + 1
         }
-        versionName "1.0.6"
+        versionName "1.0.7"
 
-        def buildDate = "10.01.2017"
+        def buildDate = "22.01.2017"
         resValue "string", "buildDate", buildDate
     }
 
@@ -119,7 +119,7 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // productionCompile fileTree(include: ['*.jar'], dir: 'libs\\appodeal')
-    compile 'com.github.turhanoz:reactivedirectorychooser:1.1.0'
+    // compile 'com.github.turhanoz:reactivedirectorychooser:1.1.0'
     productionCompile 'com.google.android.gms:play-services-ads:7.3.0'
     compile project(':AppHelperLib')
     compile 'io.github.rockerhieu:emojicon:1.4.1'

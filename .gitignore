@@ -3,7 +3,7 @@ app/src/production/*
 files/*
 apks/*
 .gradle/*
-.idea/*
+#.idea/*
 .hg/*
 build/*
 app/build/*

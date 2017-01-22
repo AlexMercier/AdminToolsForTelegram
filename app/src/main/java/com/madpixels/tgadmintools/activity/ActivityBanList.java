@@ -23,6 +23,7 @@ import com.madpixels.apphelpers.ui.ProgressDialogBuilder;
 import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.adapters.AdapterKickedUsers;
 import com.madpixels.tgadmintools.db.DBHelper;
+import com.madpixels.tgadmintools.entities.BanTask;
 import com.madpixels.tgadmintools.entities.ChatParticipantBan;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
@@ -189,9 +190,9 @@ public class ActivityBanList extends ActivityExtended {
         TgH.TG().send(new TdApi.GetChannelMembers(channel_id, new TdApi.ChannelMembersKicked(), offset, 200), new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                // MyLog.log(object.toString());
                 if (object.getConstructor() == TdApi.ChatMembers.CONSTRUCTOR) {
                     TdApi.ChatMembers users = (TdApi.ChatMembers) object;
+                    boolean isFirstLoad = offset == 0;
 
                     offset += users.members.length;
                     if (users.members.length < 200)
@@ -203,8 +204,16 @@ public class ActivityBanList extends ActivityExtended {
                     for (TdApi.ChatMember cp : users.members) {
                         chatParticipantBans.add(new ChatParticipantBan(TgUtils.getUser(cp.userId)).setChatId(chat_id));
                     }
+                    if (isFirstLoad) {
+                        ArrayList<BanTask> mutedUsers = DBHelper.getInstance().getMutedBans(chat_id);
+                        if(mutedUsers!=null)
+                        for (BanTask ban:mutedUsers) {
+                            chatParticipantBans.add(0,
+                                    new ChatParticipantBan(TgUtils.getUser(ban.user_id)).setChatId(ban.chat_id)
+                            .setMuted(true));
+                        }
+                    }
 
-                    //List<TdApi.ChatParticipant> kickedList = Arrays.asList(users.participants);
                     onListUpdate(chatParticipantBans);
                 }
             }

@@ -254,6 +254,14 @@ public class FragmentBotTokens extends DialogFragment {
 
 
     void addBotToken() {
+        final String token = edtNewBotToken.getText().toString().trim();
+        if(token.isEmpty()){
+            MyToast.toast(getContext(), R.string.toast_bottoken_is_empty);
+            edtNewBotToken.requestFocus();
+            UIUtils.showSoftKeyboard(edtNewBotToken);
+            return;
+        }
+
         final ProgressDialogBuilder pd = new ProgressDialogBuilder(getActivity())
                 .setTitle(R.string.label_loading)
                 .setCancelable(false)
@@ -268,7 +276,7 @@ public class FragmentBotTokens extends DialogFragment {
         pd.show();
 
 
-        final String token = edtNewBotToken.getText().toString().trim();
+
         new Thread() {
             @Override
             public void run() {
@@ -351,8 +359,9 @@ public class FragmentBotTokens extends DialogFragment {
                 tvBotToken.setText(botToken.mToken);
                 return convertView;
             }
+            //124140320:AAFe2_zUdAxGyfkQcYDqLpdNrNjzsbp0IHU
             tvBotusername.setText("@" + botToken.mUsername);
-            tvBotToken.setText(botToken.mToken);
+            tvBotToken.setText(botToken.getTokenSafe());
 
             Object pic = botPics.get(botToken.mUsername);
             if (pic == null) {

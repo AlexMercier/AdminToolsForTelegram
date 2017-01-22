@@ -47,7 +47,6 @@
     <string name="user_type_deleted">Аккаунт удалён</string>
     <string name="online_last_seen">в сети: недавно</string>
     <string name="last_seen_at">был в сети</string>
-    <string name="founded_deleted_users">Найдено %s удалённых аккаунтов. Удалить их из чата?</string>
     <string name="btnClose">Закрыть</string>
     <string name="revoke_user_admin">Снять права админа</string>
     <string name="ban_reason">Причина бана</string>
@@ -255,7 +254,7 @@
     <string name="banned_words_count">%d запрещенных слов</string>
     <string name="logAction_removedFloodMessage">Удалено флуд сообщение</string>
     <string name="logAction_removedVoice">Удалено войс-сообщение</string>
-    <string name="text_antispam_alert_title">Antispam alert!</string>
+    <string name="text_antispam_alert_title">AdminTools Bot Alert!</string>
     <string name="caption_alerts_title">Заголовок уведомлений антиспама</string>
     <string name="action_add_link_to_wl">Добавить ссылку в список исключений</string>
     <string name="title_warning_text_before_ban">Текст предупрежения перед банов:</string>
@@ -348,11 +347,9 @@
 
     <string name="dialog_recent_changes">
         Новое в v.%s
-        \n опция Режим рид-онли для всех
-        \n опция Режим рид-онли для новых юзеров
-        \n Уведомление в чат когда пользователь был забанен
-        \n Выбор бота для отправки уведомлений от имени бота
-        \n Мелкие фиксы и оптимизация
+        \n[+] добавление юзера в read-only вместо бана при флуде вложениями
+        \n[+] поиск по списку юзеров чата
+        \n[*] всякие фиксы
     </string>
     <string name="btnSendNewSmsCode">Отправить код по SMS</string>
     <string name="btnRequestAuthCall">Запросить звонок с кодом</string>
@@ -392,11 +389,36 @@
     <string name="chtTitlePublicBan">Уведомить в чат о бане</string>
     <string name="logAction_removeLeaveMessage">Удалено сообщение Юзер покину чат</string>
     <string name="text_dozen_battery_white_list_api23" >
-        <b>Примечание:</b> <font color='#009688'>Если</font> приложение перестаёт работать в фоне, то вам нужно добавить его в исключения оптимизации батареи вашего Android, в
+        <b>Примечание:</b> Если приложение перестаёт работать в фоне, то вам нужно добавить его в исключения оптимизации батареи вашего Android, в
         <b>Настройки-> Батарея -> Меню -> Экономия</b>
         (или <b>Настройки -> Приложения -> Дополнительно -> Экономия батареи</b>) и исключить приложение из списка экономии, чтобы оно смогло корректно работать в фоне.</string>
     <string name="text_note_battery_optimization"><b>Примечание:</b> <font color='#009688'>Battery Optimization</font></string>
+    <string name="toast_bottoken_is_empty">Пожалуйста введите токен бота</string>
+    <string name="chtTitleMuteInsteadBan">Рид-онли вместо бана</string>
+    <string name="logAction_userWasMuted">Пользователю запрещено отправлять сообщения данного типа</string>
+    <string name="logAction_userWasUnMuted">Статус Рид-онли снят с юзера по истечении срока бана</string>
+    <string name="dateformat_full">d MMMM, yyyy, HH:mm:ss</string>
+    <string name="title_dialog_welcome_message">Текст приветствия</string>
+    <string name="dialog_title_help_formatting">Справка по форматированию</string>
+    <string name="btnOk">Ок</string>
+    <string name="title_search">Поиск</string>
+    <string name="hint_search">Введите данные юзера для поиска:</string>
+    <string name="text_user_has_muted_ban" >Read-only бан</string>
+    <string name="btn_main_show_admin_groups">Show administered groups</string>
+    <string name="btn_main_stop_app">Stop application</string>
+    <string name="btn_main_run_app">Run application</string>
 
+    <string name="app_thanks_to">Thanks to:</string>
+    <string name="thanks_to_list">All team of translators from transifex which help to translate app</string>
+
+    <string name="logAction_sendViaBotError">Send message via Bot error</string>
+    <string name="textChatRole">Role:</string>
+    <string name="status_online">online</string>
+    <string name="toast_error_remove_user">Remove user error</string>
+    <string name="text_command_leave_not_error_creator">Creator can\'t leave the channel</string>
+    <string name="text_command_execute_access_denied">Access denied.\nOnly admin can execute this command</string>
+    <string name="text_battery_optimization_state_disabled">Current State: Ok. App optimization disabled</string>
+    <string name="text_battery_optimization_state_enabled">Current State: App optimization enabled. App may stop work in the background</string>
 
     <string-array name="ban_times">
         <item>Мин.</item>
@@ -444,5 +466,6 @@
         <item>рид-онли юзера</item><!-- 2 commands -->
         <item>рид-онли юзеров</item><!-- 5 commands -->
     </string-array>
+
 
 </resources>

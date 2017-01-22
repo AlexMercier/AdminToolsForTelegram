@@ -151,6 +151,8 @@ public class ActivityLogView extends ActivityExtended {
         if (hasUserInfo(log)) {
                 menu.add(0, 4, 0, R.string.action_open_userninfo);
         }
+        if(log.action== LogUtil.Action.BOT_ERROR)
+            menu.add(0, 6, 0, "Copy Message");
 
         menu.add(0, 3, 0, R.string.action_copy);
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -207,8 +209,22 @@ public class ActivityLogView extends ActivityExtended {
                     DBHelper.getInstance().addLinkToWhiteList(link);
                     MyToast.toast(mContext, "Link added to whitelist");
                 } catch (JSONException e) {
-                    MyToast.toast(mContext, "Error");
+                    MyToast.toast(mContext, "Error parsing json");
                 }
+                break;
+            case 6:
+                try {
+                    String message = new JSONObject(log.jsonData).optString("payload");
+                    if(message.isEmpty())
+                        MyToast.toast(mContext, "Text is empty");
+                    else{
+                        Utils.copyToClipboard(message, mContext);
+                        MyToast.toast(mContext, R.string.toast_copied_to_clipboard);
+                    }
+                } catch (JSONException e) {
+                    MyToast.toast(mContext, "Error parsing json");
+                }
+
                 break;
         }
 

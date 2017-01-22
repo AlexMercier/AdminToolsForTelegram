@@ -50,7 +50,6 @@
     <string name="user_type_deleted">Deleted account</string>
     <string name="online_last_seen">last seen recently</string>
     <string name="last_seen_at">last seen at </string>
-    <string name="founded_deleted_users">Founded %s deleted accounts. Remove them from group?\nThis may take some time and maybe aborted by telegram flood control</string>
     <string name="btnClose">Close</string>
     <string name="revoke_user_admin">Revoke admin privilegies</string>
     <string name="ban_reason">Ban reason</string>
@@ -202,7 +201,7 @@
     <string name="action_open_group_link">Open group in Telegram</string>
 
     <string name="app_thanks_to">Thanks to:</string>
-    <string name="thanks_to_list">Ivan Lazcano for Spanish translation</string>
+    <string name="thanks_to_list">All team of translators from transifex which help to translate app</string>
     <string name="text_notification_descr_background">background service</string>
     <string name="description_user_within_time">Count of warnings for user within:\n(If user has not violated the rules during this time, the count of warnings will be reset)</string>
     <string name="text_warn_no_warn_user">No warn user before ban</string>
@@ -248,6 +247,8 @@
         <b>%left%</b> - print number of remaining warnings for user \n
         <b>%u_id%</b> - print user id \n
         <b>%c_id%</b> - print chat id \n
+        <b>%c_title%</b> - print chat title \n
+        PS: <i>count, max, left</i> variables available only for task warns.
         \n
         <b>Example</b>: \n
         <i>%username% warning %count% of %max%! Spam not allowed! \n
@@ -277,7 +278,7 @@
     <string name="banned_words_count">%d banned words for this chat</string>
     <string name="logAction_removedFloodMessage">Deleted flood message</string>
     <string name="logAction_removedVoice">Deleted Voice message</string>
-    <string name="text_antispam_alert_title">Antispam alert!</string>
+    <string name="text_antispam_alert_title">AdminTools Bot Alert!</string>
     <string name="caption_alerts_title">Antispam alert title</string>
     <string name="action_add_link_to_wl">Add link to white list</string>
     <string name="title_warning_text_before_ban">Warning text for users before ban:</string>
@@ -376,11 +377,9 @@
 
     <string name="dialog_recent_changes">
         New in v.%s
-        \n new option Mute all users
-        \n new option Mute new joined users
-        \n Notification to chat when user was banned
-        \n Now you can select bot to send notifications to chat via bot
-        \n Optimization and improvements
+        \n[+] temporary mute user instead of ban for attachments flood
+        \n[+] search in user list
+        \n[*] some fixes
     </string>
     <string name="btnSendNewSmsCode">Resend SMS Code</string>
     <string name="btnRequestAuthCall">Call auth code</string>
@@ -429,6 +428,22 @@
     <string name="text_battery_optimization_state_disabled">Current State: Ok. App optimization disabled</string>
     <string name="text_battery_optimization_state_enabled">Current State: App optimization enabled. App may stop work in the background</string>
     <string name="text_note_battery_optimization"><b>Note:</b> <font color='#009688'>Battery Optimization</font></string>
+    <string name="toast_bottoken_is_empty">Please enter token first</string>
+    <string name="chtTitleMuteInsteadBan">Mute instead Ban</string>
+    <string name="logAction_userWasMuted">User was muted to send messages by type</string>
+    <string name="logAction_userWasUnMuted">User was unmuted after ban expired</string>
+    <!-- Date Format patterns https://developer.android.com/reference/java/text/SimpleDateFormat.html -->
+    <string name="dateformat_full">d MMMM, yyyy hh:mm:ss aa</string>
+    <string name="status_online">online</string>
+    <string name="title_dialog_welcome_message">Welcome message</string>
+    <string name="dialog_title_help_formatting">Formattin help</string>
+    <string name="btnOk">Ok</string>
+    <string name="title_search">Search</string>
+    <string name="hint_search">Enter user given name, username or id for search:</string>
+    <string name="text_user_has_muted_ban" >User has muted ban</string>
+    <string name="btn_main_show_admin_groups">Show administered groups</string>
+    <string name="btn_main_stop_app">Stop application</string>
+    <string name="btn_main_run_app">Run application</string>
 
 
     <string-array name="ban_times">

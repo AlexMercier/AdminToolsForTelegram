@@ -12,7 +12,8 @@ public class BanTask {
     public int chatType;
     public int user_id;
     public int unbanErrors = 0;
-
+    public boolean isMutedBan = false; //Mute instead of Ban
+    public String username;
 
     public void setBanTiming(long banDate, long age) {
         this.banDate = banDate;

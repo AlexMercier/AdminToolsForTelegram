@@ -7,13 +7,16 @@ package com.madpixels.tgadmintools.entities;
 public class ChatTask {
     public boolean isEnabled = false;
     public Object payload;
+    public boolean isMuteInsteadBan = false;
 
 
-    public enum TYPE {STICKERS, IMAGES, LINKS, BANWORDS, VOICE, LeaveMsg, JoinMsg, FLOOD, GAME, DOCS,
-        GIF, AUDIO, VIDEO, COMMAND, MutedUsers, CHAT_BOT, WELCOME_USER}
+    public enum TYPE {
+        STICKERS, IMAGES, LINKS, BANWORDS, VOICE, LeaveMsg, JoinMsg, FLOOD, GAME, DOCS,
+        GIF, AUDIO, VIDEO, COMMAND, MutedUsers, CHAT_BOT, WELCOME_USER
+    }
 
     public TYPE mType;
-    public int id=0; // id in database
+    public int id = 0; // id in database
     public long chat_id;
 
     public int mAllowCountPerUser = 3;
@@ -21,7 +24,7 @@ public class ChatTask {
     public boolean isReturnOnBanExpired = true;
     public String mWarnTextFirst, mWarnTextLast, mText;
     public long mWarningsDuringTime = 5 * 60;// 5 minute default. .
-    public boolean isPublicToChat=false;
+    public boolean isPublicToChat = false;
 
     public boolean isRemoveMessage = false;
     public boolean isBanUser = false;

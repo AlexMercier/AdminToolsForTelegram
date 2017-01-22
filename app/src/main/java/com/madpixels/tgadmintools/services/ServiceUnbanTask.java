@@ -7,9 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.madpixels.apphelpers.MyLog;
-import com.madpixels.apphelpers.Utils;
 import com.madpixels.tgadmintools.BuildConfig;
 import com.madpixels.tgadmintools.db.DBHelper;
 import com.madpixels.tgadmintools.entities.BanTask;
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 /**
  * Service to lift expired bans
- *
+ * <p>
  * Created by Snake on 26.02.2016.
  */
 public class ServiceUnbanTask extends Service {
@@ -37,7 +37,7 @@ public class ServiceUnbanTask extends Service {
         long ts = DBHelper.getInstance().getBanListFirst();
         if (ts == 0) return;
         if (ts < System.currentTimeMillis()) {// has expired bans. Start service emmidiatly
-           context.startService(new Intent(context, ServiceUnbanTask.class));
+            context.startService(new Intent(context, ServiceUnbanTask.class));
         } else {
             //has bans but expiration time has not come yet. Register task at closest expiration time
             Intent myIntent = new Intent(context, ServiceUnbanTask.class);
@@ -47,12 +47,12 @@ public class ServiceUnbanTask extends Service {
             alarmManager.cancel(pi);
             alarmManager.set(AlarmManager.RTC_WAKEUP, ts + 3000, pi);
 
-            String date = Utils.TimestampToDate((ts+3000)/1000);
-            MyLog.log("task registered at: "+date);
+            String date = CommonUtils.tsToDate((ts + 3000) / 1000);
+            MyLog.log("task registered at: " + date);
         }
     }
 
-    public static void unregister(Context c){
+    public static void unregister(Context c) {
         Intent myIntent = new Intent(c, ServiceUnbanTask.class);
         PendingIntent pi = PendingIntent.getService(c, 0, myIntent, 0);
         AlarmManager alarmManager = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
@@ -63,7 +63,7 @@ public class ServiceUnbanTask extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         MyLog.log("ServiceUnbanTask started");
         mListTasks = DBHelper.getInstance().getExpairedBanList();
-        if(BuildConfig.DEBUG)
+        if (BuildConfig.DEBUG)
             LogUtil.showLogNotification("Service unban started for planned unban");
 
         if (mListTasks != null) {
@@ -78,49 +78,71 @@ public class ServiceUnbanTask extends Service {
         return START_STICKY;
     }
 
-    private void next(){
-        if(mListTasks.isEmpty()){
+    private void next() {
+        if (mListTasks.isEmpty()) {
             registerTask(this); // регистрием на некст
             stopSelf();
             return;
         }
-        BanTask banTask = mListTasks.remove(0);
-        if(banTask.isReturnOnUnban)
-            unbanAndReturnToChat(banTask);
-        else{
-            removeFromBanList(banTask);
-        }
+        final BanTask banTask = mListTasks.remove(0);
+
+        Client.ResultHandler resultHandler = new Client.ResultHandler() {
+            @Override
+            public void onResult(TdApi.TLObject object) {
+                if (banTask.isMutedBan) {
+                    unmuteUser(banTask);
+                } else if (banTask.isReturnOnUnban)
+                    unbanAndReturnToChat(banTask);
+                else {
+                    removeFromBanList(banTask);
+                }
+            }
+        };
+        // Если у юзера есть username то поищем юзера чтоб TDLib знала о нём наверняка
+        if (TextUtils.isEmpty(banTask.username))
+            resultHandler.onResult(null);
+        else
+            TgH.send(new TdApi.SearchPublicChat(banTask.username), resultHandler);
+
+    }
+
+    /**
+     * remove muted user from ban list
+     */
+    private void unmuteUser(BanTask ban) {
+        DBHelper.getInstance().removeBannedUser(ban.chat_id, ban.user_id);
+        new LogUtil(onLogCallback, ban).logUnmuteBannedUser(ban);
+        next();
     }
 
     private void unbanAndReturnToChat(final BanTask ban) {
-        if(TgUtils.isGroup(ban.chatType)){
+        if (TgUtils.isGroup(ban.chatType)) {
             DBHelper.getInstance().removeUserFromAutoKick(ban.chat_id, ban.user_id);
         }
         final TdApi.TLFunction fReturnUser = new TdApi.AddChatMember(ban.chat_id, ban.user_id, 0);
         TgH.TG().send(fReturnUser, new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-
-                if(object.getConstructor()== TdApi.Ok.CONSTRUCTOR) {
+                if (object.getConstructor() == TdApi.Ok.CONSTRUCTOR) {
                     DBHelper.getInstance().removeBanTask(ban);
                     new LogUtil(onLogCallback, ban).logAutoUnbanAndReturn(ban);
-                }else{
-                    if(TgUtils.isError(object)){//DONE если удаление не удалось (например error 3 chat not found) то получается вечный loop
+                } else {
+                    if (TgUtils.isError(object)) {//DONE если удаление не удалось (например error 3 chat not found) то получается вечный loop
                         TdApi.Error e = (TdApi.Error) object;
-                        if(e.code==3){// если чат не найден попробуйем загрузить чаты
+                        if (e.code == 3) {// если чат не найден попробуйем загрузить чаты
                             TgH.send(new TdApi.GetChats(Long.MAX_VALUE, 0, 100), new Client.ResultHandler() {
                                 @Override
                                 public void onResult(TdApi.TLObject object) {
                                     TgH.send(fReturnUser, new Client.ResultHandler() {
                                         @Override
                                         public void onResult(TdApi.TLObject object) {
-                                            if(TgUtils.isError(object))
+                                            if (TgUtils.isError(object))
                                                 new LogUtil(onLogCallback, ban).logAutoUnbanAndReturnError(ban, object.toString());
                                         }
                                     });
                                 }
                             });
-                        }else //code!=3:
+                        } else //code!=3:
                             new LogUtil(onLogCallback, ban).logAutoUnbanAndReturnError(ban, object.toString());
                     }
                     DBHelper.getInstance().removeBanTask(ban);
@@ -130,18 +152,18 @@ public class ServiceUnbanTask extends Service {
         });
     }
 
-    private void removeFromBanList(final BanTask ban){
-        if(TgUtils.isSuperGroup(ban.chatType)) {
+    private void removeFromBanList(final BanTask ban) {
+        if (TgUtils.isSuperGroup(ban.chatType)) {
             TdApi.TLFunction f = new TdApi.ChangeChatMemberStatus(ban.chat_id, ban.user_id, new TdApi.ChatMemberStatusLeft());
             TgH.TG().send(f, new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.TLObject object) {
-                    if(TgUtils.isOk(object)) {
+                    if (TgUtils.isOk(object)) {
                         MyLog.log(object.toString());
                         DBHelper.getInstance().removeBannedUser(ban.chat_id, ban.user_id);
                         new LogUtil(onLogCallback, ban).logAutoRemoveFromBanList(ban);
                         next();
-                    }else{
+                    } else {
                         // Load banned users for load user
                         TdApi.TLFunction f1 = new TdApi.GetChannelMembers(ban.from_id, new TdApi.ChannelMembersKicked(), 0, 100);
                         TgH.send(f1);
@@ -150,7 +172,7 @@ public class ServiceUnbanTask extends Service {
                         TgH.send(f, new Client.ResultHandler() {
                             @Override
                             public void onResult(TdApi.TLObject object) {
-                                if(!TgUtils.isOk(object)) {
+                                if (!TgUtils.isOk(object)) {
                                     DBHelper.getInstance().setUnbanError(ban);
                                     new LogUtil(onLogCallback, ban).logAutoRemoveFromBanListError(ban, object.toString());
                                 }
@@ -160,7 +182,7 @@ public class ServiceUnbanTask extends Service {
                     }
                 }
             });
-        }else{
+        } else {
             DBHelper.getInstance().removeBannedUser(ban.chat_id, ban.user_id);
             DBHelper.getInstance().removeUserFromAutoKick(ban.chat_id, ban.user_id);
             new LogUtil(onLogCallback, ban).logAutoRemoveFromBanList(ban);

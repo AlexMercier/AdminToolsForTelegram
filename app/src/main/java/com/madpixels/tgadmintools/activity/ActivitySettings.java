@@ -16,7 +16,6 @@ import android.os.Environment;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -31,6 +30,7 @@ import android.widget.TextView;
 
 import com.madpixels.apphelpers.MyLog;
 import com.madpixels.apphelpers.MyToast;
+import com.madpixels.apphelpers.PathUtil;
 import com.madpixels.apphelpers.Sets;
 import com.madpixels.apphelpers.UIUtils;
 import com.madpixels.apphelpers.ui.ActivityExtended;
@@ -40,10 +40,6 @@ import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.db.DBHelper;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.services.ServiceChatTask;
-import com.turhanoz.android.reactivedirectorychooser.event.OnDirectoryCancelEvent;
-import com.turhanoz.android.reactivedirectorychooser.event.OnDirectoryChosenEvent;
-import com.turhanoz.android.reactivedirectorychooser.ui.DirectoryChooserFragment;
-import com.turhanoz.android.reactivedirectorychooser.ui.OnDirectoryChooserFragmentInteraction;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -51,12 +47,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
+import java.text.DecimalFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 /**
  * Created by Snake on 21.03.2016.
  */
-public class ActivitySettings extends ActivityExtended implements OnDirectoryChooserFragmentInteraction {
+public class ActivitySettings extends ActivityExtended {
 
     boolean whiteLinksChanged = false;
 
@@ -263,8 +263,16 @@ public class ActivitySettings extends ActivityExtended implements OnDirectoryCho
             case Const.ACTION_PICK_BACKUP_TO_RESTORE:
                 if (resultCode == RESULT_OK) {
                     Uri uri = data.getData();
-                    File file = new File(uri.getPath());
-                    restoreBackup(file.getAbsolutePath());
+                    try {
+                        String filePath = PathUtil.getPath(mContext, uri);
+                        if (filePath.endsWith(".db"))
+                            restoreBackup(filePath);
+                        else
+                            MyToast.toast(mContext, "Error, unknown file format. Requared Adt db file");
+                    } catch (URISyntaxException e) {
+                        MyToast.toast(mContext, e.getMessage());
+                    }
+
                 }
                 break;
         }
@@ -285,51 +293,67 @@ public class ActivitySettings extends ActivityExtended implements OnDirectoryCho
 
 
     private void showSaveFileDialog() {
-        if(!MainActivity.checkStoragePermissions(this)){
+        if (!MainActivity.checkStoragePermissions(this)) {
             MyToast.toast(mContext, "Required Storage Permission");
             return;
         }
 
-        DirectoryChooserFragment directoryChooserFragment = DirectoryChooserFragment.newInstance(Environment.getExternalStorageDirectory());
+        String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/AdminToolsTelegram/";
+        File fDir = new File(dir);
+        fDir.mkdirs();
 
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        directoryChooserFragment.show(transaction, "RDC");
+        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        String filename = "AdminToolsTgBackup_%s_%s_%d.db";
+        filename = String.format(filename, new DecimalFormat("00").format(day), new DecimalFormat("00").format(month), year);
+
+        backupDatabase(new File(fDir, filename));
     }
 
     private void showRestoreDialog() {
-        if(!MainActivity.checkStoragePermissions(this)){
+        if (!MainActivity.checkStoragePermissions(this)) {
             MyToast.toast(mContext, "Required Storage Permission");
             return;
         }
 
-        Intent i = new Intent();
-        i.setType("database/db");
-        i.setAction(Intent.ACTION_GET_CONTENT);
-        i.addCategory(Intent.CATEGORY_OPENABLE);
+        Intent intent = new Intent();
+        intent.setType("*/*");
+        if (Build.VERSION.SDK_INT >= 19) {
+            //intent = new Intent("android.intent.action.OPEN_DOCUMENT");
+            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+        } else {
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+        }
+
+
+        // i.addCategory(Intent.CATEGORY_);
         try {
-            startActivityForResult(i, Const.ACTION_PICK_BACKUP_TO_RESTORE);
+            startActivityForResult(intent, Const.ACTION_PICK_BACKUP_TO_RESTORE);
         } catch (Exception e) {
             MyToast.toast(mContext, "Error opening File Manager.\n" + e.getMessage());
         }
     }
 
-    private void backupDatabase(File directoryChosenByUser) {
+    private void backupDatabase(File backupFilename) {
         File sd = Environment.getExternalStorageDirectory();
         //File data = Environment.getDataDirectory();
         if (sd.canWrite()) {
             File currentDB = new File(DBHelper.getInstance().db.getPath());
-            File backupDB = new File(directoryChosenByUser, "AdminToolsTelegram_backup.db");
+            // File backupDB = //new File(directoryChosenByUser, "AdminToolsTelegram_backup.db");
             MainActivity.stopApplication(mContext);
             DBHelper.getInstance().dbClose();
             try {
                 FileChannel src = new FileInputStream(currentDB).getChannel();
-                FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                FileChannel dst = new FileOutputStream(backupFilename).getChannel();
                 dst.transferFrom(src, 0, src.size());
                 src.close();
                 dst.close();
-                MyToast.toast(mContext, "AdminTools backup saved to\n" + backupDB.getAbsolutePath());
+                // MyToast.toast(mContext, "AdminTools backup saved to\n" + backupFilename.getAbsolutePath());
                 MainActivity.startApplication(mContext);
-                saveBackupToCloudStorage(backupDB);
+                saveBackupToCloudStorage(backupFilename);
             } catch (IOException e) {
                 MyToast.toast(mContext, "save db error!");
             }
@@ -338,7 +362,6 @@ public class ActivitySettings extends ActivityExtended implements OnDirectoryCho
 
     private void restoreBackup(String backupDBPath) {
         File sd = Environment.getExternalStorageDirectory();
-        //File data = Environment.getDataDirectory();
         if (sd.canRead()) {
             String dbPath = DBHelper.getInstance().db.getPath();
             File dbFile = new File(dbPath);
@@ -351,29 +374,25 @@ public class ActivitySettings extends ActivityExtended implements OnDirectoryCho
                 dst.transferFrom(src, 0, src.size());
                 src.close();
                 dst.close();
-                MyToast.toast(mContext, "Databse restored");
 
+                try {
+                    DBHelper.getInstance();
+                } catch (Exception ex) {
+                    MyToast.toast(mContext, "Open database error!");
+                    dbFile.delete();
+                    return;
+                }
+
+                MyToast.toast(mContext, "Databse restored");
             } catch (IOException e) {
-                MyToast.toast(mContext, "save db error!");
+                MyToast.toastL(mContext, "Read file error:\n" + e.getMessage());
+                return;
             }
-            //MainActivity.startApplication(mContext);
-            //Restart app:
             Intent intent = new Intent(mContext, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             Runtime.getRuntime().exit(0);
         }
-    }
-
-    @Override
-    public void onEvent(OnDirectoryChosenEvent event) {
-        File directoryChosenByUser = event.getFile();
-        backupDatabase(directoryChosenByUser);
-    }
-
-    @Override
-    public void onEvent(OnDirectoryCancelEvent onDirectoryCancelEvent) {
-
     }
 
     void saveBackupToCloudStorage(final File backupFile) {
@@ -384,7 +403,7 @@ public class ActivitySettings extends ActivityExtended implements OnDirectoryCho
                 if (obj.getConstructor() == TdApi.User.CONSTRUCTOR) {
                     TdApi.User me = (TdApi.User) obj;
                     TdApi.InputFile f = new TdApi.InputFileLocal(backupFile.getAbsolutePath());
-                    TdApi.InputMessageDocument doc = new TdApi.InputMessageDocument(f, null, "TelegramAdminToolsBackup File");
+                    TdApi.InputMessageDocument doc = new TdApi.InputMessageDocument(f, null, "TelegramAdminToolsBackup File #adtbackup");
                     TdApi.SendMessage sendMsg = new TdApi.SendMessage();
                     sendMsg.inputMessageContent = doc;
                     sendMsg.chatId = me.id;

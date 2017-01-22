@@ -1,6 +1,6 @@
 package com.madpixels.tgadmintools.entities;
 
-import com.madpixels.apphelpers.Utils;
+import com.madpixels.tgadmintools.utils.CommonUtils;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -12,7 +12,7 @@ public class ChatParticipantBan {
     public String banText;
     public long chat_id;
     public long banDate, banAge;
-    public boolean isReturnToChat;
+    public boolean isReturnToChat, isMuted = false;
     public TdApi.User user;
 
     private String strBanDate, strBanExpired;
@@ -28,13 +28,18 @@ public class ChatParticipantBan {
 
     public String getBanDate(){
         if (strBanDate==null)
-            strBanDate = Utils.TimestampToDate(banDate/1000);
+            strBanDate = CommonUtils.tsToDate(banDate/1000);
         return strBanDate;
     }
 
     public String getBanExpiredTime(){
         if(strBanExpired==null)
-            strBanExpired =  Utils.TimestampToDate((banDate+banAge)/1000);
+            strBanExpired =  CommonUtils.tsToDate((banDate+banAge)/1000);
         return strBanExpired;
+    }
+
+    public ChatParticipantBan setMuted(boolean isMuted) {
+        this.isMuted = isMuted;
+        return this;
     }
 }

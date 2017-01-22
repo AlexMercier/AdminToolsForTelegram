@@ -36,7 +36,7 @@ public class MyLog {
 
         try {
             BufferedWriter buf = new BufferedWriter(new FileWriter(logWriteFile, true));
-            buf.append("[" + Utils.TimestampToDate(System.currentTimeMillis() / 1000) + "] " + msg);
+            buf.append("[" + Utils.TimestampToDateFormat(System.currentTimeMillis() / 1000, "d MMMM, yyyy, HH:mm:ss") + "] " + msg);
             buf.newLine();
             buf.close();
         } catch (Exception e) {

@@ -3,7 +3,6 @@ package com.madpixels.tgadmintools.helper;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.madpixels.apphelpers.MyLog;
 import com.madpixels.tgadmintools.R;
 import com.madpixels.tgadmintools.entities.ChatCommand;
 import com.madpixels.tgadmintools.entities.ChatTask;
@@ -55,14 +54,16 @@ public class CommandsExecutor {
         TdApi.InputMessageText msgText = new TdApi.InputMessageText();
 
         TdApi.User user = TgUtils.getUser(message.senderUserId);
-        FormattedTagText formattedTagText = CommonUtils.replaceCustomShortTags(pCommand.answer, task, user, 0);
 
-        String botToken = CommonUtils.useBotForAlert(task.chat_id);
+        String botToken = CommonUtils.getBotForChatAlerts(task.chat_id);
 
         if (botToken != null) {
-            CommonUtils.sendMessageViaBot(botToken, message.chatId, formattedTagText.resultText, false, true);
+            String text = CommonUtils.replaceCustomShortTags(pCommand.answer, task, user, -1, chatCommand.mChat, true).resultText;
+            CommonUtils.sendMessageViaBot(botToken, message.chatId, text, true, false);
             return;
         }
+
+        FormattedTagText formattedTagText = CommonUtils.replaceCustomShortTags(pCommand.answer, task, user, -1, chatCommand.mChat, false);
 
         msgText.text = formattedTagText.resultText;
         if (formattedTagText.mention != null) {
@@ -71,7 +72,7 @@ public class CommandsExecutor {
         }
 
         msgSend.inputMessageContent = msgText;
-        msgText.parseMode = new TdApi.TextParseModeMarkdown();
+        msgText.parseMode = new TdApi.TextParseModeHTML();
         TgH.send(msgSend, new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
@@ -87,7 +88,10 @@ public class CommandsExecutor {
         AdminUtils.kickUser(message.chatId, message.senderUserId, new Client.ResultHandler() {
             @Override
             public void onResult(TdApi.TLObject object) {
-                MyLog.log(object.toString());
+                // MyLog.log(object.toString());
+                //Set user status as Left so he can return back
+                TdApi.TLFunction f = new TdApi.ChangeChatMemberStatus(message.chatId, message.senderUserId, new TdApi.ChatMemberStatusLeft());
+                TgH.send(f);
             }
         });
     }
@@ -96,7 +100,7 @@ public class CommandsExecutor {
         if (chatCommand.params.length == 1) {// user not send title
             String commandExample = chatCommand.params[0] + " New Title";
 
-            String botToken = CommonUtils.useBotForAlert(task.chat_id);
+            String botToken = CommonUtils.getBotForChatAlerts(task.chat_id);
             if (botToken != null) {
                 String msgText = mContext.getString(R.string.text_hint_cmd_change_title) +
                         "\n<pre>" + TextUtils.htmlEncode(commandExample) + "</pre>";

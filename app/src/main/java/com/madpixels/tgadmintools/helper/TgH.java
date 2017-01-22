@@ -30,7 +30,7 @@ public class TgH {
     private static final Object LOCK = new Object();
 
     public static int selfProfileId;
-    public static String selfProfileUsername;
+    //public static String selfProfileUsername;
 
     public static SparseArray<TdApi.User> users = new SparseArray<>();
 
@@ -228,7 +228,7 @@ public class TgH {
                 if(object.getConstructor()== TdApi.User.CONSTRUCTOR) {
                     TdApi.User me = (TdApi.User) object;
                     selfProfileId = me.id;
-                    selfProfileUsername = me.username;
+                    // selfProfileUsername = me.username;
                     Sets.set(Const.SETS_PROFILE_ID, selfProfileId); //save last know profile
                     if (callback != null)
                         callback.onResult(object);

@@ -10,7 +10,6 @@ import android.text.TextUtils;
 
 import com.madpixels.apphelpers.MyLog;
 import com.madpixels.apphelpers.Sets;
-import com.madpixels.apphelpers.Utils;
 import com.madpixels.tgadmintools.App;
 import com.madpixels.tgadmintools.Const;
 import com.madpixels.tgadmintools.adapters.AdapterChatUsersLocal;
@@ -26,6 +25,7 @@ import com.madpixels.tgadmintools.helper.TelegramBot;
 import com.madpixels.tgadmintools.helper.TgH;
 import com.madpixels.tgadmintools.helper.TgUtils;
 import com.madpixels.tgadmintools.services.ServiceAutoKicker;
+import com.madpixels.tgadmintools.utils.CommonUtils;
 import com.madpixels.tgadmintools.utils.LogUtil;
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -169,7 +169,6 @@ public class DBHelper extends DB {
                 task.mBanTimeSec = c.getInt(c.getColumnIndex("ban_blackword_age_msec")) / 1000;
                 task.mAllowCountPerUser = c.getInt(c.getColumnIndex("banWordsFloodLimit"));
 
-//                antiSpamRule.isAlertAboutWordBan = c.getInt(c.getColumnIndex("isAlertOnBanWord")) == 1;  //TODO это надо?
                 String warnText = c.getString(c.getColumnIndex("ban_words_warn_text"));
                 if (!TextUtils.isEmpty(warnText))
                     task.mWarnTextFirst = warnText;
@@ -253,7 +252,8 @@ public class DBHelper extends DB {
         }
     }
 
-    public void addToBanList(TdApi.User user, long chat_id, int chatType, int groupIdOrChannelId, long ban_age_msec, boolean isReturnOnUnban, String banReason) {
+    public void addToBanList(TdApi.User user, long chat_id, int chatType, int groupIdOrChannelId, long ban_age_msec,
+                             boolean isReturnOnUnban, String banReason, boolean isMuteInsteadBan) {
         long ban_ts = System.currentTimeMillis();
 
         ContentValues cv = new ContentValues(7);
@@ -267,10 +267,11 @@ public class DBHelper extends DB {
         cv.put("ban_age_msec", ban_age_msec);
         cv.put("is_return_on_unban", isReturnOnUnban);
         cv.put("reason", banReason);
+        cv.put("is_mute_ban", isMuteInsteadBan);
         // cv.put("reason", 0);
 
         try {
-            long id = db.insertWithOnConflict(BAN_INFO_TABLE, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+            long id = db.insertWithOnConflict(TABLE_BAN_INFO, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
             MyLog.log(id + "");
         } catch (Exception e) {
             e.printStackTrace();
@@ -283,7 +284,7 @@ public class DBHelper extends DB {
      * @return expiration ban timestamp or 0.
      */
     public long getBanListFirst() {
-        String sql = "SELECT user_id, ban_date_ts+ban_age_msec as targetTime   FROM " + BAN_INFO_TABLE +
+        String sql = "SELECT user_id, ban_date_ts+ban_age_msec as targetTime   FROM " + TABLE_BAN_INFO +
                 " WHERE ban_age_msec>0 " +
                 " ORDER BY targetTime ASC LIMIT 1";
         Cursor c = getTable(sql);
@@ -293,7 +294,7 @@ public class DBHelper extends DB {
                 long targetTime = c.getLong(c.getColumnIndex("targetTime"));
                 MyLog.log(user_id + ": " + targetTime);
                 c.close();
-                String s = Utils.TimestampToDate(targetTime / 1000);
+                String s = CommonUtils.tsToDate(targetTime / 1000);
                 MyLog.log("targetTime: " + s);
                 return targetTime;
             }
@@ -302,32 +303,60 @@ public class DBHelper extends DB {
         return 0;
     }
 
+    public BanTask getBanTask(long chat_id, int user_id){
+        String sql = "SELECT _id, chat_id, from_id, chatType, user_id, user_login, is_return_on_unban, " +
+                "is_mute_ban, unban_errors,  ban_date_ts+ban_age_msec as targetTime FROM " +
+                TABLE_BAN_INFO + " WHERE chat_id=? AND user_id=?";
+        Cursor c = getTable(sql, chat_id+"", user_id+"");
+        if(c!=null){
+            BanTask bt = new BanTask();
+            bt.task_id = c.getLong(c.getColumnIndex("_id"));
+            bt.chat_id = c.getLong(c.getColumnIndex("chat_id"));
+            bt.from_id = c.getInt(c.getColumnIndex("from_id"));
+            bt.chatType = c.getInt(c.getColumnIndex("chatType"));
+            bt.user_id =  c.getInt(c.getColumnIndex("user_id"));
+            bt.isReturnOnUnban = c.getInt(c.getColumnIndex("is_return_on_unban")) == 1;
+            bt.user_id = c.getInt(c.getColumnIndex("user_id"));
+            bt.unbanErrors = c.getInt(c.getColumnIndex("unban_errors"));
+            bt.username = c.getString(c.getColumnIndex("user_login"));
+            bt.isMutedBan = c.getInt(c.getColumnIndex("is_mute_ban"))==1;
+            c.close();
+            return  bt;
+        }
+        return null;
+    }
+
+
+
+
     public ArrayList<BanTask> getExpairedBanList() {
 
         final long expaired_ts = System.currentTimeMillis();
-        String sql = "SELECT _id, chat_id, from_id, chatType, user_id,is_return_on_unban, unban_errors,  ban_date_ts+ban_age_msec as targetTime FROM " + BAN_INFO_TABLE +
+        String sql = "SELECT _id, chat_id, from_id, chatType, user_id, user_login, is_return_on_unban, unban_errors,  ban_date_ts+ban_age_msec as targetTime FROM " +
+                TABLE_BAN_INFO +
                 " WHERE ban_age_msec>0 AND targetTime<=" + expaired_ts +
                 " ORDER BY targetTime DESC";
         Cursor c = getTable(sql);
         if (c != null) {
             ArrayList<BanTask> list = new ArrayList<>(c.getCount());
             do {
-                String user_id = c.getString(c.getColumnIndex("user_id"));
-                long targetTime = c.getLong(c.getColumnIndex("targetTime"));
-                MyLog.log(user_id + ": " + targetTime);
+                //String user_id = c.getString(c.getColumnIndex("user_id"));
+                //long targetTime = c.getLong(c.getColumnIndex("targetTime"));
+                //MyLog.log(user_id + ": " + targetTime);
 
                 BanTask bt = new BanTask();
                 bt.task_id = c.getLong(c.getColumnIndex("_id"));
                 bt.chat_id = c.getLong(c.getColumnIndex("chat_id"));
                 bt.from_id = c.getInt(c.getColumnIndex("from_id"));
                 bt.chatType = c.getInt(c.getColumnIndex("chatType"));
-                bt.user_id = c.getInt(c.getColumnIndex("user_id"));
+                bt.user_id =  c.getInt(c.getColumnIndex("user_id"));
                 bt.isReturnOnUnban = c.getInt(c.getColumnIndex("is_return_on_unban")) == 1;
                 bt.user_id = c.getInt(c.getColumnIndex("user_id"));
                 bt.unbanErrors = c.getInt(c.getColumnIndex("unban_errors"));
+                bt.username = c.getString(c.getColumnIndex("user_login"));
 
-                String stime = Utils.TimestampToDate(targetTime / 1000);
-                MyLog.log("test time: " + stime);
+                //String stime = Utils.TimestampToDate(targetTime / 1000);
+                //MyLog.log("test time: " + stime);
 
                 list.add(bt);
             }
@@ -340,7 +369,7 @@ public class DBHelper extends DB {
 
     public void removeBanTask(BanTask ban) {
         try {
-            db.delete(BAN_INFO_TABLE, "_id=?", new String[]{ban.task_id + ""});
+            db.delete(TABLE_BAN_INFO, "_id=?", new String[]{ban.task_id + ""});
         } catch (Exception e) {
             MyLog.log(e);
         }
@@ -354,7 +383,7 @@ public class DBHelper extends DB {
         try {
             ContentValues cv = new ContentValues(2);
             cv.put("unban_errors", ban.unbanErrors + 1);
-            db.update(BAN_INFO_TABLE, cv, "_id=?", new String[]{ban.task_id + ""});
+            db.update(TABLE_BAN_INFO, cv, "_id=?", new String[]{ban.task_id + ""});
         } catch (Exception e) {
             MyLog.log(e);
         }
@@ -362,7 +391,7 @@ public class DBHelper extends DB {
 
     public void removeBanTask(long chatId, int userId) {
         try {
-            int count = db.delete(BAN_INFO_TABLE, "chat_id=? AND user_id=?", new String[]{chatId + "", userId + ""});
+            int count = db.delete(TABLE_BAN_INFO, "chat_id=? AND user_id=?", new String[]{chatId + "", userId + ""});
             MyLog.log("deleted count " + count);
         } catch (Exception e) {
             MyLog.log(e);
@@ -371,7 +400,7 @@ public class DBHelper extends DB {
 
     public void deleteGroup(long chat_id) {
         try {
-            int c = db.delete(BAN_INFO_TABLE, "chat_id=?", new String[]{chat_id + ""});
+            int c = db.delete(TABLE_BAN_INFO, "chat_id=?", new String[]{chat_id + ""});
             MyLog.log("DeleteGroup BAN_INFO_TABLE: " + c);
 
             c = db.delete(TABLE_AUTO_KICK, "chat_id=?", new String[]{chat_id + ""});
@@ -380,7 +409,7 @@ public class DBHelper extends DB {
             c = db.delete(TABLE_CHAT_TASKS, "chat_id=?", new String[]{chat_id + ""});
             MyLog.log("DeleteGroup TABLE_ANTISPAM: " + c);
 
-            c = db.delete(TABLE_ANTISPAM_WARNS, "chatId=?", new String[]{chat_id + ""});
+            c = db.delete(TABLE_TASK_WARNS, "chatId=?", new String[]{chat_id + ""});
             MyLog.log("DeleteGroup TABLE_ANTISPAM_WARNS: " + c);
         } catch (Exception e) {
             MyLog.log(e);
@@ -389,7 +418,7 @@ public class DBHelper extends DB {
 
     public void removeBannedUser(long chat_id, int user_id) {
         try {
-            int size = db.delete(BAN_INFO_TABLE, "chat_id=? AND user_id=?", new String[]{chat_id + "", user_id + ""});
+            int size = db.delete(TABLE_BAN_INFO, "chat_id=? AND user_id=?", new String[]{chat_id + "", user_id + ""});
             MyLog.log(size + "");
             if (getAutoKickCount() == 0) {
                 ServiceAutoKicker.stop(App.getContext());
@@ -443,7 +472,7 @@ public class DBHelper extends DB {
     }
 
     public ArrayList<ChatParticipantBan> getBanned(long chat_id, int offset) {
-        String sql = "SELECT * FROM " + BAN_INFO_TABLE + " WHERE chat_id=" + chat_id + " ORDER BY _id ASC LIMIT " + offset + ",100 ";
+        String sql = "SELECT * FROM " + TABLE_BAN_INFO + " WHERE chat_id=" + chat_id + " ORDER BY _id ASC LIMIT " + offset + ",100 ";
         Cursor c = getTable(sql);
         if (c != null) {
             ArrayList<ChatParticipantBan> users = new ArrayList<>(c.getCount());
@@ -529,6 +558,7 @@ public class DBHelper extends DB {
             task.isRemoveMessage = c.getInt(c.getColumnIndex("is_remove_msg")) == 1;
             task.isEnabled = c.getInt(c.getColumnIndex("isEnabled")) == 1;
             task.isPublicToChat = c.getInt(c.getColumnIndex("is_public_alert")) == 1;
+            task.isMuteInsteadBan = c.getInt(c.getColumnIndex("is_mute_on_ban"))==1;
 
             tasks.add(task);
         } while (c.moveToNext());
@@ -553,6 +583,7 @@ public class DBHelper extends DB {
         cv.put("is_remove_msg", task.isRemoveMessage);
         cv.put("isEnabled", task.isEnabled);
         cv.put("is_public_alert", task.isPublicToChat);
+        cv.put("is_mute_on_ban", task.isMuteInsteadBan);
 
 
         try {
@@ -563,8 +594,13 @@ public class DBHelper extends DB {
         }
     }
 
+    public boolean isBannedById(long chat_id, int user_id){
+        int count = getCount(TABLE_BAN_INFO, "chat_id=? AND user_id=?", chat_id+"", user_id+"");
+        return count>0;
+    }
+
     public ChatParticipantBan getBanById(long chat_id, int user_id) {
-        String sql = "SELECT * FROM " + BAN_INFO_TABLE + " WHERE chat_id=" + chat_id + " AND user_id=" + user_id;
+        String sql = "SELECT * FROM " + TABLE_BAN_INFO + " WHERE chat_id=" + chat_id + " AND user_id=" + user_id;
         Cursor c = getTable(sql);
         if (c != null) {
             String reason = c.getString(0);
@@ -778,9 +814,9 @@ public class DBHelper extends DB {
      * @param sec срок действия предупреждения, в секундах.
      * @return
      */
-    public int getAntiSpamWarnCount(ChatTask.TYPE type, long chatId, int userId, long sec) {
+    public int getTaskWarnedCount(ChatTask.TYPE type, long chatId, int userId, long sec) {
         long timestamp_value = sec > 0 ? System.currentTimeMillis() - (sec * 1000) : 0; // 0 - whole time, else last violated time.
-        String sql = "SELECT count FROM " + TABLE_ANTISPAM_WARNS + " WHERE action=?" +
+        String sql = "SELECT count FROM " + TABLE_TASK_WARNS + " WHERE action=?" +
                 " AND chatId=" + chatId + " AND userId=" + userId +
                 " AND ts > " + timestamp_value;
         try {
@@ -805,7 +841,7 @@ public class DBHelper extends DB {
         cv.put("ts", System.currentTimeMillis());
         cv.put("count", attemptsCount);
         try {
-            db.insertWithOnConflict(TABLE_ANTISPAM_WARNS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+            db.insertWithOnConflict(TABLE_TASK_WARNS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
         } catch (Exception e) {
 
         }
@@ -813,22 +849,32 @@ public class DBHelper extends DB {
 
     public void resetWarnCountForChat(long chatId) {
         try {
-            long id = db.delete(TABLE_ANTISPAM_WARNS, "chatId=?", new String[]{chatId + ""});
+            long id = db.delete(TABLE_TASK_WARNS, "chatId=?", new String[]{chatId + ""});
             MyLog.log("Deleted: " + id);
         } catch (Exception e) {
 
         }
     }
 
-    public void deleteAntiSpamWarnCount(ChatTask.TYPE type, long chatId, int fromId) {
-        db.delete(TABLE_ANTISPAM_WARNS, "action=? AND chatId=? AND userId=?", new String[]{type.name(), chatId + "", fromId + ""});
+    public void clearWarnsCountForChatTask(long chatId, ChatTask.TYPE pType) {
+        try {
+            long id = db.delete(TABLE_TASK_WARNS, "chatId=? AND action=?", new String[]{chatId + "", pType.name()});
+            MyLog.log("Deleted: " + id);
+        } catch (Exception e) {
+
+        }
+    }
+
+
+    public void deleteAntiSpamWarnCount(ChatTask.TYPE type, long chatId, int userId) {
+        db.delete(TABLE_TASK_WARNS, "action=? AND chatId=? AND userId=?", new String[]{type.name(), chatId + "", userId + ""});
     }
 
     public void clearBanList(long chat_id) {
         try {
             // return getCount(TABLE_AUTO_KICK, "chat_id=?", chatId + "");
             db.delete(TABLE_AUTO_KICK, "chat_id=?", new String[]{chat_id + ""});
-            db.delete(BAN_INFO_TABLE, "chat_id=?", new String[]{chat_id + ""});
+            db.delete(TABLE_BAN_INFO, "chat_id=?", new String[]{chat_id + ""});
         } catch (Exception e) {
 
         }
@@ -848,73 +894,7 @@ public class DBHelper extends DB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
-    /*
-    public String getWelcomeText(final long chatId) {
-        try {
-            Cursor c = getTable("SELECT text FROM " + TABLE_CHAT_WELCOME + " WHERE chatId=? AND isEnabled=1 AND text IS NOT NULL AND text !='' ", new String[]{chatId + ""});
-            if (c != null) {
-                String text = c.getString(c.getColumnIndex("text"));
-
-                c.close();
-                return text;
-            }
-        } catch (Exception e) {
-
-        }
-        return null;
-    }
-    */
-
-    /*
-    public Object[] getWelcomeTextObject(long chatId) {
-        try {
-            Cursor c = getTable("SELECT * FROM " + TABLE_CHAT_WELCOME + " WHERE chatId=?", new String[]{chatId + ""});
-            if (c != null) {
-                boolean enabled = c.getInt(c.getColumnIndex("isEnabled")) == 1;
-                String text = c.getString(c.getColumnIndex("text"));
-                c.close();
-                return new Object[]{enabled, text};
-            }
-        } catch (Exception e) {
-
-        }
-        return null;
-    }
-    */
-
-    /*
-    public void setWelcomeTextEnabled(long chatId, boolean isEnabled) {
-        ContentValues cv = new ContentValues(2);
-        cv.put("chatId", chatId);
-        cv.put("isEnabled", isEnabled);
-        try {
-            if (isRowExists(TABLE_CHAT_WELCOME, "chatId", chatId + ""))
-                db.update(TABLE_CHAT_WELCOME, cv, "chatId=?", new String[]{chatId + ""});
-            else
-                db.insertWithOnConflict(TABLE_CHAT_WELCOME, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
-        } catch (Exception e) {
-
-        }
-    }
-    */
-
-    /*
-    public void setWelcomeText(long chatId, String text, boolean isEnabled) {
-        ContentValues cv = new ContentValues(3);
-        cv.put("chatId", chatId);
-        cv.put("isEnabled", isEnabled);
-        cv.put("text", text);
-        try {
-            long id = db.insertWithOnConflict(TABLE_CHAT_WELCOME, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
-            MyLog.log("save welocme text id: " + id);
-        } catch (Exception e) {
-
-        }
-    }
-    */
 
     public void updateBannedWord(BannedWord word) {
         ContentValues cv = new ContentValues(4);
@@ -1190,6 +1170,8 @@ public class DBHelper extends DB {
         }
     }
 
+
+
     public void setChatLogTargetChat(long chatId, long id) {
         ContentValues cv = new ContentValues(3);
         cv.put("chat_id", chatId);
@@ -1375,5 +1357,29 @@ public class DBHelper extends DB {
         } catch (Exception e) {
 
         }
+    }
+
+    public ArrayList<BanTask> getMutedBans(long chat_id) {
+        String sql = "SELECT * FROM "+TABLE_BAN_INFO+" WHERE chat_id=?";
+        Cursor c = getTable(sql, chat_id+"");
+        if(c!=null){
+            ArrayList<BanTask> list = new ArrayList<>(c.getCount());
+            do{
+                BanTask bt = new BanTask();
+                bt.task_id = c.getLong(c.getColumnIndex("_id"));
+                bt.chat_id = c.getLong(c.getColumnIndex("chat_id"));
+                bt.from_id = c.getInt(c.getColumnIndex("from_id"));
+                bt.chatType = c.getInt(c.getColumnIndex("chatType"));
+                bt.user_id =  c.getInt(c.getColumnIndex("user_id"));
+                bt.isReturnOnUnban = c.getInt(c.getColumnIndex("is_return_on_unban")) == 1;
+                bt.user_id = c.getInt(c.getColumnIndex("user_id"));
+                bt.unbanErrors = c.getInt(c.getColumnIndex("unban_errors"));
+                bt.username = c.getString(c.getColumnIndex("user_login"));
+                list.add(bt);
+            }while (c.moveToNext());
+            c.close();
+            return list;
+        }
+        return null;
     }
 }
