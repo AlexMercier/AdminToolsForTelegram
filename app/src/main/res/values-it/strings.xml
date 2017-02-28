@@ -1,0 +1,425 @@
+<resources>
+    <string name="chatOwner">Creatore:</string>
+    <string name="changeChatAbout">Cambia descrizione</string>
+    <string name="kickedCount">Kickato:</string>
+    <string name="adminsCount">Amministratori:</string>
+    <string name="participiantsCount">Partecipanti:</string>
+    <string name="hint_short_link_not_created">Link breve non creato</string>
+    <string name="btnCancel">Cancella</string>
+    <string name="btnSave">Salva</string>
+
+    <string name="error_too_many_public_links">Hai creato troppi canali pubblici</string>
+    <string name="error_link_already_occupied">Errore: questo link è già occupato</string>
+    <string name="dialog_title_edit_link">Link pubblico</string>
+    <string name="input_new_chat_title">Inserisci il nuovo titolo del gruppo</string>
+    <string name="input_edit_chat_about">Inserisci la descrizione del gruppo</string>
+    <string name="titleEditChatDescription">Descrizione del gruppo</string>
+    <string name="action_ban_user">Banna utente</string>
+    <string name="action_set_as_admin">Aggiungi agli amministratori</string>
+    <string name="action_remove_user_from_chat">Rimuovi l\'utente dal gruppo</string>
+    <string name="action_manage_group">Gestisci il gruppo</string>
+    <string name="action_manage_chat_users">Gestisci gli utenti</string>
+    <string name="action_banlist">Lista utenti bannati</string>
+    <string name="btnContinue">Continua</string>
+    <string name="create_group">Crea gruppo</string>
+    <string name="create_supergroup">Crea supergruppo</string>
+
+    <string name="noteAntispamLinks">Nota: regole ignorate per gli amministratori</string>
+    <string name="toast_chat_link_added">Link cambiato</string>
+    <string name="hint_invite_link_not_created">Premi per creare un link d\'invito</string>
+    <string name="hint_no_chat_about">Premi per aggiungere la descrizione del gruppo</string>
+    <string name="generate_invite_link">Genera link d\'invito</string>
+    <string name="generate_new_invite_link">Rigenera link d\'invito</string>
+    <string name="action_copy_link">Copia il link</string>
+    <string name="toast_copied_to_clipboard">Testo copiato</string>
+    <string name="message_confirm_revoke_link">Sei sicuro di voler generare un nuovo link?\nQuello precedente non funzionerà più</string>
+    <string name="chat_title">Titolo gruppo</string>
+    <string name="action_rename">Rinomina</string>
+    <string name="error_empty_chat_title">Il titolo non può essere vuoto</string>
+    <string name="user_type_deleted">Account eliminato</string>
+    <string name="online_last_seen">ultimo accesso di recente</string>
+    <string name="last_seen_at">ultimo accesso alle</string>
+    <string name="btnClose">Chiudi</string>
+    <string name="revoke_user_admin">Revoca privilegi da amministratore</string>
+    <string name="ban_reason">Ragione ban</string>
+    <string name="action_group_was_converted">Il gruppo è stato convertito in supergruppo</string>
+    <string name="hint_enter_chat_title">Inserisci il titolo del gruppo</string>
+    <string name="action_settings">Impostazioni</string>
+    <string name="whitelist_links_description">(un link per linea)</string>
+    <string name="check_allow_stickers_links">Consenti i link dei pacchetti sticker</string>
+    <string name="chtTitleBanForLinks">Banna per i link</string>
+    <string name="chkTitleBanForSticks">Banna per sticker</string>
+    <string name="logAction_autokick">Kicka automaticamente gli utenti bannati se rietrano nel gruppo</string>
+    <string name="logAction_return_to_chat">Invita nuovamente gli utenti nel gruppo al termine del ban temporaneo</string>
+    <string name="logAction_autoUnban">Rimuovi gli utenti dalla lista degli utenti bannati al termine del ban temporaneo</string>
+    <string name="logAction_banForLink">Banna per spam</string>
+    <string name="logAction_banForSticker">Ban per flood di sticker</string>
+    <string name="logAction_removedLink">Elimina il messaggio con il link</string>
+    <string name="logAction_removedSticker">Elimina lo sticker</string>
+
+
+    <string name="label_allow_count">Numero consentito per utente:</string>
+    <string name="warntext_links_default_last">Ultimo avvertimento. Cessa lo spam</string>
+    <string name="warntext_stickers_default_first">Primo avvertimento. Flood di sticker</string>
+    <string name="edit_chat_about_hint">Inserisci la descrizione del gruppo</string>
+    <string name="action_reset_warns">Resetta avvertimenti per spam</string>
+    <string name="title_ban_age">Durata ban:</string>
+    <string name="check_return_after_bantime_expired">Invita nel gruppo al termine del ban temporaneo</string>
+    <string name="title_group_info">Gestisci gruppo</string>
+    <string name="logAction_stickersFloodWarn">Richiama l\'utente per flood di sticker</string>
+    <string name="text_publish_banreason" formatted="false">L\'utente %username% è stato bannato per il seguente motivo: %reason%</string>
+
+    <string name="action_log">Log degli eventi</string>
+    <string name="title_activity_banlist">Lista utenti bloccati</string>
+    <string name="toast_banlist_empty">La lista dei bannati è vuota</string>
+    <string name="msg_confirm_unban_all">Sei sicuro di voler sbannare tutti gli utenti bannati?</string>
+    <string name="msg_unban_all_supergroup">Nota: questa azione potrebbe essere interrotta da Telegram, se sgli utenti nella lista dei bannati sono troppi!</string>
+    <string name="actionDeleteGroup">Elimina gruppo</string>
+    <string name="action_remove_from_ban">Rimuovi dalla lista dei bannati</string>
+    <string name="action_return_to_chat">Ritorna nel gruppo</string>
+    <string name="logAction_unbanByAdminInvite">Sbannato causa invito di un amministratore</string>
+    <string name="action_show_log_notification">Mostrare notificazioni per gli eventi</string>
+    <string name="action_clear_log">Svuota log eventi</string>
+    <string name="btnYes">Si</string>
+    <string name="chk_remove_messages_links">Elimina i messaggi con link</string>
+    <string name="chk_remove_messages_stickers">Elimina gli sticker</string>
+    <string name="titleLogLifetime">Svuota log dopo</string>
+    <string name="check_anyone_can_invite">Chiunque può invitare nuovi utenti</string>
+    <string name="check_anyone_can_change_chat">Chiunque può cambiare titolo ed icona del gruppo, o invitare altri utenti</string>
+    <string name="action_chk_show_only_created">Mostra solo i gruppi creati</string>
+    <string name="action_chk_show_channels">Mostra i canali</string>
+    <string name="check_autostart">Avvia all\'avvio del sistema</string>
+    <string name="check_allow_mention_links">Permetti le menzioni</string>
+    <string name="text_confirm_deletion_group">Sei sicuro che vuoi eliminare questo gruppo?\nQuesta azione non può essere annullata!!</string>
+    <string name="text_delete_group">Si. Elimina questo gruppo</string>
+    <string name="button_delete">Elimina</string>
+    <string name="toast_group_deleted">Gruppo eliminato</string>
+    <string name="title_delete_group">Gruppo eliminato</string>
+    <string name="action_manage_channel">Gestisci canali</string>
+    <string name="chatType">Tipo:</string>
+    <string name="chatTypeGroup">Gruppo</string>
+    <string name="chatTypeChannel">Canale</string>
+    <string name="chatTypeSuperGroup">Supergruppo</string>
+    <string name="text_appstate_enabled">Servizio abilitato</string>
+    <string name="text_appstate_stopped">Servizio arrestato</string>
+    <string name="notification_show_hint">Premi per vedere il log degli eventi</string>
+    <string name="label_total_groups">Totale:</string>
+    <string name="create_chat_title">Titolo del gruppo</string>
+    <string name="dialog_new_chat_title">Crea gruppo</string>
+    <string name="group_created">Gruppo creato</string>
+    <string name="text_list_empty">La lista è vuota</string>
+    <string name="text_ban_time">Data ban:</string>
+    <string name="text_ban_permanently">Ban permanente</string>
+    <string name="text_ban_temporary">Ban temporaneo. Termina il:</string>
+    <string name="action_unban_all">Sbanna tutti</string>
+    <string name="textRoleAdmin">Creatore</string>
+    <string name="textRoleModerator">Moderatore</string>
+    <string name="textChatRole">Ruolo:</string>
+    <string name="check_enabled">Abilita</string>
+    <string name="hint_enter_welcome_text">Inserisci il messaggio di benvenuto per i nuovi membri</string>
+    <string name="hint_chat_description">Descrizione gruppo</string>
+    <string name="labelWelcomeTextForJoinedUsers">Messaggio di benvenuto per i nuovi membri</string>
+    <string name="titleManagingGroups">Gestione gruppi</string>
+    <string name="title_list_of_banned_words">Lista delle parole proibite nel gruppo:</string>
+    <string name="check_BanForWordBlackList">Banna utente</string>
+    <string name="logAction_banForBlackWord">Banna per parole proibite</string>
+    <string name="warntext_banword_last">Ultimo avvertimento. Non utilizzare parole che in questo gruppo sono proibite</string>
+    <string name="hint_each_whitelink_at_new_line">Un link per riga</string>
+    <string name="hint_blackwords">Una parola per riga</string>
+    <string name="check_delMsgBlackWords">Elimina i messaggi che contengono parole proibite</string>
+    <string name="logAction_removedBlackWordMessage">Elimina i messaggi che contengono parole proibite</string>
+    <string name="action_change_user">Logout</string>
+    <string name="dialog_title_logout">Logout</string>
+    <string name="dialog_text_logout">Sei sicuro di voler disconnettere l\'account attualmente in uso?</string>
+    <string name="dialog_title_auth">autorizzazione </string>
+    <string name="auth_phone_hint">Inserisci il tuo numero di telefono</string>
+    <string name="auth_confirmcode_hint">Inserisci il codice di verifica inviato ricevuto via SMS/Telegram</string>
+    <string name="auth_cloud_pass_hint">Inserisci la tua password</string>
+    <string name="btn_submit">Invia</string>
+    <string name="label_loading">Caricamento...</string>
+    <string name="check_remove_joined_message">Rimuovi le notifiche di servizio \"si è unito al gruppo\"</string>
+    <string name="check_remove_leaved_message">Rimuovi le notifiche di servizio \"ha lasciato il gruppo\"</string>
+    <string name="labelOther">Altro</string>
+    <string name="title_users">Membri gruppo</string>
+    <string name="logAction_banUser">Hai bannato un utente</string>
+    <string name="caption_enter_value">Inserisci un nuovo valore:</string>
+    <string name="title_change_value">Cambia valore</string>
+    <string name="caption_users_whitelist">Utenti ignorati</string>
+    <string name="check_ignore_antispam_for_shared">I tuoi contatti verranno ignorati dall\'antispam</string>
+    <string name="toast_deletion_not_avail">L\'eliminazione dei messaggi è disponibile solo nei supergruppi</string>
+    <string name="toast_access_denied_admin">Accesso negato.\nSolo il creatore può modificare questa impostazione</string>
+    <string name="toast_user_unblacklisted">Utente rimosso dalla lista dei bannati</string>
+    <string name="toast_user_was_restored_to_chat">L\'utente è tornato nel gruppo</string>
+    <string name="chtTitleAlertOnBlackWordBan">Notifica i ban con un messaggio nel nel gruppo</string>
+    <string name="mesage_user_banned_banword">L\'utente %1$s è stato bannato per aver usato parole proibite</string>
+    <string name="label_banwords_warntext">Messaggio di avvertimento:</string>
+    <string name="chkWarnBeforeBanWord">Avverti prima di bannare</string>
+    <string name="action_open_chat_info">Mostra le info del gruppo</string>
+    <string name="action_open_userninfo">Mostra le info dell\'utente</string>
+    <string name="logAction_banwordsFloodWarn">Avverti gli utenti che usano parole proibite</string>
+    <string name="warntext_links_default_firts">Primo avvertimento. Smetti di spammare</string>
+    <string name="warntext_stickers_default_last">Ultimo avvertimento. Flood di sticker non consentito</string>
+    <string name="warntext_banword_first">Primo avvertimento. Non è consentito utilizzare le parole proibite</string>
+    <string name="action_copy">Copia</string>
+    <string name="button_rate_us">Se ti piace quest\'app, premi qui per valutarci su GooglePlay</string>
+    <string name="role_moderator">Moderatore</string>
+    <string name="role_editor">Editore</string>
+    <string name="role_editor_description_supegroup">Gli amministratori possono bannare gli utenti, eliminarne i messaggi, cambiare l\'icona ed il titolo del gruppo</string>
+    <string name="role_moderator_description_supergroup">Un moderatore può solo eliminare i messaggi</string>
+    <string name="toast_user_role_changed">Ruolo dell\'utente aggiornato</string>
+    <string name="role_action_switch_continue">Cambia e continue</string>
+    <string name="text_all_are_admins_group">Tutti i membri sono amministratori</string>
+    <string name="label_ban_for_time">Durata ban:</string>
+    <string name="label_note_ban_simple_groups">Nota: nei gruppi normali non è possibile bannare qualcuno, per cui l\'utente verrà kickato non appena cercherà di unirsi al gruppo</string>
+    <string name="chkSendBanReasonToChat">Mostra la motivazione nel gruppo</string>
+    <string name="selectBanForever">Ban permanente</string>
+    <string name="selectBanTemporary">Ban temporaneo</string>
+    <string name="label_ban_period">Durata ban</string>
+    <string name="label_ban_time_prefix">per</string>
+    <string name="text_unban_time">Il ban scadrà</string>
+    <string name="title_ban_list">Lista dei bannati</string>
+    <string name="label_loading_chats_count">Caricamento chat...</string>
+    <string name="action_chats_info">Informazioni gruppo</string>
+    <string name="action_open_group_link">Apri il gruppo con Telegram</string>
+
+    <string name="app_thanks_to">Grazie a:</string>
+    <string name="thanks_to_list">Tutto il team dei traduttori che hanno aiutato a tradurre l\'app tramite Transifex</string>
+    <string name="text_notification_descr_background">servizio in background</string>
+    <string name="text_warn_no_warn_user">Non avvisare l\'utente</string>
+    <string name="text_warn_on_last_warn">All\'ultimo messaggio</string>
+    <string name="text_warn_on_first_warn">Al primo messaggio</string>
+    <string name="text_warn_on_first_last_warn">Al primo e all\'ultimo messaggio</string>
+    <string name="text_warn_on_second_and_last_warn">Al 2° ed ultimo messaggio</string>
+    <string name="text_warn_always">Avvisa sempre</string>
+    <string name="log_title_group">Gruppo</string>
+    <string name="log_title_username">Utente</string>
+    <string name="log_title_time">Tempo</string>
+    <string name="log_title_bantime">vietato a</string>
+    <string name="log_title_banuntil">Bannato fino</string>
+    <string name="log_title_banurl">Link</string>
+    <string name="log_title_message">Messaggio</string>
+    <string name="log_title_admin">Nome admin</string>
+    <string name="log_title_bannedword">parole vietate </string>
+    <string name="log_title_ban_reason">Motivazione</string>
+    <string name="title_set_user_role_admin">Imposta ruolo utente</string>
+    <string name="action_change_user_admin_role">Cambia ruolo</string>
+    <string name="chk_remove_banword_messages">Cancellare i messaggi con questa parola ?</string>
+    <string name="chk_ban_user_for_banword">Banna utente</string>
+    <string name="hint_enter_ban_word">Inserisci la parola proibita</string>
+    <string name="btnAdd">Aggiungi</string>
+    <string name="title_add_banned_word">Aggiungi parola</string>
+    <string name="toast_word_is_empty">Nessuna parola inserita</string>
+    <string name="chk_remove_messages_voice">Rimuovi i messaggi vocali</string>
+    <string name="chkTitleBanForVoice">Banna per messaggi vocali</string>
+    <string name="logAction_banForVoice">Banna chi invia messaggi vocali</string>
+    <string name="warntext_voice_default_last">Ultimo avvertimento. I messaggi vocali non sono consentiti</string>
+    <string name="warntext_voice_default_first">Primo avvertimento. Messaggi vocali non consentiti</string>
+    <string name="hint_first_user_warning">Messaggio primo avvertimento</string>
+    <string name="hint_last_user_warning">Messaggio ultimo avvertimento</string>
+
+    <string name="list_of_banned_words">Lista delle parole proibite nel gruppo</string>
+    <string name="chk_remove_message_with_banword">Rimuovi\nnmessaggio</string>
+    <string name="chk_ban_user_with_banword">Banna\nnutente</string>
+    <string name="action_add_banword">Aggiungi parola</string>
+    <string name="action_clear_banwords">Elimina tutte</string>
+    <string name="title_dialog_confirm">Conferma azione</string>
+    <string name="text_clear_all_banwords_for_chat">Sei sicuro di voler eliminare definitivamente la lista delle parole proibite di questo gruppo?</string>
+    <string name="check_show_icon_in_bar">Mostra sempre l\'icona nella barra di stato</string>
+    <string name="text_show_icon_in_system_bar">questa opzione può essere utile nel caso in cui il sistema termini l\'app</string>
+    <string name="text_banned_words_list_empty">La lista è vuota</string>
+    <string name="title_import_words">Seleziona le parole da importare</string>
+    <string name="text_flood_control_watch_within_time">Conta i messaggi in questo lasso di tempo</string>
+    <string name="logAction_banForFlood">Ban per flood</string>
+    <string name="btnBanUser">Ban</string>
+    <string name="btn_banned_words_list_empty">La lista delle parole proibite è vuota</string>
+    <string name="banned_words_count">%d delle parole vietate</string>
+    <string name="logAction_removedVoice">Elimina messaggio vocale</string>
+    <string name="text_antispam_alert_title">Avviso bot AdminTools!</string>
+    <string name="action_add_link_to_wl">Aggiungi link alla whitelist</string>
+    <string name="title_warning_text_before_ban">Messaggio di avvertimento prima del ban:</string>
+    <string name="title_warn_help">Aiuto formattazione</string>
+    <string name="ban_for_flood">Banna utente</string>
+    <string name="labelChatTasks">Controlli gruppo</string>
+    <string name="labelChatCommands">Comandi del gruppo</string>
+    <string name="text_clear_all_commands_for_chat">Sei sicuro di voler eliminare tutti i comandi  personalizzati di questo gruppo?</string>
+    <string name="title_dialog_clear_all">Elimina tutti</string>
+    <string name="labelChatCommand">Comando:\n(per esempio \'/comando\')</string>
+    <string name="label_chatCommand_action">Azione associata:</string>
+    <string name="chk_chatcommand_only_admin_can_execute">Solo gli admin possono utilizzare i comandi</string>
+    <string name="title_chat_commands">Comandi gruppo</string>
+    <string name="btn_chat_commands_manage">Modifica i comandi</string>
+    <string name="text_label_inviter">Invitato da:</string>
+    <string name="error_auth_pin_incorrect">Errore\nLa password (PIN) inserita non è corretta</string>
+    <string name="error_phone_not_registered">Sembra che il numero inserito non sia registrato.\nVuoi fare un altro tentativo?</string>
+    <string name="label_commands_count_in_chat">impostati</string>
+    <string name="label_no_commands_in_chat">Nessun comando impostato</string>
+    <string name="title_select_task_for_chat">Seleziona il tipo di controllo che vuoi attuare in questo gruppo</string>
+    <string name="toast_task_already_applied">Questo tipo di controllo è già stato aggiunto. Tieni premuto su di esso per rimuoverlo</string>
+    <string name="title_add_new_task_for_chat">Aggiungi un nuovo controllo</string>
+    <string name="hint_press_to_add_command">Premi Aggiungi per aggiungere un nuovo comando</string>
+    <string name="title_task_stickers">Controllo sticker</string>
+    <string name="title_task_voices">Controllo vocali</string>
+    <string name="title_task_links">Controllo link (antispam)</string>
+    <string name="text_command_leave_not_error_creator">Il creatore non può abbandonare il canale</string>
+    <string name="text_command_execute_access_denied">Accesso negato. Solo gli amministratori possono utilizzare questo comando</string>
+    <string name="warntext_bangame_first">Primo avvertimento. In questo gruppo non è consentito condividere giochi</string>
+    <string name="warntext_bangame_last">Ultimo avvertimento. Condividere giochi non è consentito</string>
+    <string name="logAction_banForGame">Ban per condivisione di giochi inline</string>
+    <string name="title_task_game">Giochi via @gamebot</string>
+    <string name="chk_remove_messages_game">Elimina i giochi condivisi</string>
+    <string name="chkTitleBanForGames">Banna chi condivide giochi</string>
+    <string name="title_task_add_stickers">Sticker</string>
+    <string name="title_task_add_voices">Vocali</string>
+    <string name="title_task_add_link">Link (antispam)</string>
+    <string name="title_task_add_games">Giochi via @gamebot</string>
+    <string name="logAction_execCommandError">Errore nell\'esecuzione del comando</string>
+    <string name="title_banwords">Parole proibite</string>
+    <string name="title_flood_control">Controllo flood</string>
+    <string name="warntext_banphoto_first">Primo avvertimento. L\'invio di troppe foto consecutivamente non è consentito</string>
+    <string name="warntext_banphoto_last">Ultimo avvertimento. Le foto non sono consentite</string>
+    <string name="logAction_banForPhotos">Ban per invio di foto</string>
+    <string name="title_task_add_photos">Foto</string>
+    <string name="logAction_removedGameMessage">Elimina i messaggi coi giochi</string>
+    <string name="logAction_removedPhoto">Elimina le foto</string>
+    <string name="title_task_photos">Foto</string>
+    <string name="chk_remove_messages_photos">Elimina le foto</string>
+    <string name="chkTitleBanForPhotos">Banna chi invia foto</string>
+    <string name="title_task_docs">File (documenti)</string>
+    <string name="chk_remove_messages_docs">Elimina i file</string>
+    <string name="chkTitleBanForDocs">Banna chi invia file</string>
+    <string name="logAction_removedDocs">File eliminato</string>
+    <string name="logAction_DocsFloodWarn">Utente richiamato, causa: invio documenti</string>
+    <string name="logAction_PhotosFloodWarn">Utente richiamato, causa: invio foto</string>
+    <string name="title_task_add_documents">Documenti</string>
+    <string name="logAction_banForDocs">Ban per invio di documenti</string>
+    <string name="title_remove_taskfrom_added">Rimuovi controllo</string>
+    <string name="text_confirm_remove_task">Sei sicuro di voler rimuovere questo controllo?</string>
+    <string name="chk_remove_messages_gif">Rimuovi le GIF</string>
+    <string name="chkTitleBanForGif">Banna chi invia GIF</string>
+    <string name="logAction_banForGifs">Ban per invio di GIF</string>
+    <string name="logAction_removedGif">Elimina le GIF</string>
+    <string name="logAction_gifsFloodWarn">Utente richiamato, causa: invio GIF</string>
+    <string name="warntext_bangifs_first">Primo avvertimento. Le GIF non sono consentite</string>
+    <string name="warntext_bangifs_last">Ultimo avvertimento. Le GIF non sono consentite</string>
+    <string name="title_task_audio">Audio</string>
+    <string name="chk_remove_messages_audio">Rimuovi gli audio (musica)</string>
+    <string name="chkTitleBanForAudio">Banna chi invia audio</string>
+    <string name="logAction_banForAudio">Banna chi invia audio</string>
+    <string name="logAction_removedAudio">Elimina gli audio</string>
+    <string name="logAction_audioFloodWarn">Richiama gli utenti che inviano degli audio</string>
+    <string name="warntext_banAudio_first">Primo avvertimento. Audio non consentiti</string>
+    <string name="warntext_banAudio_last">Ultimo avvertimento. Audio non consentiti in questo gruppo</string>
+    <string name="title_task_video">Video</string>
+    <string name="chk_remove_messages_video">Elimina i video</string>
+    <string name="chkTitleBanForVideo">Banna chi invia dei video</string>
+    <string name="warntext_banVideo_first">Primo avvertimento. I video non sono consentiti</string>
+    <string name="warntext_banVideo_last">Ultimo avvertimento. I video non sono consentiti</string>
+    <string name="logAction_banForVideo">Banna chi invia dei video</string>
+    <string name="logAction_removedVideo">Video eliminato</string>
+    <string name="logAction_videoFloodWarn">Utente richiamato, causa: invio video</string>
+    <string name="logAction_removedMutedMessage">Elimina i messaggi degli utenti silenziati</string>
+    <string name="text_select_users_to_mute">Seleziona gli utenti che vuoi silenziare.\nTutti i loro messaggi verranno eliminati</string>
+    <string name="title_task_mute_users">Silenzia utenti</string>
+    <string name="text_no_muted_users">Nessun utente silenziato in questo gruppo</string>
+    <string name="label_select_user_to_mute">Seleziona un utente per silenziarlo</string>
+    <string name="label_select_user_to_remove_mute">Seleziona un utente per ridargli la voce</string>
+    <string name="toast_user_added_to_muted">Utente silenziato</string>
+    <string name="toast_user_removed_from_muted">L\'utente ha riacquistato la voce</string>
+
+    <string name="btnSendNewSmsCode">Invia nuovamente il codice di autenticazione via SMS</string>
+    <string name="title_chat_in_readonly_mode">Notifica i membri che il gruppo è in modalità sola lettura:</string>
+    <string name="title_chat_no_in_readonly">Notifica i membri che il gruppo non è più in modalità sola lettura:</string>
+    <string name="text_chat_in_readonly_now">Il gruppo è ora in modalità sola lettura.</string>
+    <string name="text_chat_not_in_readonly">Questo gruppo non è più in modalità sola lettura</string>
+    <string name="btnSend">Invia</string>
+    <string name="chkMuteAllMembers">Silenzia tutti gli utenti ad eccezione degli amministratori</string>
+    <string name="chkMuteJoinedMembers">Silenzia tutti i nuovi membri</string>
+    <string name="logAction_sendViaBotError">Mandare messaggio con Errore Bot</string>
+    <string name="text_bot_not_selected">Bot non selezionato</string>
+    <string name="text_send_notifications_as_bot">Invia notifiche come bot</string>
+    <string name="option_remove_bot">Rimuovi il bot dalla lista</string>
+    <string name="title_select_bot">Seleziona il bot</string>
+    <string name="hint_botfather_for_createbot">Utilizza BotFather per creare un nuovo bot</string>
+    <string name="hint_insert_bot_token">Inserisci il token del bot</string>
+    <string name="action_mute_user">Silenzia utente (può solo leggere)</string>
+    <string name="text_mute_user_now">Per silenziare un utente, il controllo \"silenzia utenti\" deve essere abilitato dalle impostazioni del gruppo.\nAbilitarlo ora?</string>
+    <string name="btnSkip">Salta</string>
+    <string name="text_chat_title">Titolo:</string>
+    <string name="text_hint_cmd_change_title">Per favore, inserisci il nuovo titolo dopo il comando.\nEsempio:</string>
+    <string name="text_confirm_select_group_for_logging">Sei sicuro di voler usare questo gruppo come log per gli eventi?</string>
+    <string name="logAction_userTitleChanged">L\'utente ha cambiato il titolo del gruppo</string>
+    <string name="logAction_gameFloodWarn">Utente richiamato, causa: invio gioco</string>
+    <string name="logAction_voiceFloodWarn">Utente richiamato, causa: invio messaggio vocale</string>
+    <string name="log_title_oldChangedChatTitle">Vecchio titolo</string>
+    <string name="title_backup_restore_settings">Impostazioni per backup/restore</string>
+    <string name="text_backup_description">Salva un backup nella tua scheda SD e nel cloud personale di Telegram</string>
+    <string name="btn_backup_settings">Crea backup</string>
+    <string name="btn_backup_restore_settings">Ripristina backup</string>
+    <string name="text_backup_restore_description">Seleziona un backup dalla memoria esterna per ripristinarlo. I controlli attuali verranno sovrascritti!</string>
+    <string name="toast_user_was_removed">Utente rimosso dal gruppo.\nPuò ancora rientrare tramite link</string>
+    <string name="logAction_removedJoinMessage">Rimosso un messaggio di servizio - nuovo membro</string>
+    <string name="chtTitlePublicBan">Pubblica il ban nel gruppo</string>
+    <string name="logAction_removeLeaveMessage">Rimosso messaggio di servizio - un membro ha abbandonato il gruppo</string>
+    <string name="text_battery_optimization_state_disabled">Stato attuale: OK. Ottimizzazione app disabilitata</string>
+    <string name="text_battery_optimization_state_enabled">Stato attuale: ottimizzazione app abilitata. L\'applicazione potrebbe interrompersi mentre è in esecuzione in background</string>
+    <string name="toast_bottoken_is_empty">Per favore, prima inserisci il token</string>
+    <string name="chtTitleMuteInsteadBan">Silenzia invece di bannare</string>
+    <string name="logAction_userWasMuted">L\'utente non è autorizzato a mandare messaggi di questo tipo</string>
+    <string name="logAction_userWasUnMuted">All\'utente è stata ridata la voce al termine del ban</string>
+    <!-- Date Format patterns https://developer.android.com/reference/java/text/SimpleDateFormat.html -->
+    <string name="dateformat_full">d MMMM, yyyy hh:mm:ss aa</string>
+    <string name="status_online">online</string>
+    <string name="title_dialog_welcome_message">Messaggio di benvenuto</string>
+    <string name="dialog_title_help_formatting">Aiuto con la formattazione</string>
+    <string name="btnOk">Ok</string>
+    <string name="title_search">Cerca</string>
+    <string name="btn_main_show_admin_groups">Mostra i gruppi amministrati</string>
+    <string name="btn_main_stop_app">Termina applicazione</string>
+    <string name="btn_main_run_app">Avvia applicazione</string>
+    <string-array name="ban_times">
+        <item>Min</item>
+        <item>Ora</item>
+        <item>Giorno</item>
+        <item>Mese</item>
+    </string-array>
+
+    <string-array name="auto_ban_times">
+        <item>Per sempre</item>
+        <item>Min</item>
+        <item>Ora</item>
+        <item>Giorno</item>
+    </string-array>
+
+    <string-array name="log_lifetime">
+        <item>Mese</item>
+        <item>Settimana</item>
+        <item>3 giorni</item>
+        <item>1 giorno</item>
+    </string-array>
+
+    <string-array name="times_during_warnings">
+        <item>Per tutto questo tempo</item>
+        <item>Min</item>
+        <item>Ora</item>
+        <item>Giorno</item>
+    </string-array>
+
+    <string-array name="command_types">
+        <item>La risposta semplice</item>
+        <item>Kicka l\'utente che usa il comando</item>
+        <item>Cambia titolo</item>
+    </string-array>
+
+    <string-array name="commands_plural">
+        <item>comando</item><!-- 1 command -->
+        <item>comandi</item><!-- 2 commands -->
+        <item>comandi</item><!-- 5 commands -->
+    </string-array>
+
+    <string-array name="muted_users_plural">
+        <item>Utente silenziato</item><!-- 1 item -->
+        <item>Utenti silenziati</item><!-- 2 items -->
+        <item>Utenti silenziati</item><!-- 5 items -->
+    </string-array>
+
+</resources>

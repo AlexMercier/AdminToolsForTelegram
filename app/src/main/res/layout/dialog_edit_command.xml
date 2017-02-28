@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:hint="enter command here"
+        android:hint="@string/hint_enter_command"
         android:lines="1"
         android:maxLines="1"
         android:singleLine="true" />
@@ -44,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:hint="Enter answer here"
+        android:hint="@string/hint_enter_command_answer"
 
         android:maxLines="4"
 

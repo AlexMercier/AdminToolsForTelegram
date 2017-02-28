@@ -27,7 +27,6 @@
     <string name="action_ban_user">Ban user</string>
     <string name="action_set_as_admin">Add to admin</string>
     <string name="action_remove_user_from_chat">Remove user from chat</string>
-    <string name="action_remove_deleted_users">Remove deleted users from chat</string>
     <string name="action_manage_group">Manage chat</string>
     <string name="action_manage_chat_users">Manage users</string>
     <string name="action_banlist">Ban-list</string>
@@ -81,8 +80,7 @@
     <string name="logAction_stickersFloodWarn">Warn user of stikers flood</string>
     <string name="logAction_linksFloodWarn">Warn user of ban for spam</string>
     <string name="text_publish_banreason" formatted="false">User %username% was banned by reason: %reason%</string>
-    <string name="deleted_accounts_hint">Notice: Telegram not allow to remove deleted accounts, but this accounts self-removed after ~1 week.
-        \nSo don\'t worry about that</string>
+
     <string name="action_log">Events log</string>
     <string name="title_activity_banlist">Ban list</string>
     <string name="toast_banlist_empty">Ban list is empty</string>
@@ -377,9 +375,7 @@
 
     <string name="dialog_recent_changes">
         New in v.%s
-        \n[+] temporary mute user instead of ban for attachments flood
-        \n[+] search in user list
-        \n[*] some fixes
+        \n[*] translation fixes
     </string>
     <string name="btnSendNewSmsCode">Resend SMS Code</string>
     <string name="btnRequestAuthCall">Call auth code</string>
@@ -444,6 +440,31 @@
     <string name="btn_main_show_admin_groups">Show administered groups</string>
     <string name="btn_main_stop_app">Stop application</string>
     <string name="btn_main_run_app">Run application</string>
+    <string name="action_about_app">About</string>
+    <string name="title_battery_optimization">Battery Optimization</string>
+    <string name="action_copy_log_text">Copy Message</string>
+    <string name="title_dialog_chat_stats">Chats stat</string>
+    <string name="toast_invite_link_created">Invite link created</string>
+    <string name="title_dialog_upgrade_group">Upgrade group</string>
+    <string name="btn_upgrate_to_supegroup">Upgrade to supergroup</string>
+    <string name="toast_warnings_counter_reset">Warnings counter is reset</string>
+    <string name="text_stickers_link_description">e.g. telegram.me/addstickers/animals</string>
+    <string name="text_mention_link_description">e.g. @username links</string>
+    <string name="title_forbidden_words">Forbidden words</string>
+    <string name="btn_switch_muted_members">Muted members</string>
+    <string name="btn_switch_all_users">All members</string>
+    <string name="hint_enter_command">enter command here</string>
+    <string name="hint_enter_command_answer">Enter answer here</string>
+    <string name="title_log">Log</string>
+    <string name="chkSendLogToChat">Send Log to chat</string>
+    <string name="text_select_chat_to_forward_log">Select chat to forward logging messages to this chat</string>
+    <string name="log_title_user_id">User id</string>
+    <string name="text_checking_auth">Checking auth...</string>
+    <string name="toast_auth_input_is_empty">This field can not be empty</string>
+    <string name="text_release_date">Release date:</string>
+    <string name="text_version">Version:</string>
+    <string name="text_source_code">Source code:</string>
+    <string name="text_contact_for_feedback">Any question(english prefer):</string>
 
 
     <string-array name="ban_times">

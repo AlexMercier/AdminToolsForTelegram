@@ -458,7 +458,7 @@ public class ActivitySettings extends ActivityExtended {
         }
 
         new AlertDialog.Builder(mContext)
-                .setTitle("Battery Optimization")
+                .setTitle(R.string.title_battery_optimization)
                 .setView(ln)
                 .setNegativeButton(R.string.btnClose, null)
                 .show();

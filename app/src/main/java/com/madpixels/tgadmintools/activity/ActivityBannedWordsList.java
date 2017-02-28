@@ -55,7 +55,7 @@ public class ActivityBannedWordsList extends ActivityExtended {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bannedwords);
         UIUtils.setToolbarWithBackArrow(this, R.id.toolbar);
-        setTitle("Banned words");
+        setTitle(R.string.title_forbidden_words);
 
         Bundle b = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();
         chatID = b.getLong("chat_id");

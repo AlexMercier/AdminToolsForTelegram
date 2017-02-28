@@ -16,7 +16,7 @@
             android:layout_weight="1"
             android:background="@drawable/btn_switch_lists"
             android:padding="4dp"
-            android:text="Muted members" />
+            android:text="@string/btn_switch_muted_members" />
 
         <Button
             android:id="@+id/btnShowAll"
@@ -26,7 +26,7 @@
             android:layout_weight="1"
             android:background="@drawable/btn_switch_lists_active"
             android:padding="4dp"
-            android:text="All members" />
+            android:text="@string/btn_switch_all_users" />
 
     </LinearLayout>
 
@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Loading, please wait" />
+            android:text="@string/label_loading" />
 
 
         <ListView android:divider="@null"

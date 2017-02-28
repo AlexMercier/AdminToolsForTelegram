@@ -1495,7 +1495,7 @@ public class ActivityGroupInfo extends ActivityExtended {
 
     void dialogConfirmRevokeInviteLink() {
         new AlertDialog.Builder(mContext)
-                .setTitle("Confirm")
+                .setTitle(R.string.title_dialog_confirm)
                 .setMessage(R.string.message_confirm_revoke_link)
                 .setNegativeButton(R.string.btnCancel, null)
                 .setPositiveButton(R.string.btnContinue, new DialogInterface.OnClickListener() {
@@ -1518,7 +1518,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                     TdApi.ChatInviteLink inviteLink = (TdApi.ChatInviteLink) object;
                     chatInviteLink = inviteLink.inviteLink;
                     tvInviteLink.setText(chatInviteLink);
-                    MyToast.toast(mContext, "Invite link created");
+                    MyToast.toast(mContext, R.string.toast_invite_link_created);
                 }
             }
         });
@@ -1560,7 +1560,7 @@ public class ActivityGroupInfo extends ActivityExtended {
                 break;
             case 2:
                 DBHelper.getInstance().resetWarnCountForChat(chatId);
-                MyToast.toast(mContext, "Reset done");
+                MyToast.toast(mContext, R.string.toast_warnings_counter_reset);
                 break;
             case 3:
                 dialogConfirmDeleteGroup();
@@ -2443,7 +2443,7 @@ public class ActivityGroupInfo extends ActivityExtended {
         String msg = getString(R.string.hint_upgrade_to_supergroup);
 
         new AlertDialog.Builder(mContext)
-                .setTitle("Upgrade group")
+                .setTitle(R.string.title_dialog_upgrade_group)
                 .setMessage(msg)
                 .setNegativeButton(R.string.btnCancel, null)
                 .setPositiveButton(R.string.btnSave, new DialogInterface.OnClickListener() {
@@ -2496,9 +2496,9 @@ public class ActivityGroupInfo extends ActivityExtended {
 
     private void showConvertSuccessAndFinish() {
         new AlertDialog.Builder(mContext).setCancelable(false)
-                .setTitle("Success")
+                .setTitle(R.string.title_dialog_upgrade_group)
                 .setMessage(R.string.action_group_was_converted)
-                .setNegativeButton("Ок", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.btnOk, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         ActivityGroupsList.reloadOnResume = true;

@@ -11,7 +11,7 @@ android:orientation="vertical">
 
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="Log"
+    android:text="@string/title_log"
     android:textColor="@color/md_blue_600"
     android:textStyle="bold" />
 
@@ -19,13 +19,13 @@ android:orientation="vertical">
     android:id="@+id/chkEnableLogToChat"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="Send Log to chat" />
+    android:text="@string/chkSendLogToChat" />
 
 <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginLeft="16dp"
-    android:text="Select chat to forward logging messages to this chat" />
+    android:text="@string/text_select_chat_to_forward_log" />
 
 
 <!-- -->

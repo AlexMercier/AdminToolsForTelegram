@@ -1,6 +1,4 @@
 <resources>
-
-
     <string name="ban_soft_hint">"Nota: la app oficial de Telegram no tiene herramienta interna para ban temporal, por lo que esta app usa una lista de ban propia.
 \nUn usuario con ban temporal, solo podra ser eliminado de la lista si tu telefono esta conectado. Si desinstalas o reinstalas esta app, la lista de ban se perdera. Puedes exportar la lista en ajustes."</string>
     <string name="chatOwner">Propietario:</string>
@@ -24,7 +22,6 @@
     <string name="action_ban_user">Banear usuario</string>
     <string name="action_set_as_admin">Añadir como admin</string>
     <string name="action_remove_user_from_chat">Eliminar usuario de este chat</string>
-    <string name="action_remove_deleted_users">Eliminar usuarios eliminados del chat</string>
     <string name="action_manage_group">Administrar chat</string>
     <string name="action_manage_chat_users">Administrar usuarios</string>
     <string name="action_banlist">Lista de Ban</string>
@@ -65,11 +62,11 @@
     <string name="logAction_banForSticker">Ban por flood de stickers</string>
     <string name="logAction_removedLink">Mensaje con enlace eliminado</string>
     <string name="logAction_removedSticker">Mensaje eliminado con sticker</string>
-    <string name="logAction_banForBlackWord">Ban por palabra</string>
+
+
     <string name="label_allow_count">Contador activado para cada usuario:</string>
     <string name="warntext_links_default_last">Ultimo aviso. Deja el spam</string>
     <string name="warntext_stickers_default_first">Primer aviso. Flood con stickers</string>
-    <string name="warntext_banword_last">Ultimo aviso. El uso de palabras prohibidas no esta permitido</string>
     <string name="edit_chat_about_hint">Introduce la descripcion del grupo</string>
     <string name="action_reset_warns">Resetear contador de anti spam</string>
     <string name="title_ban_age">Tiempo de ban:</string>
@@ -78,9 +75,8 @@
     <string name="logAction_stickersFloodWarn">Avisar al usuario sobre stickers-flood</string>
     <string name="logAction_linksFloodWarn">Avisar al usuario de la prohibición de spam</string>
     <string name="text_publish_banreason" formatted="false">Usuario %username% ha sido baneado por la razon: %reason%</string>
-    <string name="deleted_accounts_hint">"Noticia: Telegram no permite borrar usuarios que han eliminado su cuenta, pero su cuenta sera eliminada tras 1 semana.\nAsi que no te preocupes por ello"</string>
+
     <string name="action_log">Log de eventos</string>
-    <string name="action_change_user">Cerrar sesion</string>
     <string name="title_activity_banlist">Lista de ban</string>
     <string name="toast_banlist_empty">La lista de ban esta vacia</string>
     <string name="msg_confirm_unban_all">¿Seguro que quieres desbanear a todos los usuarios baneados?</string>
@@ -125,6 +121,7 @@
     <string name="action_unban_all">Desbanear a todos</string>
     <string name="textRoleAdmin">Creador</string>
     <string name="textRoleModerator">Moderador</string>
+    <string name="textChatRole">Rol:</string>
     <string name="check_enabled">Activar</string>
     <string name="hint_enter_welcome_text">Introduce el texto de bienvenida para los usuarios que se unan</string>
     <string name="hint_chat_description">Descripcion del chat</string>
@@ -132,10 +129,13 @@
     <string name="titleManagingGroups">Administrando grupos</string>
     <string name="title_list_of_banned_words">La lista de palabras prohibidad en el chat:</string>
     <string name="check_BanForWordBlackList">Banear usuario</string>
+    <string name="logAction_banForBlackWord">Ban por palabra</string>
+    <string name="warntext_banword_last">Ultimo aviso. El uso de palabras prohibidas no esta permitido</string>
     <string name="hint_each_whitelink_at_new_line">Introduce el link en una nueva linea</string>
     <string name="hint_blackwords">Introduce alguna palabra en otra linea</string>
     <string name="check_delMsgBlackWords">Eliminar mensajes que contengan palabras de la lista negra</string>
     <string name="logAction_removedBlackWordMessage">Mensaje eliminado con la palabra prohibida</string>
+    <string name="action_change_user">Cerrar sesion</string>
     <string name="dialog_title_logout">Cerrar sesion</string>
     <string name="dialog_text_logout">¿Seguro que quieres cerrar sesion?</string>
     <string name="dialog_title_auth">Autenticación</string>
@@ -169,8 +169,6 @@
     <string name="warntext_links_default_firts">Primer aviso. Deja el spam</string>
     <string name="warntext_stickers_default_last">Ultimo aviso. Flood con stickers</string>
     <string name="warntext_banword_first">Primer aviso. El uso de palabras prohibidas no esta permitido</string>
-    <string name="warntext_bangame_first">Primera advertencia. Juegos están prohibidos en el chat</string>
-    <string name="warntext_banphoto_first">Primera advertencia. Flood de imágenes prohibida.</string>
     <string name="action_copy">Copiar</string>
     <string name="text_about_app">AdminTools for Telegram te ayudara a administrar tus grupos.</string>
     <string name="button_rate_us">Si te gusta esta app, haz click para puntuarla en google play</string>
@@ -179,7 +177,8 @@
     <string name="role_editor_description_supegroup">Admin puede invitar y prohibir usuarios, eliminar todos los mensajes de los usuarios, cambiar el avatar y el título del supergrupo</string>
     <string name="role_moderator_description_supergroup">El moderador solo puede borrar mensajes</string>
     <string name="toast_user_role_changed">Rol del usuario cambiada</string>
-    <string name="dialog_group_all_are_admins">Este grupo está marcado como Todos los miembros son administradores. \n¿Desea cambiar la administración del grupo sólo a los administradores?</string>
+    <string name="dialog_group_all_are_admins">Este grupo está marcado como Todos los miembros son administradores. 
+\n¿Desea cambiar la administración del grupo sólo a los administradores?</string>
     <string name="role_action_switch_continue">Cambiar y continuar</string>
     <string name="text_all_are_admins_group">Todos los miembros son admins</string>
     <string name="label_ban_for_time">Baneado por:</string>
@@ -194,8 +193,11 @@
     <string name="label_loading_chats_count">Cargando chats...</string>
     <string name="action_chats_info">Info de chats</string>
     <string name="action_open_group_link">Abrir grupo en Telegram</string>
+
+    <string name="app_thanks_to">Gracias a:</string>
+    <string name="thanks_to_list">Todo el equipo de traductores de transifex que ayudan a traducir la aplicación</string>
     <string name="text_notification_descr_background">Proceso en segundo plano</string>
-    <string name="description_user_within_time">Número de advertencias para el usuario dentro de: \n(Si el usuario no ha violado las reglas durante este tiempo, el conteo de advertencias se restablecerá)</string>
+    <string name="description_user_within_time">Número de advertencias para el usuario dentro de: \n (Si el usuario no ha violado las reglas durante este tiempo, el conteo de advertencias se restablecerá)</string>
     <string name="text_warn_no_warn_user">No avisar al usuario</string>
     <string name="text_warn_on_last_warn">En el último mensaje</string>
     <string name="text_warn_on_first_warn">En el primer mensaje</string>
@@ -203,7 +205,6 @@
     <string name="text_warn_on_second_and_last_warn">Segunda y última mensaje</string>
     <string name="text_warn_always">Advierte siempre</string>
     <string name="text_warn_count_for_user_before_ban">Advertencias para el usuario:</string>
-
     <string name="log_title_group">Grupo</string>
     <string name="log_title_username">Usuario</string>
     <string name="log_title_time">Tiempo</string>
@@ -230,6 +231,7 @@
     <string name="warntext_voice_default_first">Primer aviso. Las notas de voz están prohibidas.</string>
     <string name="hint_first_user_warning">El mensaje para la primera advertencia</string>
     <string name="hint_last_user_warning">Mensaje para la última advertencia</string>
+
     <string name="list_of_banned_words">Lista de palabras prohibidas en el chat</string>
     <string name="chk_remove_message_with_banword">Remover/Mensaje</string>
     <string name="chk_ban_user_with_banword">Ban/Usuario</string>
@@ -251,7 +253,7 @@
     <string name="banned_words_count">%d  palabras prohibidas para este chat</string>
     <string name="logAction_removedFloodMessage">Los mensajes con flood se eliminan</string>
     <string name="logAction_removedVoice">Mensaje de voz eliminado</string>
-    <string name="text_antispam_alert_title">AdminTools Bot ¡Alerta!</string>
+    <string name="text_antispam_alert_title">Alerta antispam!</string>
     <string name="caption_alerts_title">Título de alerta de Antispam</string>
     <string name="action_add_link_to_wl">Añadir un enlace a la lista de excepciones</string>
     <string name="title_warning_text_before_ban">Texto de advertencia antes de banear:</string>
@@ -278,10 +280,12 @@
     <string name="title_task_stickers">Stickers</string>
     <string name="title_task_voices">Voz</string>
     <string name="title_task_links">Tarea de enlaces (antispam)</string>
+    <string name="text_command_leave_not_error_creator">El creador no puede abandonar el canal</string>
+    <string name="text_command_execute_access_denied">Acceso denegado.\nSólo el administrador puede ejecutar este comando</string>
+    <string name="warntext_bangame_first">Primera advertencia. Juegos están prohibidos en el chat</string>
     <string name="warntext_bangame_last">Última advertencia. ¡Los juegos están prohibidos!</string>
     <string name="logAction_banForGame">Prohibición de compartir juegos</string>
     <string name="title_task_game">Juegos a través de @gamebot</string>
-    <string name="title_task_photos">fotos</string>
     <string name="chk_remove_messages_game">Eliminar los mensajes de los juegos</string>
     <string name="chkTitleBanForGames">Prohibición de Juegos</string>
     <string name="title_task_add_stickers">stikers</string>
@@ -291,11 +295,13 @@
     <string name="logAction_execCommandError">Error al ejecutar el comando</string>
     <string name="title_banwords">Palabras en la lista negra</string>
     <string name="title_flood_control">Control de flood</string>
+    <string name="warntext_banphoto_first">Primera advertencia. Flood de imágenes prohibida.</string>
     <string name="warntext_banphoto_last">Última advertencia. Detener el flood de fotos</string>
     <string name="logAction_banForPhotos">Prohibición de flood de fotos</string>
     <string name="title_task_add_photos">fotos</string>
     <string name="logAction_removedGameMessage">Mensaje del juego eliminado</string>
     <string name="logAction_removedPhoto">Mensaje de foto eliminado</string>
+    <string name="title_task_photos">fotos</string>
     <string name="chk_remove_messages_photos">Eliminar mensajes con Fotos</string>
     <string name="chkTitleBanForPhotos">Prohibición de imágenes</string>
     <string name="title_task_docs">documentos</string>
@@ -342,10 +348,7 @@
     <string name="toast_user_added_to_muted">Usuario agregado para silenciar</string>
     <string name="toast_user_removed_from_muted">Usuario eliminado del silencio</string>
 
-    <string name="dialog_recent_changes">New in v. %s 
-\n[+] temporary mute user instead of ban for attachments flood
-\n[+] search in user list
-\n[*] some fixes</string>
+
     <string name="btnSendNewSmsCode">Reenviar el código SMS</string>
     <string name="btnRequestAuthCall">Solicitar una llamada para autentificar</string>
     <string name="title_chat_in_readonly_mode">Notificar a los miembros que el chat está en modo de sólo lectura:</string>
@@ -355,6 +358,7 @@
     <string name="btnSend">Enviar</string>
     <string name="chkMuteAllMembers">Silenciar a todos excepto a los administradores</string>
     <string name="chkMuteJoinedMembers">Silenciar a todos los nuevos usuarios</string>
+    <string name="logAction_sendViaBotError">Error al enviar el mensaje vía bot</string>
     <string name="text_bot_not_selected">Bot no seleccionado</string>
     <string name="text_send_notifications_as_bot">Enviar notificaciones como Bot</string>
     <string name="text_select_bot_none">Seleccione Ninguno para desactivar el bot para este grupo</string>
@@ -367,7 +371,7 @@
     <string name="text_mute_user_now">Debe activar la tarea Silencio en la configuración de chat para silenciar al usuario. \n¿Aceptar ahora?</string>
     <string name="btnSkip">Ir al contenido</string>
     <string name="text_chat_title">Titulo:</string>
-    <string name="text_hint_cmd_change_title">Por favor, especifique el título del chat después del comando. \nEjemplo:</string>
+    <string name="text_hint_cmd_change_title">Por favor, especifique el título del chat después del comando. \Ejemplo:</string>
     <string name="text_confirm_select_group_for_logging">¿Configurar este grupo para reenviar eventos de registro?</string>
     <string name="logAction_userTitleChanged">El usuario ha cambiado el nombre del grupo</string>
     <string name="logAction_gameFloodWarn">Avisar al usuario del flood del juego</string>
@@ -379,22 +383,24 @@
     <string name="btn_backup_restore_settings">Restaurar a partir de copia de seguridad</string>
     <string name="text_backup_restore_description">Seleccione el archivo de copia de seguridad de sdcard para restaurar. ¡Todas las tareas existentes para chats serán sobrescritas!</string>
     <string name="text_backup_saved">Archivo guardado en \'%s\'.\n\n¿Quiere guardar la copia de seguridad en Telegram Cloud Storage?</string>
-    <string name="toast_user_was_removed">El usuario ha sido excluido de la conversación. \no será capaz de volver otra vez si quiere</string>
+    <string name="toast_user_was_removed">El usuario ha sido excluido de la conversación.\n No será capaz de volver otra vez si quiere</string>
+    <string name="toast_error_remove_user">Error en eliminar usuario</string>
     <string name="logAction_removedJoinMessage">Eliminar los mensajes del usuario que se una</string>
     <string name="chtTitlePublicBan">Publicar prohibición para chatear</string>
     <string name="logAction_removeLeaveMessage">Suprimir los mensajes que los miembros dejan en el chat</string>
-    <string name="text_dozen_battery_white_list_api23" >
-    <b> Nota: </b> Si la aplicación se suspende en segundo plano, debe agregarla a la lista blanca de Android Doze en
-    \n
-    <b> Configuración> Batería -> Menú -> Guardar </b>
-    \n
-    (O <b> Configuración -> Aplicaciones -> Opciones avanzadas -> Batería de ahorro </b>) y para excluir la aplicación de la lista de ahorro, de modo que pueda funcionar correctamente en el fondo.</string>
+    <string name="text_dozen_battery_white_list_api23"><b> Nota: </b> Si la aplicación se suspende en segundo plano, debe agregarla a la lista blanca de Android Doze en
+        \n<b> Configuración> Batería -> Menú -> Guardar </b>
+        \n(O <b> Configuración -> Aplicaciones -> Opciones avanzadas -> Batería de ahorro </b>) y para excluir la aplicación de la lista de ahorro, de modo que pueda funcionar correctamente en el fondo.</string>
+    <string name="text_battery_optimization_state_disabled">Estado actual: Ok. Optimización de la aplicación inhabilitada</string>
+    <string name="text_battery_optimization_state_enabled">Estado actual: optimización de la aplicación habilitada. La aplicación puede detener el trabajo en segundo plano</string>
     <string name="text_note_battery_optimization"><b>Nota:</b> <font color='#009688'>Optimizacion de bateria</font></string>
     <string name="toast_bottoken_is_empty">Ingrese primero el token</string>
     <string name="chtTitleMuteInsteadBan">Mute en vez de prohibir</string>
     <string name="logAction_userWasMuted">El usuario se silenció por enviar mensajes de tipo</string>
-    <string name="logAction_userWasUnMuted">El usuario será desilenciado después que el baneo expire.</string>
+    <string name="logAction_userWasUnMuted">El usuario se le quita el silencio después de que el baneo expire.</string>
+    <!-- Date Format patterns https://developer.android.com/reference/java/text/SimpleDateFormat.html -->
     <string name="dateformat_full">d MMMM, aaaa hh:mm:ss</string>
+    <string name="status_online">En linea</string>
     <string name="title_dialog_welcome_message">Mensaje de bienvenida</string>
     <string name="dialog_title_help_formatting">Ayuda de formato</string>
     <string name="btnOk">De acuerdo</string>
@@ -404,26 +410,12 @@
     <string name="btn_main_show_admin_groups">Mostrar grupos administrados</string>
     <string name="btn_main_stop_app">Detener la aplicación</string>
     <string name="btn_main_run_app">Ejecutar aplicación</string>
-
-    <string name="app_thanks_to">Gracias a:</string>
-    <string name="thanks_to_list">Todo el equipo de traductores de transifex que ayudan a traducir la aplicación</string>
-
-    <string name="logAction_sendViaBotError">Error al enviar el mensaje vía bot</string>
-    <string name="textChatRole">Rol:</string>
-    <string name="status_online">En linea</string>
-    <string name="toast_error_remove_user">Error en eliminar usuario</string>
-    <string name="text_command_leave_not_error_creator">El creador no puede abandonar el canal</string>
-    <string name="text_command_execute_access_denied">Acceso denegado.\nSólo el administrador puede ejecutar este comando</string>
-    <string name="text_battery_optimization_state_disabled">Estado actual: Ok. Optimización de la aplicación inhabilitada</string>
-    <string name="text_battery_optimization_state_enabled">Estado actual: optimización de la aplicación habilitada. La aplicación puede detener el trabajo en segundo plano</string>
-
     <string-array name="ban_times">
         <item>Min.</item>
         <item>Hora.</item>
         <item>Días.</item>
         <item>Meses.</item>
     </string-array>
-
 
     <string-array name="auto_ban_times">
         <item>Eternidad</item>
@@ -459,10 +451,9 @@
     </string-array>
 
     <string-array name="muted_users_plural">
-        <item>Mensaje eliminado del usuario silenciado</item><!-- 1 command -->
-        <item>Usuario silenciado</item><!-- 2 commands -->
-        <item>usuarios silenciados</item><!-- 5 commands -->
+        <item>Mensaje eliminado del usuario silenciado</item><!-- 1 item -->
+        <item>Usuario silenciado</item><!-- 2 items -->
+        <item>usuarios silenciados</item><!-- 5 items -->
     </string-array>
-
 
 </resources>

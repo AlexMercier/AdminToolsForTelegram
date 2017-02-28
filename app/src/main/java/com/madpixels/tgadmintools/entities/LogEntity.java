@@ -91,7 +91,7 @@ public class LogEntity {
                 logTime = String.format("%s: %s", TaskValues.getString(R.string.log_title_time),
                         CommonUtils.tsToDate(json.optLong("ts") / 1000));
             if (userId != 0)
-                userIdText = String.format("User id: %s\n", userId);
+                userIdText = String.format("%s: %s\n", TaskValues.getString(R.string.log_title_user_id), userId);
 
             actionTitle = TaskValues.getString(TaskValues.getTitleLogAction(action), action.name());
 
@@ -208,8 +208,8 @@ public class LogEntity {
                     break;
                 case RemoveMuted:
                     String message = json.optString("payload");
-                    logMsg = chatTitle + userIdText + "Message: " + message + "\n" + userFullName + logTime;
-
+                    message = String.format("%s: %s\n", TaskValues.getString(R.string.log_title_message), message);
+                    logMsg = chatTitle + userIdText + message + userFullName + logTime;
                     break;
 
                 case RemoveJoinMessage:
@@ -315,12 +315,12 @@ public class LogEntity {
                     break;
 
                 case BOT_ERROR:
-                    logMsg ="Chat id: " + json.optLong("chatId") + "\n" +
+                    logMsg = "Chat id: " + json.optLong("chatId") + "\n" +
                             "Error code: " + json.optInt("error_code") + "\n" +
-                            logTime+
+                            logTime +
                             "Error: " + json.optString("description");
-                    if(json.has("payload"))
-                        logMsg+="\nMessage body:\n"+json.optString("payload")+"\n";
+                    if (json.has("payload"))
+                        logMsg += "\nMessage body:\n" + json.optString("payload") + "\n";
 
                     break;
 

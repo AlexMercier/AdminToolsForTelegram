@@ -80,11 +80,11 @@ public class ActivityLogView extends ActivityExtended {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem i = menu.add(0, 1, 0, R.string.action_show_log_notification);
+        MenuItem i = menu.add(0, R.string.action_show_log_notification, 0, R.string.action_show_log_notification);
         i.setCheckable(true);
         i.setChecked(Sets.getBoolean(Const.NOTIFICATION_LOG, true));
 
-        menu.add(0, 2, 0, R.string.action_clear_log);
+        menu.add(0, R.string.action_clear_log, 0, R.string.action_clear_log);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -92,13 +92,13 @@ public class ActivityLogView extends ActivityExtended {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case 1:
+            case R.string.action_show_log_notification:
                 item.setChecked(!item.isChecked());
                 Sets.set(Const.NOTIFICATION_LOG, item.isChecked());
                 break;
-            case 2:
+            case R.string.action_clear_log:
                 new AlertDialog.Builder(mContext)
-                        .setTitle("Confirm")
+                        .setTitle(R.string.title_dialog_confirm)
                         .setMessage(R.string.action_clear_log)
                         .setNegativeButton(R.string.btnCancel, null)
                         .setPositiveButton(R.string.btnYes, new DialogInterface.OnClickListener() {
@@ -152,7 +152,7 @@ public class ActivityLogView extends ActivityExtended {
                 menu.add(0, 4, 0, R.string.action_open_userninfo);
         }
         if(log.action== LogUtil.Action.BOT_ERROR)
-            menu.add(0, 6, 0, "Copy Message");
+            menu.add(0, 6, 0, R.string.action_copy_log_text);
 
         menu.add(0, 3, 0, R.string.action_copy);
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -196,7 +196,7 @@ public class ActivityLogView extends ActivityExtended {
                 String text;
                 text = log.getTitle() + "\n" + log.getLogText();
                 Utils.copyToClipboard(text, mContext);
-                MyToast.toast(mContext, "Text copied");
+                MyToast.toast(mContext, R.string.toast_copied_to_clipboard);
                 break;
             case 4:
                 String link = "https://telegram.me/" + log.username;

@@ -20,13 +20,13 @@ android {
         applicationId "com.madpixels.tgadmintools"
         minSdkVersion 11
         targetSdkVersion 23
-        versionCode 84
+        versionCode 86
         if(arch=="v7a" || arch=="all"){
             versionCode versionCode + 1
         }
-        versionName "1.0.7"
+        versionName "1.0.7.1 beta"
 
-        def buildDate = "22.01.2017"
+        def buildDate = "01.03.2017"
         resValue "string", "buildDate", buildDate
     }
 
@@ -68,7 +68,7 @@ android {
             jniDebuggable false
             minifyEnabled false
             shrinkResources false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
         }
     }

@@ -176,8 +176,6 @@ public class ActivityChatUsers extends ActivityExtended {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, 101, 0, R.string.action_remove_deleted_users);
-
         MenuItem item = menu.add(0, 102, 0, R.string.title_search);
         item.setIcon(android.R.drawable.ic_menu_search);
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
@@ -188,9 +186,6 @@ public class ActivityChatUsers extends ActivityExtended {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case 101:
-                dialogAcceptRemoveUsers();
-                break;
             case 102:
                 dialogSearch();
                 break;
@@ -564,9 +559,19 @@ public class ActivityChatUsers extends ActivityExtended {
                 TgH.send(f, new Client.ResultHandler() {
                     @Override
                     public void onResult(TdApi.TLObject object) {
-                        MyToast.toastL(mContext, TgUtils.isOk(object) ? R.string.toast_user_was_removed : R.string.toast_error_remove_user);
+                        String msg;
+                        if(!TgUtils.isOk(object)){
+                            TdApi.Error e = (TdApi.Error) object;
+                            msg = getString(R.string.toast_error_remove_user);
+                            msg+="\n"+e.message;
+                            MyToast.toastL(mContext, msg);
+                        }else{
+                            msg = getString(R.string.toast_user_was_removed);
+                            MyToast.toast(mContext, msg);
+                        }
+
                         if (TgUtils.isOk(object)) {
-                            runOnUiThread(new Runnable() {
+                            onUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     mAdapter.getList().remove(user);
@@ -574,7 +579,6 @@ public class ActivityChatUsers extends ActivityExtended {
                                 }
                             });
                         }
-
                     }
                 });
             }
@@ -908,156 +912,6 @@ public class ActivityChatUsers extends ActivityExtended {
 
 
     }
-
-    void dialogAcceptRemoveUsers() {
-        new AlertDialog.Builder(mContext)
-                .setTitle("Clear deleted accounts")
-                .setMessage(R.string.deleted_accounts_hint)
-                .show();
-        if (true)
-            return;
-    /*
-        new AlertDialog.Builder(mContext)
-                .setTitle("Deleted accounts")
-                .setMessage("Scan for remove deleted accounts from chat.\n" +
-                        "Continue?")
-                .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton(R.string.btnContinue, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        new RemoveDeletedUsersProcess().start();
-                    }
-                })
-                .show();
-                */
-    }
-
-    /*
-    private class RemoveDeletedUsersProcess {
-        int offset = 0;
-        //int removed = 0;
-        ArrayList<TdApi.ChatParticipant> deletedUsers = new ArrayList<>();
-        int errorsCount = 0;
-        ProgressDialog prgDialog;
-        boolean isCancelled = false;
-
-        void start() {
-            showLoading("Scanning...please wait");
-            process();
-        }
-
-        void showLoading(final String msg) {
-            prgDialog = new ProgressDialogBuilder(mContext)
-                    .setMessage(msg)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            isCancelled = true;
-                        }
-                    })
-                    .show();
-        }
-
-        void process() {
-            TgH.send(new TdApi.GetChannelParticipants(channel_id, new TdApi.ChannelParticipantsRecent(), offset, 200), new Client.ResultHandler() {
-                @Override
-                public void onResult(TdApi.TLObject object) {
-                    if (object.getConstructor() != TdApi.ChatParticipants.CONSTRUCTOR) {
-                        error(object);
-                        return;
-                    }
-                    TdApi.ChatParticipants users = (TdApi.ChatParticipants) object;
-                    offset += users.participants.length;
-                    for (TdApi.ChatParticipant user : users.participants) {
-                        if (isCancelled) return;
-                        if (user.user.type.getConstructor() == TdApi.UserTypeDeleted.CONSTRUCTOR) {
-                            deletedUsers.add(user);
-                            MyLog.log("deleted user: " + user.toString());
-                        }
-                    }
-
-                    if (isCancelled) return;
-                    if (users.participants.length == 200)
-                        process(); // next loop
-                    else
-                        onUiThread(scanComplete);
-                }
-            });
-        }
-
-        Runnable scanComplete = new Runnable() {
-            @Override
-            public void run() {
-                prgDialog.dismiss();
-                if (deletedUsers.isEmpty()) {
-                    new AlertDialog.Builder(mContext)
-                            .setTitle("Deleted accounts")
-                            .setMessage("This chat has no deleted accounts")
-                            .setNegativeButton(R.string.close, null)
-                            .setCancelable(false)
-                            .show();
-                    return;
-                }
-
-                new AlertDialog.Builder(mContext)
-                        .setTitle("Deleted accounts")
-                        .setMessage(getString(R.string.founded_deleted_users, deletedUsers.size()))
-                        .setNegativeButton(R.string.cancel, null)
-                        .setCancelable(false)
-                        .setPositiveButton(R.string.btnContinue, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                showLoading("Deleting...please wait");
-                                removeUserNext();
-                            }
-                        })
-                        .show();
-            }
-        };
-
-
-        private void removeUserNext() {
-            if (isCancelled) return;
-            if (deletedUsers.isEmpty()) onUiThread(onComplete);
-            TdApi.ChatParticipant user = deletedUsers.remove(0);
-
-            final TdApi.TLFunction f = new TdApi.ChangeChatParticipantRole(chat_id, user.user.id, new TdApi.ChatParticipantRoleLeft());
-            TgH.TG().send(f, new Client.ResultHandler() {
-                @Override
-                public void onResult(TdApi.TLObject object) {
-                    if (TgUtils.isError(object))
-                        errorsCount++;
-                    removeUserNext();
-                }
-            });
-        }
-
-        Runnable onComplete = new Runnable() {
-            @Override
-            public void run() {
-                prgDialog.dismiss();
-                new AlertDialog.Builder(mContext)
-                        .setTitle("Deleted users")
-                        .setMessage("Operation complete.\n" + (errorsCount > 0 ? "Error " + errorsCount : ""))
-                        .setPositiveButton("Close", null)
-                        .setCancelable(false)
-                        .show();
-            }
-        };
-
-
-        private void error(TdApi.TLObject object) {
-            MyToast.toast(mContext, object.toString());
-            onUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    prgDialog.dismiss();
-                }
-            });
-        }
-    }
-    */
 
     void addUserToMuted(TdApi.User user) {
         DBHelper.getInstance().addMutedUser(chat_id, user.id, user.username);

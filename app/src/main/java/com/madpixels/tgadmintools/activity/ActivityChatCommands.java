@@ -57,7 +57,7 @@ public class ActivityChatCommands extends ActivityExtended {
         setContentView(R.layout.activity_commands_list);
         // UIUtils.setActionBarWithBackArrow(this);
         UIUtils.setToolbarWithBackArrow(this, R.id.toolbar);
-        setTitle("Chat commands");
+        setTitle(R.string.title_chat_commands);
 
         Bundle b = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();
         chatId = b.getLong("chat_id");

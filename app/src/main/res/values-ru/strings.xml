@@ -24,7 +24,6 @@
     <string name="action_ban_user">Забанить</string>
     <string name="action_set_as_admin">Назначить админом</string>
     <string name="action_remove_user_from_chat">Убрать из чата</string>
-    <string name="action_remove_deleted_users">Очистить чат от удалённых пользователей</string>
     <string name="action_manage_group">Управление группой</string>
     <string name="action_manage_chat_users">Управление пользователями</string>
     <string name="action_banlist">Бан-лист</string>
@@ -80,7 +79,6 @@
     <string name="logAction_stickersFloodWarn">Предупреждение пользователя о стикер-флуде</string>
     <string name="logAction_linksFloodWarn">Предупреждение пользователя о бане за спам</string>
     <string name="text_publish_banreason" formatted="false">Пользователь %username% был забанен по причине: %reason%</string>
-    <string name="deleted_accounts_hint">В Телеграме нельзя удалить из списка удалённые аккаунты. Просто ждите, они сами пропадут примерно через неделю</string>
     <string name="action_log">Журнал событий</string>
     <string name="action_change_user">Сменить учетную запись</string>
     <string name="title_activity_banlist">Забаненные</string>
@@ -345,12 +343,7 @@
     <string name="toast_user_added_to_muted">Пользователь добавлен в рид-онли</string>
     <string name="toast_user_removed_from_muted">Пользователь удалён из рид-онли</string>
 
-    <string name="dialog_recent_changes">
-        Новое в v.%s
-        \n[+] добавление юзера в read-only вместо бана при флуде вложениями
-        \n[+] поиск по списку юзеров чата
-        \n[*] всякие фиксы
-    </string>
+
     <string name="btnSendNewSmsCode">Отправить код по SMS</string>
     <string name="btnRequestAuthCall">Запросить звонок с кодом</string>
     <string name="title_chat_in_readonly_mode">Уведомить пользователей что чат переведён в режим рид-онли:</string>
@@ -419,6 +412,13 @@
     <string name="text_command_execute_access_denied">Access denied.\nOnly admin can execute this command</string>
     <string name="text_battery_optimization_state_disabled">Current State: Ok. App optimization disabled</string>
     <string name="text_battery_optimization_state_enabled">Current State: App optimization enabled. App may stop work in the background</string>
+    <string name="title_dialog_chat_stats">Статистика чатов</string>
+    <string name="title_forbidden_words">Запрещённые слова</string>
+    <string name="btn_switch_muted_members">Рид-онли юзеры</string>
+    <string name="btn_switch_all_users">Все участники</string>
+    <string name="chkSendLogToChat">Пересылать лог в чат</string>
+    <string name="text_select_chat_to_forward_log">Выберите чат в который пересылать события лога</string>
+    <string name="toast_auth_input_is_empty">Это поле не может быть пустым</string>
 
     <string-array name="ban_times">
         <item>Мин.</item>

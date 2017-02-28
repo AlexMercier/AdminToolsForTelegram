@@ -52,7 +52,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Version:"
+                    android:text="@string/text_version"
                     android:id="@+id/textView25"
                     android:textStyle="bold" />
 
@@ -73,7 +73,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Release date:"
+                    android:text="@string/text_release_date"
                     android:textStyle="bold" />
 
                 <TextView
@@ -107,13 +107,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Contacts for any question:"
+                    android:text="@string/text_contact_for_feedback"
                     android:textStyle="bold" />
 
                 <TextView android:textColor="@color/text_clickable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="send message"
+                    android:text="open"
                     android:id="@+id/tvContact"
                     android:layout_marginLeft="4dp" />
             </LinearLayout>
@@ -121,7 +121,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Telegram login: @alexmadd"
+                android:text="My login: @alexmadd"
                 android:textStyle="bold" />
 
 
@@ -152,7 +152,7 @@
             <TextView android:textStyle="bold" android:layout_marginTop="8dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sources:"/>
+                android:text="@string/text_source_code"/>
 
             <TextView android:textColor="@color/text_clickable"
                 android:layout_width="wrap_content"

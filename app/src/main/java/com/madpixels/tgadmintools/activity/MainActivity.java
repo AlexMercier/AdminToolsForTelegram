@@ -82,7 +82,7 @@ public class MainActivity extends ActivityExtended {
             btnClearCache.setVisibility(View.GONE);
             checkBoxWriteLog.setVisibility(View.GONE);
         }
-        tvAdditionalStatus.setText("Checking auth...");
+        tvAdditionalStatus.setText(R.string.text_checking_auth);
         final TextView textViewAppState = getView(R.id.textViewAppState);
 
         btnGroups.setOnClickListener(new View.OnClickListener() {
@@ -209,7 +209,7 @@ public class MainActivity extends ActivityExtended {
         menu.add(0, 100, 0, R.string.action_settings);
         menu.add(0, 101, 0, R.string.action_log);
         menu.add(0, 102, 0, R.string.action_change_user);
-        menu.add(0, 103, 0, "About");
+        menu.add(0, 103, 0, R.string.action_about_app);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -304,14 +304,14 @@ public class MainActivity extends ActivityExtended {
                     return;
                 }
 
-                tvAdditionalStatus.setText("Requared sms code...");
+                tvAdditionalStatus.setText("Required sms code...");
                 showLoginDialog(authState.getConstructor(), stateWaitCode.nextCodeType);
                 break;
             case TdApi.AuthStateWaitPhoneNumber.CONSTRUCTOR:
                 showLoginDialog(authState.getConstructor());
                 break;
             case TdApi.AuthStateWaitPassword.CONSTRUCTOR:
-                tvAdditionalStatus.setText("Requared login password...");
+                tvAdditionalStatus.setText("Required login password...");
                 showLoginDialog(authState.getConstructor());
                 break;
             case TdApi.AuthStateOk.CONSTRUCTOR:
@@ -372,7 +372,7 @@ public class MainActivity extends ActivityExtended {
         showLoginDialog(action, null);
     }
 
-    private void showLoginDialog(final int action, TdApi.AuthCodeType nextAuthCodeType) {
+    private void showLoginDialog(final int action, final TdApi.AuthCodeType nextAuthCodeType) {
         final View view = getLayoutInflater().inflate(R.layout.dialog_login, null);
         final AlertDialog d = new AlertDialog.Builder(this)
                 .setCancelable(false)
@@ -442,6 +442,10 @@ public class MainActivity extends ActivityExtended {
             @Override
             public void onClick(View v) {
                 String text = eEditText.getText().toString();
+                if(text.isEmpty()){
+                    showLoginDialog(action, nextAuthCodeType);
+                    MyToast.toast(mContext, R.string.toast_auth_input_is_empty);
+                }
 
                 TdApi.TLFunction func = null;
                 switch (action) {

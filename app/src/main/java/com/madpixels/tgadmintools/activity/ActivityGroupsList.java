@@ -168,7 +168,7 @@ public class ActivityGroupsList extends ActivityExtended {
                                 "Moderation groups: " + chatsInfo.admin_groups_count + "\n" +
                                 "Moderation channels: " + chatsInfo.admin_channels_count;
                 new AlertDialog.Builder(mContext)
-                        .setTitle("Chats stat")
+                        .setTitle(R.string.title_dialog_chat_stats)
                         .setMessage(text)
                         .setPositiveButton("Ok", null)
                         .show();
